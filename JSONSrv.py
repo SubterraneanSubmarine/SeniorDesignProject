@@ -3,7 +3,7 @@
 
 # Timer and HostController for fetching/pushing data to Xbee3 Network
 
-
+# Tested in Python3.7 and 3.4(RPi)
 
 # Builtin Webserver of python being used to serve/recieve JSON Payloads
 # Inspiration for this code sourced from GitHub user: Nitaku
@@ -17,6 +17,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import json
 import cgi
+
 
 
 class PiSrv(BaseHTTPRequestHandler):
@@ -35,7 +36,8 @@ class PiSrv(BaseHTTPRequestHandler):
     # PythonHTTPServer function name
     def do_GET(self):
         self.set_header()
-        self.wfile.write(json.dumps({"hello": "world", "received": "ok"}).encode("utf-8"))
+#TODO Outline/detail what information should be returned upon a get request
+        self.wfile.write(json.dumps({"get": "request", "received": "ok"}).encode("utf-8"))
  
 
 
@@ -47,22 +49,19 @@ class PiSrv(BaseHTTPRequestHandler):
         
         # refuse to receive non-json content
         if ctype != 'application/json':
-            self.send_response(400)
-            self.end_headers()
-            self.wfile.write("Error: Expected \'application/json\' header.".encode("utf-8"))
+            self.send_error(400, "Expected \'application/json\' header")
             return
             
-        # read the message and convert it into a python dictionary        
-        length = int(self.headers.get("content-length"))
-        print("hummmm:"+json.loads(json.dumps(self.rfile.read(length).decode('utf-8'))))
-        message = json.loads(self.rfile.read(length))
+        # read the message content and convert it into a python dictionary        
+        body = self.rfile.read( int(self.headers.get("content-length")) ).decode("utf-8")
+        message = json.loads(body)
         
-        # add a property to the object, just to mess with data
-        message["received"] = "ok"
+#TODO Process the JSON payload      # message["received"] = "ok"
         
-        # send the message back
+        
+        # Send reply
         self.set_header()
-        self.wfile.write(json.dumps(message).encode("utf-8"))
+        self.wfile.write(json.dumps({"post": "request", "received": "ok"}).encode("utf-8"))
 
 
 # From Python documentaion: https://docs.python.org/3/library/http.server.html
@@ -73,6 +72,4 @@ def run(server_class=HTTPServer, handler_class=PiSrv, port=8008):
     httpd.serve_forever()
 
 if __name__=='__main__':
-    print('hello')
-    server_class=HTTPServer
     run()
