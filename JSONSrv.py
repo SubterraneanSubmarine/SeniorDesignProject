@@ -37,6 +37,7 @@ class PiSrv(BaseHTTPRequestHandler):
     def do_GET(self):
         self.set_header()
 #TODO Outline/detail what information should be returned upon a get request
+        # Get data from GPIO \ stored data
         self.wfile.write(json.dumps({"get": "request", "received": "ok"}).encode("utf-8"))
  
 
@@ -57,19 +58,29 @@ class PiSrv(BaseHTTPRequestHandler):
         message = json.loads(body)
         
 #TODO Process the JSON payload      # message["received"] = "ok"
-        
+        # Get data from GPIO \ stored data
+        # Push data from message to GPIO \ store it for later pushing(?)
         
         # Send reply
         self.set_header()
         self.wfile.write(json.dumps({"post": "request", "received": "ok"}).encode("utf-8"))
 
 
+
 # From Python documentaion: https://docs.python.org/3/library/http.server.html
 def run(server_class=HTTPServer, handler_class=PiSrv, port=8008):
-    server_address = ('', port)
-    httpd = server_class(server_address, handler_class)
-    print('Starting httpd on port ', port)
-    httpd.serve_forever()
+    server_address = ('', port) #listen on any IP-Address\Interface but only on the given port
+    RPiSrv = server_class(server_address, handler_class)
+    print('Starting RPiSrv on port ', port)
+    try:
+        RPiSrv.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    RPiSrv.shutdown()
+    RPiSrv.server_close()
 
 if __name__=='__main__':
+#TODO Parse cmdline args.
+#TODO Create a help\useage output
     run()
+    print("Server Stopped.\n")
