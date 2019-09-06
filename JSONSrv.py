@@ -1,7 +1,7 @@
 # David Carlson & Bryce Martin
 # ECE 4800 Senior Design Project
 
-# Timer and HostController for fetching/pushing data to Xbee3 Network
+# This file contains the server for fetching/pushing data
 
 # Tested in Python3.7 and 3.4(RPi)
 
@@ -17,7 +17,24 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import json
 import cgi
+import Jarvis
 
+
+# Jarvis.TimerTriggering.get("DayOfWeek")[index] -> [True|False] | starttime | endtime
+# Jarvis.TimerTriggering.get("DayOfWeek")[index] = newvalue
+
+# Jarvise.SensorStats[index].get("Zone | Moisture | Tempurature | Power") = newvalue
+
+# Jarvis.MainController.get("Wind | Rain | Tempurature") = newvalue
+
+
+AvailablePaths = [
+    "/TimerControl/Enable/",
+    "/TimerControl/Disable/",
+    "/TimerControl/DaysZonesTimes/",
+    "/TimerControl/Thresholds/",
+    "/Xbee3/Dump"
+]
 
 
 class PiSrv(BaseHTTPRequestHandler):
@@ -26,50 +43,70 @@ class PiSrv(BaseHTTPRequestHandler):
         self.send_header("Content-type", "application/json")
         self.end_headers()
 
-
     # PythonHTTPServer function name
     def do_HEAD(self):
         self.set_header()
-        
 
-    # GET sends back a Hello world message
+    # GET replys with data
     # PythonHTTPServer function name
     def do_GET(self):
         self.set_header()
 #TODO Outline/detail what information should be returned upon a get request
         # Get data from GPIO \ stored data
-        self.wfile.write(json.dumps({"get": "request", "received": "ok"}).encode("utf-8"))
- 
-
-
+        self.wfile.write(json.dumps(
+            {"get": "request", "received": "ok"}).encode("utf-8"))
 
     # POST echoes the message adding a JSON field
     # PythonHTTPServer function name
     def do_POST(self):
+
         ctype, pdict = cgi.parse_header(self.headers.get_content_type())
-        
         # refuse to receive non-json content
         if ctype != 'application/json':
             self.send_error(400, "Expected \'application/json\' header")
             return
-            
-        # read the message content and convert it into a python dictionary        
-        body = self.rfile.read( int(self.headers.get("content-length")) ).decode("utf-8")
-        message = json.loads(body)
-        
-#TODO Process the JSON payload      # message["received"] = "ok"
-        # Get data from GPIO \ stored data
-        # Push data from message to GPIO \ store it for later pushing(?)
-        
-        # Send reply
-        self.set_header()
-        self.wfile.write(json.dumps({"post": "request", "received": "ok"}).encode("utf-8"))
 
+        requestPath = self.path
+        if requestPath in AvailablePaths:
+            # read the message content and convert it into a python dictionary
+            serializedBodyData = self.rfile.read(
+                int(self.headers.get("content-length"))).decode("utf-8")
+            bodyData = json.loads(serializedBodyData)
+
+            # "/TimerControl/Enable/"
+            if requestPath == AvailablePaths[0]:
+                print("#TODO")
+            # "/TimerControl/Disable/"
+            if requestPath == AvailablePaths[1]:
+                print("#TODO")
+            # "/TimerControl/DaysZonesTimes/"
+            if requestPath == AvailablePaths[2]:
+                print("#TODO")
+            # "/TimerControl/Thresholds/"
+            if requestPath == AvailablePaths[3]:
+                print("#TODO")
+            # "/Xbee3/Dump"
+            if requestPath == AvailablePaths[4]:
+                print("#TODO")
+
+#TODO Process the JSON payload      # message["received"] = "ok"
+#TODO JSON for TempDisable (?)
+
+            # Get data from GPIO \ stored data
+            # Push data from message to GPIO \ store it for later pushing(?)
+
+            # Send reply
+            self.set_header()
+            self.wfile.write(json.dumps(
+                {"post": "request", "received": "ok"}).encode("utf-8"))
+        else:
+            self.send_error(400, "Unexpected Path")
 
 
 # From Python documentaion: https://docs.python.org/3/library/http.server.html
 def run(server_class=HTTPServer, handler_class=PiSrv, port=8008):
-    server_address = ('', port) #listen on any IP-Address\Interface but only on the given port
+    # listen on any IP-Address\Interface but only on the given port
+    server_address = ('', port)
     RPiSrv = server_class(server_address, handler_class)
     print('Starting RPiSrv on port ', port)
     try:
@@ -79,8 +116,9 @@ def run(server_class=HTTPServer, handler_class=PiSrv, port=8008):
     RPiSrv.shutdown()
     RPiSrv.server_close()
 
-if __name__=='__main__':
-#TODO Parse cmdline args.
-#TODO Create a help\useage output
+
+if __name__ == '__main__':
+    #TODO Parse cmdline args.
+    #TODO Create a help\useage output
     run()
     print("Server Stopped.\n")
