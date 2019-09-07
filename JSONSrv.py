@@ -17,6 +17,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import json
 import cgi
+
 import Jarvis
 
 
@@ -75,19 +76,19 @@ class PiSrv(BaseHTTPRequestHandler):
 
             # "/TimerControl/Enable/"
             if requestPath == AvailablePaths[0]:
-                print("#TODO")
+                print("#TODO1")
             # "/TimerControl/Disable/"
             if requestPath == AvailablePaths[1]:
-                print("#TODO")
+                print("#TODO2")
             # "/TimerControl/DaysZonesTimes/"
             if requestPath == AvailablePaths[2]:
-                print("#TODO")
+                print("#TODO3")
             # "/TimerControl/Thresholds/"
             if requestPath == AvailablePaths[3]:
-                print("#TODO")
+                print("#TODO4")
             # "/Xbee3/Dump"
             if requestPath == AvailablePaths[4]:
-                print("#TODO")
+                print("#TODO5")
 
 #TODO Process the JSON payload      # message["received"] = "ok"
 #TODO JSON for TempDisable (?)
@@ -117,8 +118,3 @@ def run(server_class=HTTPServer, handler_class=PiSrv, port=8008):
     RPiSrv.server_close()
 
 
-if __name__ == '__main__':
-    #TODO Parse cmdline args.
-    #TODO Create a help\useage output
-    run()
-    print("Server Stopped.\n")
