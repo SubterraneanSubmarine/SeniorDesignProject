@@ -15,6 +15,18 @@ if platform == "linux":
 # Initial States of system
 
 SystemEnabled = False
+NewSensorData = False
+
+
+# Threshold values to prevent system from running
+# "Name": [CurrentSensorValue, TurnOffLimit]
+Thresholds = {
+    "Moisture": [0, 33], #TODO what is the max value of our sensor? How does that translate to moisture in soil
+    "Wind": [0, 5], #TODO The anemometer will return a small voltage range: What will be less-than-ideal wind?
+    "Temperature": [0, 32], #TODO What unit/standard should we use here? Celcius?
+    "Rain": [0, 5] #TODO say... mm (milimeters)?
+}
+
 
 # "Day": Active[bool], StartTime[int], EndTime[int]  -> (military time)
 # "Monday": [True, 0, 230] -> 0 == 12:00am, 230 == 2:30am, ... 2314 == 11:14pm
@@ -30,25 +42,27 @@ TimerTriggering = {
 }
 
 
-#TODO Talk with Bryce: Should we use classes/objects instead of complex varibles?  (Are they really that much differnet?)
-
 # List of Dictionaries
 # [ {"key": value, ...}, {...}, ...]
 SensorStats = [
-    #TODO get number of sensors from Xbee, and build this list up
-    # this is throw-away temp code
+#TODO get number of sensors from Xbee, and build this list up
+# this is throw-away temp code
+    {"MainController": 0,
+    "Wind": 5,
+    "Rain": 1,
+    "Temperature": 29},
     {"Zone": 0,
      "Moisture": 37,
-     "Temperature": 28,
-     "Power Level": 88},
+     "LightLevel": 28,
+     "PowerLevel": 88},
     {"Zone": 1,
      "Moisture": 70,
-     "Temperature": 24,
-     "Power Level": 75},
+     "LightLevel": 24,
+     "PowerLevel": 75},
     {"Zone": 2,
      "Moisture": 20,
-     "Temperature": 30,
-     "Power Level": 96}
+     "LightLevel": 30,
+     "PowerLevel": 96}
 ]
 
 #TODO OR do we merge the MainController into the list of Sensors?
