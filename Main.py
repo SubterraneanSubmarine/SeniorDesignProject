@@ -5,8 +5,11 @@
 # JSONServer, SprinklerControl, and Xbee3 interface
 
 # Tested in Python3.7 and 3.4(RPi)
+import threading
 
 import JSONSrv
+import Edith
+import Hal
 
 
 #TODO Question: Do I thread this?
@@ -25,5 +28,8 @@ import JSONSrv
 if __name__ == '__main__':
     #TODO Parse cmdline args.
     #TODO Create a help\useage output
-    JSONSrv.run()
+    #TODO Check for dependances (pyserial, pygpio, etc)
+    threading.Thread(Edith.SprinklerRunner())
+    threading.Thread(Hal.TalkToXbee())
+    threading.Thread(JSONSrv.run())
     print("Server Stopped.\n")

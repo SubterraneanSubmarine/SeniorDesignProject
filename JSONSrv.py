@@ -22,19 +22,12 @@ import cgi
 import Jarvis
 
 
-# Jarvis.TimerTriggering.get("DayOfWeek")[index] -> [True|False] | starttime | endtime
-# Jarvis.TimerTriggering.get("DayOfWeek")[index] = newvalue
-
-# Jarvise.SensorStats[index].get("Zone | Moisture | Tempurature | Power") = newvalue
-
-# Jarvis.MainController.get("Wind | Rain | Tempurature") = newvalue
-
-
 AvailablePaths = [
     "/TimerControl/State/",
     "/TimerControl/DaysZonesTimes/",
     "/TimerControl/Thresholds/",
-    "/Xbee3/Dump/"
+    "/Xbee3/Dump/",
+    "/DateTime/"  # TODO code in the datetime elements: We need to be able to set and read the date/time of RPi from android app
 ]
 
 
@@ -97,9 +90,11 @@ class PiSrv(BaseHTTPRequestHandler):
                         state = bodyData.get("State")
                         if state in ["True", "False"]:
                             if state == "True":
-                                Jarvis.SystemEnabled = True
+                                with Jarvis.lock:
+                                    Jarvis.SystemEnabled = True
                             elif state == "False":
-                                Jarvis.SystemEnabled = False
+                                with Jarvis.lock:
+                                    Jarvis.SystemEnabled = False
                             self.set_header()
                             # Send reply
                             self.wfile.write(json.dumps(
@@ -115,7 +110,8 @@ class PiSrv(BaseHTTPRequestHandler):
                         for key in bodyData.keys():
                             if len(bodyData[key]) == 3:
                                 if bool == type(bodyData[key][0]) and int == type(bodyData[key][1]) and int == type(bodyData[key][2]):
-                                    Jarvis.TimerTriggering[key] = bodyData[key]
+                                    with Jarvis.lock:
+                                        Jarvis.TimerTriggering[key] = bodyData[key]
                                 else:
                                     self.send_error(
                                         400, "Expected value type error")
@@ -133,7 +129,8 @@ class PiSrv(BaseHTTPRequestHandler):
                         for key in bodyData.keys():
                             if len(bodyData[key]) == 2:
                                 if int == type(bodyData[key][1]):
-                                    Jarvis.Thresholds[key][1] = bodyData[key][1]
+                                    with Jarvis.lock:
+                                        Jarvis.Thresholds[key][1] = bodyData[key][1]
                                 else:
                                     self.send_error(
                                         400, "Expected value type error")
@@ -149,7 +146,6 @@ class PiSrv(BaseHTTPRequestHandler):
                     self.send_error(400, "Post Not Available")
             else:
                 self.send_error(400, "No Content")
-#TODO Process the JSON payload      # message["received"] = "ok"
 #TODO JSON for TempDisable (?)
             # Get data from GPIO \ stored data
             # Push data from message to GPIO \ store it for later pushing(?)

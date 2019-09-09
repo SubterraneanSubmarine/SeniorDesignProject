@@ -1,16 +1,14 @@
 # David Carlson & Bryce Martin
 # ECE 4800 Senior Design Project
 
-# This File represents intractions of the Pi and (Xbee and Relays)
+# This File represents the globally accesed variables/objects/data
+# intractions of the Pi and (Xbee and Relays)
 # This will also save/load stored data.
 
 # Tested in Python3.7 and 3.4(RPi)
 
-from sys import platform
-if platform == "linux":
-    import gpiozero
-    import pyserial
-
+import threading
+lock = threading.Lock()
 
 # Initial States of system
 
