@@ -1,14 +1,18 @@
-# David Carlson & Bryce Martin
-# ECE 4800 Senior Design Project
+'''
+David Carlson & Bryce Martin
+ECE 4800 Senior Design Project
 
-# This File represents the globally accesed variables/objects/data
-# intractions of the Pi and (Xbee and Relays)
-# This will also save/load stored data.
+This File represents the globally accesed variables/objects/data
+intractions of the Pi and (Xbee and Relays)
+This will also save/load stored data.
 
-# Tested in Python3.7 and 3.4(RPi)
+Tested in Python3.7 and 3.4(RPi)
+'''
 
 import threading
-lock = threading.Lock()
+lock = threading.Lock()  # Mutex for threads to grab when changing values here
+
+ProgramRunning = True
 
 # Initial States of system
 
