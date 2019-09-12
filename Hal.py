@@ -10,9 +10,25 @@ Tested in Python3.7(Windows) and 3.4(RPi)
 from sys import platform
 if platform == "linux":
     import serial
+import json
 
 import Jarvis
 
+
+# The Xbee (under MicroPython API) forwards a byte object/string that
+# needs to be formated before we can manipulate it as a data object
+# We are 'JSON'ifying the data
+def ConvertToDict(string_or_bytes):
+    temp = str(string_or_bytes, "utf-8")
+    # Here is what the Xbee will send:
+    # {'profile': 49413, 'dest_ep': 232, 
+    #     'broadcast': False, 'sender_nwk': 38204,
+    #     'source_ep': 232, 'payload': b'Iteration: 12', 
+    #     'sender_eui64': b'\x00\x13\xa2\x00A\x99O\xcc',    ### NOTE This is the MAC Addr: A = 41, O = 4F
+    #     'cluster': 17}
+    temp = temp.replace("\'", "\"").replace("b\"", "\"").replace("\\", "\\\\").replace("False", "false").replace("True", "true")
+    temp = json.loads(temp)
+    return temp
 
 def TalkToXbee():
     if platform == "linux":
@@ -26,5 +42,7 @@ def TalkToXbee():
             pass
         while Jarvis.ProgramRunning:
             if port.inWaiting() > 0:
-                port.read(8)  # ready 8 bits (?) # TODO double check on this
-            # print("#TODO XBEE")
+                temp = ConvertToDict(port.readline())
+                for key, value in temp.items():
+                    print(key, " : ", value)
+                # TODO Take this object, check if the reporting node already exists in our 'database.' Do stuff with it

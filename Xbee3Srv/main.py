@@ -8,6 +8,7 @@ This file defines how a XBEE COORDINATOR behaves
 
 
 import xbee, time
+import json
 # Set the identifying string of the radio
 xbee.atcmd("NI", "Coordinator")
 # Configure some basic network settings
@@ -27,7 +28,11 @@ print("Operating network parameters:")
 for cmd in operating_network:
     print("{}: {}".format(cmd, xbee.atcmd(cmd)))
 
+temp = {}
 while True:
-    print(xbee.receive())  # This only prints the body/payload on the serial port!!!
-    time.sleep(10)
+    temp = xbee.receive()
+    if temp:
+        # for key, value in temp.items():
+        print(temp)
+        temp.clear()
 

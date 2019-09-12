@@ -41,7 +41,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
 
-    print("Program Starting...")
+    print("Program Starting... (Ctrl + C to stop)")
 
     # Create our threads that will run the system. (Save handles/ID's to list/array)
     threads = []
