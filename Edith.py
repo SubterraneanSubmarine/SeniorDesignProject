@@ -23,6 +23,7 @@ import Jarvis
 # TODO Look into the possible ways of seeting the RPi's time in linux, rather than python?
 # Perhaps we set the system with with python? -- or do we poll internet servers for time?
 # TODO using temp sensor values recorded through out a day, alter/change water duration based on daytime temperatures
+# TODO use moisture values/samples to dictate watering, instead of timmer stuff
 
 def SprinklerRunner():
     while Jarvis.ProgramRunning:

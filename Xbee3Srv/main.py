@@ -28,6 +28,17 @@ print("Operating network parameters:")
 for cmd in operating_network:
     print("{}: {}".format(cmd, xbee.atcmd(cmd)))
 
+# TODO Get/Read and send values about sensors connected to the coordinator to the RPi
+# And keep the formatting the same (if possible?)
+'''
+Please format any messages using the following style
+(because, I've dissected the payload using this formatting)
+
+# This yields a payload like this:  'payload': b'{'Iteration': 0, 'Value': 345, 'Zone': 2}'
+message = ("{'WindMeter': " + str(WindValue)
+         + ", 'ADCRead': " + str(pin30.read())
+         + ", 'Zone': " + str(zone) + "}")  # Multiline to read easier?
+'''
 temp = {}
 while True:
     temp = xbee.receive()
