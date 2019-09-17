@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SeniorDesignProject</string>
+    <string name="URL">Enter Addr.</string>
+    <string name="submit_button">Submit</string>
+</resources>
