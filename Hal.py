@@ -16,10 +16,6 @@ import re
 import Jarvis
 
 
-
-
-
-
 # The Xbee (under MicroPython API) forwards a byte object/string that
 # needs to be formated before we can manipulate it as a data object
 # We are 'JSON'ifying the data
@@ -44,7 +40,7 @@ def ConvertToDict(bytes_in):
     temp = temp.replace("\'", "\"").replace("b\"", "\"").replace("\\", "\\\\").replace("False", "false").replace("True", "true")
     payload = json.loads(payload)
     temp = json.loads(temp)
-    temp.update(payload) 
+    temp.update(payload)  # Merge dictionaries
     return temp  # Returns a nested Dictionary Object
 
 def TalkToXbee():
