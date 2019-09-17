@@ -12,5 +12,5 @@ The Basics:
 
 
 
-Eventually we will get an appropriate license typed out in here, but sufficit to say...  
+Eventually we will get an appropriate license typed out in here, but suffice it to say...  
 This is Open Source, and a current work in progress.
