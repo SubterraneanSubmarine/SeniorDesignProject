@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">SeniorDesignProject</string>
-    <string name="URL">Enter Addr.</string>
-    <string name="submit_button">Submit</string>
+    <string name="submit_button">Update</string>
+    <string name="timmer_button">View Current\\Basic Schedule</string>
+    <string name="sensorsView_button">View Sensor Stats</string>
 </resources>

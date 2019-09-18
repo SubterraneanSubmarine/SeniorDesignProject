@@ -11,35 +11,157 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/urlText"
-        app:layout_constraintVertical_bias="0.45" />
-
-    <EditText
-        android:id="@+id/urlText"
-        android:layout_width="253dp"
-        android:layout_height="43dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:inputType="textUri"
-        android:text="@string/URL"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:importantForAutofill="no" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:id="@+id/updateButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
         android:onClick="ButtonClick"
         android:text="@string/submit_button"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/urlText"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/connectStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="14dp"
+        android:padding="0sp"
+        android:paddingStart="1sp"
+        android:paddingLeft="0sp"
+        android:paddingTop="0sp"
+        android:paddingEnd="0sp"
+        android:paddingRight="0sp"
+        android:paddingBottom="0sp"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/constSrvTxt"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/constSrvTxt"
+        android:layout_width="105dp"
+        android:layout_height="14dp"
+        android:ems="10"
+        android:padding="0sp"
+        android:paddingStart="1sp"
+        android:paddingLeft="0sp"
+        android:paddingTop="0sp"
+        android:paddingEnd="0sp"
+        android:paddingRight="0sp"
+        android:paddingBottom="0sp"
+        android:text="Server Connection:"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/sysEnableLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="64dp"
+        android:text="System Enabled: "
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/moistureLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Av. Moisture: "
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/sysEnableLabel"
+        app:layout_constraintTop_toBottomOf="@+id/sysEnableLabel" />
+
+    <TextView
+        android:id="@+id/tempuratureLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Av. Temperature: "
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/moistureLabel"
+        app:layout_constraintTop_toBottomOf="@+id/moistureLabel" />
+
+    <TextView
+        android:id="@+id/windLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Current Wind: "
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/tempuratureLabel"
+        app:layout_constraintTop_toBottomOf="@+id/tempuratureLabel" />
+
+    <TextView
+        android:id="@+id/sysEnabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=". . . . ."
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/sysEnableLabel"
+        app:layout_constraintTop_toTopOf="@+id/sysEnableLabel" />
+
+    <TextView
+        android:id="@+id/moisture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=". . . . ."
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/moistureLabel"
+        app:layout_constraintTop_toTopOf="@+id/moistureLabel" />
+
+    <TextView
+        android:id="@+id/tempurature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=". . . . ."
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/tempuratureLabel"
+        app:layout_constraintTop_toTopOf="@+id/tempuratureLabel" />
+
+    <TextView
+        android:id="@+id/wind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=". . . . ."
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/windLabel"
+        app:layout_constraintTop_toTopOf="@+id/windLabel" />
+
+    <Button
+        android:id="@+id/viewTimmer"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/timmer_button"
+        app:layout_constraintBottom_toTopOf="@+id/updateButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/viewSensors"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/sensorsView_button"
+        app:layout_constraintBottom_toTopOf="@+id/viewTimmer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

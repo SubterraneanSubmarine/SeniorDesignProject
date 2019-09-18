@@ -46,14 +46,14 @@ public class ServerConnect {
         try {
             InputStream stream = connection.getInputStream();
             Scanner scanner = new Scanner(stream);
-            // TODO Consider a differnet Delimiter -- I think it is breaking stuff...
+            // TODO Consider a different delimiter
             scanner.useDelimiter("\\A");
 
             boolean hasData = scanner.hasNext();
             if (hasData) {
                 String result = scanner.next();
                 Log.d(TAG, "HasData! " + result);
-                return scanner.next();
+                return result;
             } else {
                 Log.d(TAG, "In the Else: 57");
                 return null;
