@@ -20,7 +20,7 @@
         android:id="@+id/updateButton"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:onClick="ButtonClick"
+        android:onClick="UpdateButton"
         android:text="@string/submit_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -151,6 +151,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="@string/timmer_button"
+        android:onClick="ScheduleButton"
         app:layout_constraintBottom_toTopOf="@+id/updateButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -160,6 +161,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="@string/sensorsView_button"
+        android:onClick="SensorsButton"
         app:layout_constraintBottom_toTopOf="@+id/viewTimmer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

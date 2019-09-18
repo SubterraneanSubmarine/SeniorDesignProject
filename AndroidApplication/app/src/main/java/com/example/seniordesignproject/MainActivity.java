@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     // link to other activites?
     // pageviewer ?
 
-    public void ButtonClick(View view){
+    public void UpdateButton(View view){
         // Here is the start of our code: We want to try accessing the RPi webserver
         // We use the URL java utility to build a URL, then we send it over
         // to a thread to run --> AsyncTask (PiQuery)
@@ -100,6 +100,13 @@ public class MainActivity extends AppCompatActivity {
 //            toast.show();
 //        }
 
+    }
+
+    public void SensorsButton(View view) {
+
+    }
+
+    public void ScheduleButton(View view) {
     }
 
     // TODO Consider adding a waiting/loading thread-task to let user know stuff is happening
