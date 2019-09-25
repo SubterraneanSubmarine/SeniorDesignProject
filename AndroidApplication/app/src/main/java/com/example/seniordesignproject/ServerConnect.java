@@ -1,10 +1,18 @@
 package com.example.seniordesignproject;
 
-// ECE 4800 - Senior Project
-// David Carlson and Bryce Martin
-// Inspiration for this code drawn from:
-// https://app.pluralsight.com/library/courses/android-studio-connected-app-building-first/table-of-contents
-//              by Simone Alessandria
+/*
+ECE 4800 - Senior Project
+David Carlson and Bryce Martin
+
+Inspiration for the design and coding of this android app originate from:
+https://app.pluralsight.com/library/courses/android-fundamentals-fragments/table-of-contents
+                -- Sriyank Siddhartha
+                For his teaching about Fragments and UI management
+
+ https://app.pluralsight.com/library/courses/android-studio-connected-app-building-first/table-of-contents
+                -- Simone Alessandria
+                For his teaching how to do Async internet/server fetches
+ */
 
 
 import android.util.Log;
@@ -42,17 +50,17 @@ public class ServerConnect {
 
     public static String getJson(URL url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(10000);
 
         try {
             InputStream stream = connection.getInputStream();
             Scanner scanner = new Scanner(stream);
-            // TODO Consider a different delimiter
             scanner.useDelimiter("\\A");
 
             boolean hasData = scanner.hasNext();
             if (hasData) {
                 String result = scanner.next();
-                Log.d(TAG, "HasData! " + result);
+                // Log.d(TAG, "HasData! " + result);
                 return result;
             } else {
                 Log.d(TAG, "In the Else: 57");
