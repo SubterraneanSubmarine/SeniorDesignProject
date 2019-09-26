@@ -10,6 +10,8 @@ Tested in Python3.7 and 3.4(RPi)
 '''
 
 import threading
+
+# TODO Outline what threads are modifying what data -- perhaps create separate mutex locks?
 lock = threading.Lock()  # Mutex for threads to grab when changing values here
 
 ProgramRunning = True
@@ -44,32 +46,17 @@ TimerTriggering = {
 }
 
 
-# List of Dictionaries
-# [ {"key": value, ...}, {...}, ...]
-SensorStats = [
-#TODO get number of sensors from Xbee, and build this list up
-# this is throw-away temp code
-    {"MainController": 0,
-    "Wind": 5,
-    "Rain": 1,
-    "Temperature": 29},
-    {"Zone": 0,
-     "Moisture": 37,
-     "LightLevel": 28,
-     "PowerLevel": 88},
-    {"Zone": 1,
-     "Moisture": 70,
-     "LightLevel": 24,
-     "PowerLevel": 75},
-    {"Zone": 2,
-     "Moisture": 20,
-     "LightLevel": 30,
-     "PowerLevel": 96}
-]
 
-#TODO OR do we merge the MainController into the list of Sensors?
-MainController = {
-    "Wind": 5,
-    "Rain": 1,
-    "Temperature": 29
-}
+
+'''
+Nested Dictionaries
+HAL.py builds this up based on received messages from Xbee Coord.
+example:
+    { <sender_eui64>: { <payload from xbee> } }
+Translates too...
+    { '\x00\x13\xa2\x00F\x99B\xc3' : { 'Iteration': 25, 'Value': 323, 'Zone': 1 } }
+Thus, we are able search values like so: SensorStats[<macaddress>]["Iteration"]
+'''
+SensorStats = {}
+
+# TODO Ensure that the MainCoordingator is picked up in the SensorStats

@@ -56,10 +56,14 @@ message = ("{'Iteration': " + str(increment)
 
 
 
-xbee.transmit(xbee.ADDR_COORDINATOR, message)
-# while True:
-#     xbee.transmit(xbee.ADDR_COORDINATOR, "Iteration: " + str(increment)
-#                                    + ", \"ADC Read: \"" + str(pin30.read())
-#                   )
-#     increment = increment + 1
-#     time.sleep(15)
+# xbee.transmit(xbee.ADDR_COORDINATOR, message)
+while True:
+    # xbee.transmit(xbee.ADDR_COORDINATOR, "Iteration: " + str(increment)
+    #                                + ", \"ADC Read: \"" + str(pin30.read())
+    #               )
+    xbee.transmit(xbee.ADDR_COORDINATOR, message)
+    message = ("{'Iteration': " + str(increment)
+               + ", 'ADCRead': " + str(pin30.read())
+               + ", 'Zone': " + str(zone) + "}")  # Multiline to read easier?
+    increment = increment + 1
+    time.sleep(120)

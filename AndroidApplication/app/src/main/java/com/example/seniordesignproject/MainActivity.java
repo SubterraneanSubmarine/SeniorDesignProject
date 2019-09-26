@@ -30,6 +30,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.stream.JsonWriter;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 String msg = e.getMessage().toString();
                 Log.d(TAG, "Exception 78: " + msg);
             }
-            Log.d(TAG, "URLResult: " + result);
+            Log.d(TAG, "169 URLResult: " + result);
             return result;
         }
 
@@ -204,8 +206,7 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     DaysZonesTimes = new JSONObject(PiResponses[1]);
-                    Log.d(TAG, DaysZonesTimes.getJSONArray("Monday").getString(1));  // {"Monday": [false, 100, 250]} --> 100
-
+//                    Log.d(TAG, DaysZonesTimes.getJSONArray("Monday").getString(1));  // {"Monday": [false, 100, 250]} --> 100
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -215,11 +216,12 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 // TODO Get XbeeSensor data read into a usable object thing!
-//                try {
-//                    XbeeSens2 = new GsonBuilder().create() PiResponses[3];
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    XbeeSensors = new JSONObject(PiResponses[3]);
+//                    Log.d(TAG, XbeeSensors.toString(2));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             ToastMessage("Success!!!");
@@ -227,38 +229,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // TODO consider using classes instead of JSON objects? -- gson filling them up (see chrome tab)
-    public class DayTimer {
-        String Day;
-        boolean Enabled;
-        int StartTime;
-        int EndTime;
-    }
-
-    public class Thresholds {
-        String Temp;
-        int Current;
-        int Limit;
-    }
-
-    public class NodesSensors {
-        String Name;
-        int Zone;
-        String Rain;
-        int rainMeasure;
-        String Wind;
-        int windMeasure;
-        String Temp;
-        int tempMeasure;
-
-    }
 
     public void UpdateData(){
         // Here is the start of our code: We want to try accessing the RPi webserver
         // We use the URL java utility to build a URL, then we send it over
         // to a thread to run --> AsyncTask (PiQuery)
 
-        int urlpass = 0;
+        int urlpass = 1;
 
         // TODO This for loop finishes before any of the threads throw an error.....
         //  Thus Never attempting the other URL/Link for the server.
