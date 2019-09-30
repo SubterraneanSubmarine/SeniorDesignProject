@@ -8,7 +8,7 @@ The Basics:
  \- Edith.py : Contains the code that essentially functions as a typical sprinkler timer/control box.  
  \- HAL.py : Interfaces with the Xbee Coordinator module, then stores data.  
  \- Jarvis.py : Is the *Global Variables* of the program.  
- \- Xbee/main.py : Code that is loaded onto the Nodes/Routers
+ \- Xbee/main.py : Code that is loaded onto the Nodes/Routers  
  \- XbeeSrv/main.py : What runs on the Coordinator  
   
   
