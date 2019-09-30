@@ -56,9 +56,13 @@ def TalkToXbee():
         while Jarvis.ProgramRunning:
             if port.inWaiting() > 0:
                 temp = ConvertToDict(port.readline())
-                for key, value in temp.items():
-                    print(key, " : ", value)
-                # TODO Take this object, check if the reporting node already exists in our 'database.' Do stuff with it
+                holdval = ""
+                sendfound = False
+                if temp.get("sender_eui64") != None:
+                    if Jarvis.SensorStats.get(temp["sender_eui64"]) == None:
+                        Jarvis.SensorStats[temp["sender_eui64"]] = {}
+                    Jarvis.SensorStats[temp["sender_eui64"]].update(temp["payload"])
+                
 
 
 

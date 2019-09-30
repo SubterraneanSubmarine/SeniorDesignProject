@@ -24,6 +24,7 @@ for command, value in network_settings.items():
 xbee.atcmd("AC") # Apply changes
 time.sleep(1)
 
+# Query AI until it reports success
 while xbee.atcmd("AI") != 0:
     time.sleep_ms(100)
 
