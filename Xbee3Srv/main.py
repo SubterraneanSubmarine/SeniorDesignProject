@@ -1,51 +1,55 @@
-'''
+"""
 Bryce Martin and David Carlson
+
 ECE 4800 - Senior Project
 
-Code pulled from Digi manual for XBee3 quick setup/start
-This file defines how a XBEE COORDINATOR behaves
-'''
+Network setup pulled from Digi manual for XBee3 quick setup/start
+
+This code runs on the Xbee3 acting as a coordinator receiving data it
+collects from the nodes. This data is then relayed to the main brain board.
+"""
+import xbee
+import time
+import json
 
 
-import xbee, time
+print("Forming a new Zigbee network as a coordinator...")
+xbee.atcmd("NI", "Coordinator Hub")
 
-# Set the identifying string of the radio
-xbee.atcmd("NI", "Coordinator")
-# Configure some basic network settings
-network_settings = {"CE": 1, "ID": 0xABCD, "EE": 0, "NJ": 0xFF}
+# NJ should be changed in the final product
+network_settings = {"BD": 0x7, "CE": 1, "EE": 0, "ID": 0xABCD, "NJ": 0xFF, "PS": 1}
 
 for command, value in network_settings.items():
     xbee.atcmd(command, value)
-
 xbee.atcmd("AC") # Apply changes
 time.sleep(1)
 
 # Query AI until it reports success
 while xbee.atcmd("AI") != 0:
-    time.sleep(0.1)
+    time.sleep_ms(100)
 
-print("Network Established")
-operating_network = ["OI", "OP", "CH"]
-print("Operating network parameters:")
-for cmd in operating_network:
-    print("{}: {}".format(cmd, xbee.atcmd(cmd)))
+print("Network Established\n")
+print("Waiting for a remote node to join...")
 
-# TODO Get/Read and send values about sensors connected to the coordinator to the RPi
-# And keep the formatting the same (if possible?)
-'''
-Please format any messages using the following style
-(because, I've dissected the payload using this formatting)
+node_list = []
+while len(node_list) == 0:  # Perform a network discovery until the router joins
+    node_list = list(xbee.discover())
+print("Remote node found, transmitting data")
 
-# This yields a payload like this:  'payload': b'{'Iteration': 0, 'Value': 345, 'Zone': 2}'
-message = ("{'WindMeter': " + str(WindValue)
-         + ", 'ADCRead': " + str(pin30.read())
-         + ", 'Zone': " + str(zone) + "}")  # Multiline to read easier?
-'''
+for node in node_list:
+    dest_addr = node['sender_nwk']  # using 16 bit addressing
+    dest_node_id = node['node_id']
+    payload_data = "Hello, " + dest_node_id + "!"
+    print("Sending \"{}\" to {}".format(payload_data, hex(dest_addr)))
+    xbee.transmit(dest_addr, payload_data)
+
+print("Receiving data...")
+
 temp = {}
 while True:
     temp = xbee.receive()
     if temp:
-        # for key, value in temp.items():
         print(temp)
+        # From here the 'payload' key can be used to pull the data sent from the sensors
         temp.clear()
-
+    time.sleep_ms(250) # wait 0.25 seconds before checking again
