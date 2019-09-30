@@ -8,17 +8,19 @@ This file defines how a XBEE COORDINATOR behaves
 
 
 import xbee, time
-import json
+
 # Set the identifying string of the radio
 xbee.atcmd("NI", "Coordinator")
 # Configure some basic network settings
 network_settings = {"CE": 1, "ID": 0xABCD, "EE": 0, "NJ": 0xFF}
+
 for command, value in network_settings.items():
     xbee.atcmd(command, value)
 
 xbee.atcmd("AC") # Apply changes
 time.sleep(1)
 
+# Query AI until it reports success
 while xbee.atcmd("AI") != 0:
     time.sleep(0.1)
 

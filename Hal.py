@@ -63,28 +63,6 @@ def TalkToXbee():
                         Jarvis.SensorStats[temp["sender_eui64"]] = {}
                     Jarvis.SensorStats[temp["sender_eui64"]].update(temp["payload"])
                 
-                # for key, value in temp.items():
-                #     # Do we have a new Xbee Node that needs to be added?
-                #     if key == "sender_eui64" and Jarvis.SensorStats.get(value) == None:
-                #         # TODO May not need thread lock: Currently only this thread modifies these values
-                #         with Jarvis.lock:
-                #             Jarvis.SensorStats[value] = {}
-                #         holdval = value
-                #         sendfound = True
-                #     # We don't have a new Xbee Node to add: Get ready to updates payload values
-                #     elif key == "sender_eui64" and Jarvis.SensorStats.get(value) != None:
-                #         print("Key already exists in dict")
-                #         holdval = value
-                #         sendfound = True
-                #     # Weather we have a new node or not, update the payload dictionary
-                #     if key == "payload":
-                #         if sendfound:
-                #             for sub_key, sub_value in temp[key].items():
-                #                 # TODO May not need thread lock: Currently only this thread modifies these values
-                #                 with Jarvis.lock:
-                #                     Jarvis.SensorStats[holdval][sub_key] = sub_value
-                #         else :
-                #             print("ERROR Payload found before sender (shouldn't happen)")
 
 
 

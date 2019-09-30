@@ -13,6 +13,7 @@ from machine import Pin, ADC
 xbee.atcmd("NI", "Router")
 # Configure some basic network settings
 network_settings = {"CE": 0, "ID": 0xABCD, "EE": 0}  # "command": value pairs
+
 for command, value in network_settings.items():
     xbee.atcmd(command, value)
 

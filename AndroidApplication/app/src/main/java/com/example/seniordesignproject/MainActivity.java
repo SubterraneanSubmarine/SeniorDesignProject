@@ -189,8 +189,9 @@ public class MainActivity extends AppCompatActivity {
                 TextView connection = (TextView) findViewById(R.id.connectStatus);
                 connection.setText("Success");
 
+                // TODO Why does PiResponses[0] <string class> not compare to "false|true" ???
                 ((TextView) findViewById(R.id.sysEnabled)).setText((PiResponses[0] == "false") ? "Disabled" : "Enabled");
-
+                Log.d(TAG, "class " + (PiResponses[0]).getClass().toString());
 
                 ((TextView) findViewById(R.id.sysEnableLabel)).setTextColor(Color.rgb(0, 0, 0));
                 ((TextView) findViewById(R.id.sysEnabled)).setTextColor(Color.rgb(0, 0, 0));
@@ -235,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         // We use the URL java utility to build a URL, then we send it over
         // to a thread to run --> AsyncTask (PiQuery)
 
-        int urlpass = 1;
+        int urlpass = 0;
 
         // TODO This for loop finishes before any of the threads throw an error.....
         //  Thus Never attempting the other URL/Link for the server.

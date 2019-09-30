@@ -18,6 +18,8 @@ https://app.pluralsight.com/library/courses/android-fundamentals-fragments/table
 import android.util.Log;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -75,6 +77,10 @@ public class ServerConnect {
         finally {
             connection.disconnect();
         }
+    }
+
+    public static String postJson(URL url, JSONObject payload) throws IOException {
+        // TODO Push data to the server
     }
 }
 
