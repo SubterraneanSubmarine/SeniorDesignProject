@@ -19,40 +19,50 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import json
 # import ssl
-
 import Jarvis
 
 
+# Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}
 AvailablePaths = [
     "/TimerControl/State/",
     "/TimerControl/DaysZonesTimes/",
     "/TimerControl/Thresholds/",
     "/Xbee3/Dump/",
     "/DateTime/"  # TODO code in the datetime elements: We need to be able to set and read the date/time of RPi from android app
-                  #TODO Consider adding in TempDisable
+                  #TODO Consider adding in TempDisable?
 ]
 
 
+"""
+Here, we define a class that takes a BaseHTTPRequestHandler
+      With in this class, we define what the Handler/server will, and how, to respond.
 
-
+The BaseHTTPRequestHandler has defined functions that we can expand upon
+        The functions are the following
+            do_HEAD
+            do_GET
+            do_POST
+        They relate the the http/tcp request types of GET, POST, PUT, etc
+"""
 class PiSrv(BaseHTTPRequestHandler):
+    # Header segment of an http/tcp packet -- informing a client what the data will be
     def set_header(self):
         self.send_response(200)
         self.send_header("Content-type", "application/json")
         self.end_headers()
 
-    # PythonHTTPServer function name
+    # PythonHTTPServer function name -- Define the header of our packet
     def do_HEAD(self):
         self.set_header()
         
-
-    # GET replys with data
     # PythonHTTPServer function name
+    # GET simply responds to a request with data
     def do_GET(self):
         requestPath = self.path
-        if requestPath in AvailablePaths:
+        if requestPath in AvailablePaths:  # check if the requested 'page' is a valid path
             self.set_header()
 
+            # We have a valid path requested, return the Data requested
             if requestPath == AvailablePaths[0]:  # "/TimerControl/State/"
                 self.wfile.write(json.dumps(Jarvis.SystemEnabled).encode("utf-8"))
 
@@ -71,6 +81,7 @@ class PiSrv(BaseHTTPRequestHandler):
 
 
     # PythonHTTPServer function name
+    # POST will handle incoming data, and doing something with it
     def do_POST(self):
 
         # refuse to receive non-json content
@@ -79,28 +90,32 @@ class PiSrv(BaseHTTPRequestHandler):
             return
 
         requestPath = self.path
-        if requestPath in AvailablePaths:
+        if requestPath in AvailablePaths:  # Is the 'directory' requested one of the valid Paths?
             # read the message content and convert it into a python dictionary
+            # Get the size of the packet body/payload (number of bytes)
             contentlength = int(self.headers.get("content-length"))
-            if contentlength:
+            if contentlength:  # if there is no data, Error!
 
+                # Then, with the size of the payload, we read the bytes-data into an object
                 serializedBodyData = self.rfile.read(
                     contentlength).decode("utf-8")
                 bodyData = json.loads(serializedBodyData)  # Creates Dict data type
+
+                # Now that we have the payload/body in an object, read the Path from the http request to determin how to handle the data
 
                 # "/TimerControl/State/"
                 if requestPath == AvailablePaths[0]:
                     if "State" in bodyData:
                         state = bodyData.get("State")
-                        if state in ["True", "False"]:
+                        if state in ["True", "False"]:  # Check if the Value being sent is True or False
                             if state == "True":
-                                with Jarvis.lock:
+                                with Jarvis.lock:  # TODO Consider not using a lock -- only this thread touches this data
                                     Jarvis.SystemEnabled = True
                             elif state == "False":
                                 with Jarvis.lock:
                                     Jarvis.SystemEnabled = False
                             self.set_header()
-                            # Send reply
+                            # Send reply with current state of system
                             self.wfile.write(json.dumps(
                                 Jarvis.SystemEnabled).encode("utf-8"))
                         else:
@@ -111,12 +126,15 @@ class PiSrv(BaseHTTPRequestHandler):
 
                 # "/TimerControl/DaysZonesTimes/"
                 if requestPath == AvailablePaths[1]:
+                    # Check to make sure there are no more than 7 days passed in
                     if bodyData.keys() <= Jarvis.TimerTriggering.keys():
                         for key in bodyData.keys():
+                            # Check to make sure we have the array of [bool, int, int] with our Key
                             if len(bodyData[key]) == 3:
                                 if bool == type(bodyData[key][0]) and int == type(bodyData[key][1]) and int == type(bodyData[key][2]):
                                     # TODO Range-check the military integer values (?)
                                     with Jarvis.lock:
+                                        # We have the correct Data. Save it!
                                         Jarvis.TimerTriggering[key] = bodyData[key]
                                 else:
                                     self.send_error(
@@ -132,6 +150,7 @@ class PiSrv(BaseHTTPRequestHandler):
 
                 # "/TimerControl/Thresholds/"
                 if requestPath == AvailablePaths[2]:
+                    # Ensure the incoming data is not bigger than the current data/object
                     if bodyData.keys() <= Jarvis.Thresholds.keys():
                         for key in bodyData.keys():
                             if len(bodyData[key]) == 2:
@@ -150,7 +169,8 @@ class PiSrv(BaseHTTPRequestHandler):
                         self.send_error(400, "Expected Threshold keys")
 
                 # "/Xbee3/Dump/"
-                if requestPath == AvailablePaths[3]:
+                if requestPath == AvailablePaths[3]:  # Deny efforts to push data into the Xbee's
+                    # TODO Do we want to try and post changes/data to the Xbee's?
                     self.send_error(400, "Post Not Available")
 
                 #TODO TempDisable (?)
@@ -161,15 +181,19 @@ class PiSrv(BaseHTTPRequestHandler):
 
 
 # From Python documentaion: https://docs.python.org/3/library/http.server.html
+# Here, we pre-define several of our HTTPServer variables for the run function -- if run() is called without any arguments
 def run(server_class=HTTPServer, handler_class=PiSrv, port=8008):
     # listen on any IP-Address\Interface but only on the given port
     server_address = ('', port)
+
+    # Next, we call the server_call function (part of the python http.server library) with instructions on how to hand requests -- the PiSrv class dictates this
     RPiSrv = server_class(server_address, handler_class)
     RPiSrv.timeout = 0.5  # Do not block program/thread waiting for a request
 
-    #RPiSrv.socket = ssl.wrap_socket(RPiSrv.socket, keyfile="key.pem", certfile="cert.pem", server_side=True)
+    #RPiSrv.socket = ssl.wrap_socket(RPiSrv.socket, keyfile="key.pem", certfile="cert.pem", server_side=True)  # Oneday we could look into using SSL for the server
     print(' ADD TO DEBUG OUTPUT: Starting RPiSrv on port ', port)
 
+    # Since this http.server is spawned on a thread, we will watch the ProgramRunning variable to know when to stop and shutdown the server.
     while Jarvis.ProgramRunning:
         try:
             RPiSrv.handle_request()  # Wait 0.5 seconds for a request
