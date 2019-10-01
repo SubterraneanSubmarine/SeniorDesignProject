@@ -22,7 +22,7 @@ xbee.atcmd("NI", "Sensor Probe")
 
 # Configure some basic network settings
 # "CE must be 0 before SM can be set to a value greater than 0 to change the device to an end device"
-network_settings = {"ID": 0xABCD, "EE": 0, "SM": 6, "AV": 2}
+network_settings = {"AV": 2, "BD": 0x7, "EE": 0, "ID": 0xABCD, "PS": 1, "SM": 6}
 # "CE": 0
 
 for command, value in network_settings.items():
