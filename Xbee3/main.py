@@ -13,13 +13,16 @@ import xbee
 import time
 from machine import Pin, ADC
 
-SLEEP_DURATION = 500
+# SLEEP_DURATION = 500
+SLEEP_DURATION = 10
+
 SELF = xbee.XBee()
 # Set the identifying string of the radio
 xbee.atcmd("NI", "Sensor Probe")
 
 # Configure some basic network settings
-network_settings = {"ID": 0xABCD, "EE": 0, "SM": 6, "AV": 2, "EE": 0}
+# "CE must be 0 before SM can be set to a value greater than 0 to change the device to an end device"
+network_settings = {"ID": 0xABCD, "EE": 0, "SM": 6, "AV": 2}
 # "CE": 0
 
 for command, value in network_settings.items():
@@ -82,11 +85,11 @@ while True:
                   "\nBattery: " + str(battery) +
                   "\n\n")
             xbee.transmit(xbee.ADDR_COORDINATOR,
-                          "Iteration: " + str(iteration) +
-                          " Sector: " + str(zone) +
-                          " Moisture: " + str(reading) +
-                          " Sunlight: " + str(ambiance) +
-                          " Battery: " + str(battery)
+                          "{'Iteration': " + str(iteration) +
+                          ", 'Sector': " + str(zone) +
+                          ", 'Moisture': " + str(reading) +
+                          ", 'Sunlight': " + str(ambiance) +
+                          ", 'Battery': " + str(battery) + "}"
                           )
         except Exception as err:
             print(err)

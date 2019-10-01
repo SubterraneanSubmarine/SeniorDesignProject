@@ -10,7 +10,6 @@ collects from the nodes. This data is then relayed to the main brain board.
 """
 import xbee
 import time
-import json
 
 
 print("Forming a new Zigbee network as a coordinator...")
