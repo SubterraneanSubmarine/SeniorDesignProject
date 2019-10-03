@@ -2,7 +2,7 @@
 David Carlson & Bryce Martin
 ECE 4800 Senior Design Project
 
-This File represents intractions of the Pi and Xbee3 coordinator (UART)
+This File represents interactions of the Pi and Xbee3 coordinator (UART)
 
 Tested in Python3.7(Windows) and 3.4(RPi)
 '''

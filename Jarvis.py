@@ -3,7 +3,7 @@ David Carlson & Bryce Martin
 ECE 4800 Senior Design Project
 
 This File represents the globally accesed variables/objects/data
-intractions of the Pi and (Xbee and Relays)
+interactions of the Pi and (Xbee and Relays)
 This will also save/load stored data.
 
 Tested in Python3.7 and 3.4(RPi)

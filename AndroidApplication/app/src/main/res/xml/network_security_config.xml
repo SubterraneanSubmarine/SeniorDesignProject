@@ -6,8 +6,9 @@ https://medium.com/@son.rommer/fix-cleartext-traffic-error-in-android-9-pie-2f4e
 -->
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">vpn.figureix.com</domain>
+        <domain includeSubdomains="true">seniorproject.figureix.com</domain>
         <domain includeSubdomains="true">192.168.1.104</domain>
         <domain includeSubdomains="true">192.168.137.7</domain>
+        <domain includeSubdomains="true">192.168.232.1</domain>
     </domain-config>
 </network-security-config>

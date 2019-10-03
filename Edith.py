@@ -2,7 +2,7 @@
 David Carlson & Bryce Martin
 ECE 4800 Senior Design Project
 
-This File represents intractions of the Pi and Sprinkler Relays (GPIO)
+This File represents interactions of the Pi and Sprinkler Relays (GPIO)
 It will server as the timer program
 
 Tested in Python3.7 and 3.4(RPi)
@@ -17,9 +17,9 @@ import Jarvis
 
 # TODO During initial setup from android app -- ask for time+timezone+dst! (or base everything off utc?)
 # datetime.now(timezone(hours=-7))
-# TODO Look into the possible ways of seeting the RPi's time in linux, rather than python?
+# TODO Look into the possible ways of setting the RPi's time in linux, rather than python?
 # Perhaps we set the system with with python? -- or do we poll internet servers for time?
-# TODO using temp sensor values recorded through out a day, alter/change water duration based on daytime temperatures
+# TODO using temp sensor values recorded throughout a day, alter/change water duration based on daytime temperatures
 # TODO use moisture values/samples to dictate watering, instead of timmer stuff
 
 def SprinklerRunner():
