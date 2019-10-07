@@ -21,18 +21,23 @@ ProgramRunning = True
 SystemEnabled = False
 NewSensorData = False
 
+avMoisture = 0
+avWind = 0
+avTemp = 0
+avRain = 0
+
 
 # Threshold values to prevent system from running
-# "Name": [CurrentSensorValue, TurnOffLimit]
+# "Name": [AvValue, CurrentSensorValue, TurnOffLimit]
 Thresholds = {
-    "Moisture": [0, 33], #TODO what is the max value of our sensor? How does that translate to moisture in soil
-    "Wind": [0, 5], #TODO The anemometer will return a small voltage range: What will be less-than-ideal wind?
-    "Temperature": [0, 32], #TODO What unit/standard should we use here? Celcius?
-    "Rain": [0, 5] #TODO say... mm (milimeters)?
+    "Moisture": [avMoisture, 0, 33], #TODO what is the max value of our sensor? How does that translate to moisture in soil
+    "Wind": [avWind, 0, 5], #TODO The anemometer will return a small voltage range: What will be less-than-ideal wind?
+    "Temperature": [avTemp,0, 32], #TODO What unit/standard should we use here? Celcius?
+    "Rain": [avRain, 0, 5] #TODO say... mm (milimeters)?
 }
 
 
-# "Day": Active[bool], StartTime[int], EndTime[int]  -> (military time)
+# "Day": Active[bool], StartTime[int], EndTime[int]  -> (military time)  # Make sure we handle watering from 2300 to 0100
 # "Monday": [True, 0, 230] -> 0 == 12:00am, 230 == 2:30am, ... 2314 == 11:14pm
 #TODO reset these to default values
 TimerTriggering = {

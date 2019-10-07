@@ -83,6 +83,10 @@ def TalkToXbee():
                         
                     # The eui_64 is already in our database (dictionary): Update its Value with the new information from the Xbee
                     Jarvis.SensorStats[temp["sender_eui64"]].update(temp["payload"])
+
+                    # We now have within SensorState an object like so...
+                    # {"\\x00\\x13\\xa2\\x00A\\x99O\\xcc": {"Iteration": 30796, "Sunlight": 2079, "Battery": 3348, "Moisture": 3239, "Sector": 0}
+                    #   , "\\x00\\x11\\xa3\\x05A\\x94O\\xdd": {"Iter... , ... : 4} }
                 
 
 

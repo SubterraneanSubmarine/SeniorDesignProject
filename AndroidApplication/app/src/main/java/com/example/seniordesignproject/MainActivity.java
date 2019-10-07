@@ -37,6 +37,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 //import com.google.gson.stream.JsonWriter;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 //import java.net.Inet4Address;
@@ -64,13 +65,14 @@ public class MainActivity extends AppCompatActivity {
     // [1] <- TimerControl/DaysZonesTimes
     // [2] <- TimerControl/Thresholds
     // [3] <- Xbee3/Dump
-    String[] PiResponses = {"", "", "", ""};
-    // Then we will parse the responses into dictionaries  //TODO going to think abou this
-    JSONObject DaysZonesTimes;
-    JSONObject Thresholds;
-    JSONObject XbeeSensors;
+    public String[] PiResponses = {"", "", "", ""};
+    // Then we will parse the responses into dictionaries  //TODO going to think about this
+    public JSONObject DaysZonesTimes;
+    public JSONObject Thresholds;
+    public JSONObject XbeeSensors;
 
     public boolean HaveData = false;
+
 
 
     // When the Android system allocates time for the APP to run, this function
@@ -80,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // Initialize the fragments and transaction manager.
         // We are essentially creating groups of elements that 'start and die' at the
         // command of our Fragment-->Transaction manager.
@@ -92,17 +93,27 @@ public class MainActivity extends AppCompatActivity {
         mainPage = new MainPage();
         manager = getSupportFragmentManager();
         transaction = manager.beginTransaction();
-        transaction.add(R.id.frameWindow, sensors, "SensorPage");
-        transaction.hide(sensors);
-        transaction.add(R.id.frameWindow, schedule, "SchedulePage");
-        transaction.hide(schedule);
+//        transaction.add(R.id.frameWindow, sensors, "SensorPage");
+//        transaction.hide(sensors);
+//        transaction.add(R.id.frameWindow, schedule, "SchedulePage");
+//        transaction.hide(schedule);
         transaction.add(R.id.frameWindow, mainPage, "MainPage");
         transaction.show(mainPage);
         transaction.commit();  // Think of this as "Update the GUI'
 
+        //  Pre-made temporary data.
+        try{
+            XbeeSensors = new JSONObject("{'xbeeMAC1': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}, 'xbeeMAC2': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}, 'xbeeMAC3': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}}");
+            Thresholds = new JSONObject("{'Rain': [10, 3, 15], 'Temperature': [23, 26, 24], 'Wind': [3, 1, 5], 'Moisture': [5, 7, 4]}");
+            DaysZonesTimes = new JSONObject("{'Monday': [false, 1245, 1300], 'Tuesday': [false, 245, 1000], 'Wednesday': [false, 0, 100], 'Thursday': [false, 1610, 1645], 'Friday': [false, 100, 230], 'Saturday': [false, 1700, 1800], 'Sunday': [false, 2345, 50]}");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
 
         // Attempt Pi connection
-        UpdateData();
+        // UpdateData();
     }
 
 
@@ -124,7 +135,24 @@ public class MainActivity extends AppCompatActivity {
             ToastMessage("No Data. Press \'Update\'", "Short");
             return;
         }
-        SwitchToFragment(mainPage);
+
+        transaction = manager.beginTransaction();
+
+        if (manager.findFragmentByTag("MainPage") == null) {
+            transaction.add(R.id.frameWindow, mainPage, "MainPage");
+        }
+        if (manager.findFragmentByTag("SchedulePage") != null && manager.findFragmentByTag("SchedulePage").isVisible()){
+            transaction.hide(schedule);
+        }
+        if (manager.findFragmentByTag("SensorPage") != null && manager.findFragmentByTag("SensorPage").isVisible()) {
+            transaction.hide(sensors);
+        }
+
+        transaction.replace(R.id.frameWindow, mainPage, "MainPage");
+
+        //transaction.add(R.id.frameWindow, sensors, "SensorPage");
+        transaction.show(mainPage);
+        transaction.commit();
     }
 
     // This function is linked to a GUI Button: When pressed this runs
@@ -134,7 +162,35 @@ public class MainActivity extends AppCompatActivity {
             ToastMessage("No Data. Press \'Update\'", "Short");
             return;
         }
-        SwitchToFragment(sensors);
+
+
+//        Log.d(TAG, "SensBtn: " + XbeeSensors.toString());
+//        sensors.XbeeSensorsFrag = XbeeSensors;
+
+//        sensors.mAdapter.notifyDataSetChanged();
+
+        transaction = manager.beginTransaction();
+
+        if (manager.findFragmentByTag("SensorPage") == null) {
+            transaction.add(R.id.frameWindow, sensors, "SensorPage");
+        }
+
+
+        if (manager.findFragmentByTag("SchedulePage") != null && manager.findFragmentByTag("SchedulePage").isVisible()){
+            transaction.hide(schedule);
+        }
+        if (manager.findFragmentByTag("MainPage") != null && manager.findFragmentByTag("MainPage").isVisible()) {
+            transaction.hide(mainPage);
+        }
+
+        transaction.replace(R.id.frameWindow, sensors, "SensorPage");
+
+        //transaction.add(R.id.frameWindow, sensors, "SensorPage");
+        transaction.show(sensors);
+        transaction.commit();
+
+//        SwitchToFragment(sensors);
+        // TODO Refresh data in recycle view
     }
 
     // This function is linked to a GUI Button: When pressed this runs
@@ -144,7 +200,26 @@ public class MainActivity extends AppCompatActivity {
             ToastMessage("No Data. Press \'Update\'", "Short");
             return;
         }
-        SwitchToFragment(schedule);
+
+        transaction = manager.beginTransaction();
+
+        if (manager.findFragmentByTag("SchedulePage") == null) {
+            transaction.add(R.id.frameWindow, schedule, "SchedulePage");
+
+        }
+
+
+        if (manager.findFragmentByTag("SensorPage") != null && manager.findFragmentByTag("SensorPage").isVisible()){
+            transaction.hide(sensors);
+        }
+        if (manager.findFragmentByTag("MainPage") != null && manager.findFragmentByTag("MainPage").isVisible()) {
+            transaction.hide(mainPage);
+        }
+        transaction.replace(R.id.frameWindow, schedule, "SchedulePage");
+        //transaction.add(R.id.frameWindow, sensors, "SensorPage");
+        transaction.show(schedule);
+        transaction.commit();
+//        SwitchToFragment(schedule);
     }
 
 
@@ -209,8 +284,7 @@ public class MainActivity extends AppCompatActivity {
             // For each AsyncTask that runs, save its return value into our array
             PiResponses[saveIndex] = result;
 
-            // TODO Perhaps: Save the strings into JSON objects as they arrive--checking for errors
-            // Then set a flag if there was a data retrieve error.
+            // TODO Perhaps: Save the strings into JSON objects as they arrive
 
             // If each AsyncTask has completed, except the last one, then the
             // last one will do data processing and posting to the User
@@ -218,19 +292,10 @@ public class MainActivity extends AppCompatActivity {
                 HaveData = true;
                 connection.setText("Success");
 
-                // TODO Why does PiResponses[0] <string class> not compare to "false|true" ???
-                ((TextView) findViewById(R.id.sysEnabled)).setText((PiResponses[0].equals("false")) ? "Disabled" : "Enabled");
                 Log.d(TAG, "class " + (PiResponses[0]).getClass().toString());
 
                 // TODO Set data in the rest of the views
-                ((TextView) findViewById(R.id.sysEnableLabel)).setTextColor(Color.rgb(0, 0, 0));
-                ((TextView) findViewById(R.id.sysEnabled)).setTextColor(Color.rgb(0, 0, 0));
-                ((TextView) findViewById(R.id.moistureLabel)).setTextColor(Color.rgb(0, 0, 0));
-                ((TextView) findViewById(R.id.moisture)).setTextColor(Color.rgb(0, 0, 0));
-                ((TextView) findViewById(R.id.tempuratureLabel)).setTextColor(Color.rgb(0, 0, 0));
-                ((TextView) findViewById(R.id.tempurature)).setTextColor(Color.rgb(0, 0, 0));
-                ((TextView) findViewById(R.id.windLabel)).setTextColor(Color.rgb(0, 0, 0));
-                ((TextView) findViewById(R.id.wind)).setTextColor(Color.rgb(0, 0, 0));
+
                 ((Button) findViewById(R.id.viewTimer)).setTextColor(Color.rgb(0, 0, 0));
                 ((Button) findViewById(R.id.viewSensors)).setTextColor(Color.rgb(0, 0, 0));
 
@@ -250,10 +315,15 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Get XbeeSensor data read into a usable object thing!
                 try {
                     XbeeSensors = new JSONObject(PiResponses[3]);
-//                    Log.d(TAG, XbeeSensors.toString(2));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                // Update Values in Fragments
+                if (manager.findFragmentByTag("MainPage") != null) mainPage.updateValues();
+                if (manager.findFragmentByTag("SensorPage") != null) sensors.updateValues();
+
+
                 ToastMessage("Success!!!", "Short");
             }
         }
@@ -327,6 +397,8 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
+
+        // TODO tell any recycler views to update their content
     }
 
     // Function to give us quick swaps/transactions of the several fragments we have going.

@@ -5,8 +5,41 @@
     android:padding="10dp">
 
     <TextView
-        android:id="@+id/recyclerRow"
+        android:id="@+id/xbeeZone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:text="TextView"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/xbeeKeyValue1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
         android:text="TextView" />
+
+    <TextView
+        android:id="@+id/xbeeKeyValue2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:text="TextView" />
+    <TextView
+        android:id="@+id/xbeeKeyValue3"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:text="TextView" />
+    <TextView
+        android:id="@+id/xbeeKeyValue4"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:text="TextView" />
+<!--    <TextView-->
+<!--        android:id="@+id/xbeeKeyValue5"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_marginLeft="20dp"-->
+<!--        android:text="TextView" />-->
 </LinearLayout>

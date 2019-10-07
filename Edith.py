@@ -12,8 +12,15 @@ from datetime import datetime  # TODO import these --> , timedelta, timezone may
 import time
 from sys import platform
 if platform == "linux":
-    import gpiozero
+    from gpiozero import LED  #https://gpiozero.readthedocs.io/en/stable/api_output.html
+    # Define Pins 31, 33, 35, and 37 (39 is ground)
+    pin31 = LED(31, active_high=True, initial_value=False)  # Could swap this for "DigitalOutputDevice"
+    pin33 = LED(33, active_high=True, initial_value=False)  # reality is: LED is a wrapper for ^^^
+    pin35 = LED(35, active_high=True, initial_value=False)
+    pin37 = LED(37, active_high=True, initial_value=False)
 import Jarvis
+
+
 
 # TODO During initial setup from android app -- ask for time+timezone+dst! (or base everything off utc?)
 # datetime.now(timezone(hours=-7))
@@ -35,3 +42,5 @@ def SprinklerRunner():
                     and int(datetime.now().strftime("%H%M")) < Jarvis.TimerTriggering.get(datetime.now().strftime("%A"))[2]):
                 # Then do this:
                 print("Enable the GPIO for the correct zone!!!!")
+        
+        # will will also need to collect sensor values from the connected wind and temp/humid sensors (put this on a thread?)

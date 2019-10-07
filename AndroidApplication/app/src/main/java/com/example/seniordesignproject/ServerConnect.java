@@ -53,9 +53,10 @@ public class ServerConnect {
         // upon connecting: read the incoming data.
         try {
             InputStream stream = connection.getInputStream();
+            // https://developer.android.com/reference/java/util/Scanner?hl=en
             Scanner scanner = new Scanner(stream);
             // We will use this 'end of message' delimiter to know when to stop reading data
-            scanner.useDelimiter("\\A");
+            scanner.useDelimiter("~");  // in the JSONSrv.py message, three '~' will be appended
 
             // If there is something to read/receive, we will return it.
             // Returning our data is made available to the onPostExecute AsyncTask thread function!
