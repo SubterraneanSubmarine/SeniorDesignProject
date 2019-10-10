@@ -17,11 +17,11 @@ https://app.pluralsight.com/library/courses/android-fundamentals-fragments/table
  https://stackoverflow.com/
                     questions/12069669/how-can-you-pass-multiple-primitive-parameters-to-asynctask
 
+https://www.youtube.com/watch?v=bNpWGI_hGGg
+                    For showing an implementation for TabLayout
  */
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 //import androidx.recyclerview.widget.RecyclerView;
@@ -32,16 +32,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-//import com.google.gson.stream.JsonWriter;
+import com.google.android.material.tabs.TabLayout;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-//import java.net.Inet4Address;
-//import java.net.InetAddress;
 import java.net.URL;
 
 
@@ -56,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     MainPage mainPage;
     FragmentManager manager;
     FragmentTransaction transaction;
+    public TabLayout tabLayout;
+
 
 
     // Here we will define some global variables
@@ -66,13 +66,11 @@ public class MainActivity extends AppCompatActivity {
     // [2] <- TimerControl/Thresholds
     // [3] <- Xbee3/Dump
     public String[] PiResponses = {"", "", "", ""};
-    // Then we will parse the responses into dictionaries  //TODO going to think about this
     public JSONObject DaysZonesTimes;
     public JSONObject Thresholds;
     public JSONObject XbeeSensors;
 
     public boolean HaveData = false;
-
 
 
     // When the Android system allocates time for the APP to run, this function
@@ -93,17 +91,44 @@ public class MainActivity extends AppCompatActivity {
         mainPage = new MainPage();
         manager = getSupportFragmentManager();
         transaction = manager.beginTransaction();
-//        transaction.add(R.id.frameWindow, sensors, "SensorPage");
-//        transaction.hide(sensors);
-//        transaction.add(R.id.frameWindow, schedule, "SchedulePage");
-//        transaction.hide(schedule);
         transaction.add(R.id.frameWindow, mainPage, "MainPage");
         transaction.show(mainPage);
         transaction.commit();  // Think of this as "Update the GUI'
 
+
+
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        tabLayout.getTabAt(1).select();
+
+
+        // https://stackoverflow.com/questions/33646586/tablayout-without-using-viewpager
+        tabLayout.addOnTabSelectedListener(
+                new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        if(!HaveData) tabLayout.getTabAt(1).select();
+                        if(tabLayout.getSelectedTabPosition() == 0) SensorsButton(tabLayout.getRootView());
+                        if(tabLayout.getSelectedTabPosition() == 1) MainButton(tabLayout.getRootView());
+                        if(tabLayout.getSelectedTabPosition() == 2) ScheduleButton(tabLayout.getRootView());
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+                        ToastMessage("Hello again", "Short");
+                    }
+                }
+        );
+
+
+
         //  Pre-made temporary data.
         try{
-            XbeeSensors = new JSONObject("{'xbeeMAC1': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}, 'xbeeMAC2': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}, 'xbeeMAC3': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}}");
+            XbeeSensors = new JSONObject("{'PlaceHolder': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}, 'PlaceHolder2': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}, 'PlaceHolder3': {'Moisture': 5, 'Sunlight': 8, 'Battery': 99, 'Sector': 9, 'Iteration': 33333}}");
             Thresholds = new JSONObject("{'Rain': [10, 3, 15], 'Temperature': [23, 26, 24], 'Wind': [3, 1, 5], 'Moisture': [5, 7, 4]}");
             DaysZonesTimes = new JSONObject("{'Monday': [false, 1245, 1300], 'Tuesday': [false, 245, 1000], 'Wednesday': [false, 0, 100], 'Thursday': [false, 1610, 1645], 'Friday': [false, 100, 230], 'Saturday': [false, 1700, 1800], 'Sunday': [false, 2345, 50]}");
         }
@@ -115,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
         // Attempt Pi connection
         // UpdateData();
     }
-
 
 
     // This is a simple wrapper function for the GUI Update button.
@@ -130,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
     // This function is linked to a GUI Button: When pressed this runs
     public void MainButton(View view) {
-        // TODO Replace this with the TabLayout
         if (!HaveData) {
             ToastMessage("No Data. Press \'Update\'", "Short");
             return;
@@ -157,17 +180,10 @@ public class MainActivity extends AppCompatActivity {
 
     // This function is linked to a GUI Button: When pressed this runs
     public void SensorsButton(View view) {
-        // TODO Replace this with the TabLayout
         if (!HaveData) {
             ToastMessage("No Data. Press \'Update\'", "Short");
             return;
         }
-
-
-//        Log.d(TAG, "SensBtn: " + XbeeSensors.toString());
-//        sensors.XbeeSensorsFrag = XbeeSensors;
-
-//        sensors.mAdapter.notifyDataSetChanged();
 
         transaction = manager.beginTransaction();
 
@@ -185,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
 
         transaction.replace(R.id.frameWindow, sensors, "SensorPage");
 
-        //transaction.add(R.id.frameWindow, sensors, "SensorPage");
         transaction.show(sensors);
         transaction.commit();
 
@@ -195,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
 
     // This function is linked to a GUI Button: When pressed this runs
     public void ScheduleButton(View view) {
-        // TODO Replace this with the TabLayout
         if (!HaveData) {
             ToastMessage("No Data. Press \'Update\'", "Short");
             return;
@@ -216,10 +230,8 @@ public class MainActivity extends AppCompatActivity {
             transaction.hide(mainPage);
         }
         transaction.replace(R.id.frameWindow, schedule, "SchedulePage");
-        //transaction.add(R.id.frameWindow, sensors, "SensorPage");
         transaction.show(schedule);
         transaction.commit();
-//        SwitchToFragment(schedule);
     }
 
 
@@ -272,15 +284,14 @@ public class MainActivity extends AppCompatActivity {
             TextView connection = (TextView) findViewById(R.id.connectStatus);
             progressBar.setVisibility(ProgressBar.INVISIBLE);
 
-            // TODO Perhaps we do REGEX validation on data
-            //  to check to be sure it is formatted correctly.... (hummm)
             // If a server response is bad/empty, then 'break fast'
-            if (result == null | result == "null") {
+            if (result == null | result.equals("null")) {
                 HaveData = false;
                 connection.setText("Error");
                 return;
             }
 
+            // There is a risk that one of the 1st three URL requests fail, but this still works...
             // For each AsyncTask that runs, save its return value into our array
             PiResponses[saveIndex] = result;
 
@@ -294,16 +305,13 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "class " + (PiResponses[0]).getClass().toString());
 
-                // TODO Set data in the rest of the views
-
-                ((Button) findViewById(R.id.viewTimer)).setTextColor(Color.rgb(0, 0, 0));
-                ((Button) findViewById(R.id.viewSensors)).setTextColor(Color.rgb(0, 0, 0));
+//                ((Button) findViewById(R.id.viewTimer)).setTextColor(Color.rgb(0, 0, 0));
+//                ((Button) findViewById(R.id.viewSensors)).setTextColor(Color.rgb(0, 0, 0));
 
 
                 // TODO Get the data unpacked and shown to the user! IF There is an error, we need to stop the threads!
                 try {
                     DaysZonesTimes = new JSONObject(PiResponses[1]);
-//                    Log.d(TAG, DaysZonesTimes.getJSONArray("Monday").getString(1));  // {"Monday": [false, 100, 250]} --> 100
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -312,7 +320,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                // TODO Get XbeeSensor data read into a usable object thing!
                 try {
                     XbeeSensors = new JSONObject(PiResponses[3]);
                 } catch (JSONException e) {
@@ -322,9 +329,7 @@ public class MainActivity extends AppCompatActivity {
                 // Update Values in Fragments
                 if (manager.findFragmentByTag("MainPage") != null) mainPage.updateValues();
                 if (manager.findFragmentByTag("SensorPage") != null) sensors.updateValues();
-
-
-                ToastMessage("Success!!!", "Short");
+                if (manager.findFragmentByTag("SchedulePage") != null) schedule.updateValues();
             }
         }
     }
@@ -342,8 +347,9 @@ public class MainActivity extends AppCompatActivity {
         // https://developer.android.com/reference/java/net/DatagramSocketImpl
 
         // Here are two static addresses to the RPi
-        String[] URL = {"http://seniorproject.figureix.com:8008",
-                "http://192.168.1.104:8008"
+        String[] URL = {"http://192.168.1.104:8008",
+                "http://seniorproject.figureix.com:8008",
+                "http://10.0.2.2:8008"
         };
         // And the available file paths on the Pi
         String[] PATHS = {"/TimerControl/State/",
@@ -365,56 +371,29 @@ public class MainActivity extends AppCompatActivity {
         // This code allows us to run an Android OS program -- In this case, PING
         Runtime runtime = Runtime.getRuntime();
         try {
-            // Try to ping the RPi server, and wait for the return value (a zero == success)
-            Process pingAddr = runtime.exec("/system/bin/ping -c 1 192.168.1.104");
-            int retVal = pingAddr.waitFor();
-            Log.d(TAG, "UpdateData: Ping result=" + retVal);
-            // If we can ping the RPi server (we are in the same network)
-            if (retVal == 0) {
-                for (int i = 0; i < PATHS.length; i++) {
-                    try {
-                        // Request data from the RPi server, using the LocalLAN IP Address
-                        URL webUrl = ServerConnect.buildURL(URL[1] + PATHS[i]);
-                        new PiQuery(i).execute(webUrl);
-                    } catch (Exception e) {
-                        Log.d("UpdateData", "We have Try Error");
-                    }
-                }
+            int retVal = 1;
+
+            if (CurrentGatewayAddress.equals("192.168.1.1")) retVal = 0;
+            if (CurrentGatewayAddress.equals("192.168.232.1")) {
+                Process pingAddr = runtime.exec("/system/bin/ping -c 1 192.168.1.104");
+                retVal = pingAddr.waitFor();  //retVal = 1 on fail, 0 on success
+                Log.d(TAG, "UpdateData: Ping result=" + retVal);
+                if (retVal == 1) retVal = 2;
             }
-            // Else, we are not in the same network, attempt Figureix
-            else{
-                for (int i = 0; i < PATHS.length; i++) {
-                    try {
-                        // Request data from the RPi server, using DDNS routing over the internet.
-                        URL webUrl = ServerConnect.buildURL(URL[0] + PATHS[i]);
-                        new PiQuery(i).execute(webUrl);
-                    } catch (Exception e) {
-                        Log.d("UpdateData", "We have Try Error");
-                    }
+
+            for (int i = 0; i < PATHS.length; i++) {
+                try {
+                    // Request data from the RPi server, using the LocalLAN IP Address
+                    URL webUrl = ServerConnect.buildURL(URL[retVal] + PATHS[i]);
+                    new PiQuery(i).execute(webUrl);
+                } catch (Exception e) {
+                    Log.d("UpdateData", "We have Try Error");
                 }
             }
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-
-        // TODO tell any recycler views to update their content
-    }
-
-    // Function to give us quick swaps/transactions of the several fragments we have going.
-    // Essentially, when a new/different Fragment is requested, we
-    // will hide everything, then show the requested fragment
-    public void SwitchToFragment(Fragment switchTo) {
-
-        // TODO Think-about: Do this programmically / iteratively
-        transaction = manager.beginTransaction();
-
-        if (manager.findFragmentByTag("SchedulePage").isVisible()) transaction.hide(schedule);
-        if (manager.findFragmentByTag("SensorPage").isVisible()) transaction.hide(sensors);
-        if (manager.findFragmentByTag("MainPage").isVisible()) transaction.hide(mainPage);
-
-        transaction.show(switchTo);
-        transaction.commit();
     }
 
     // Function to create a popup message to the user.

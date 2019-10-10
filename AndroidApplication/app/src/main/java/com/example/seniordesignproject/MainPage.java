@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -68,11 +67,10 @@ public class MainPage extends Fragment {
         if (mainActivity.HaveData) {
             try {
                 ((TextView) view.findViewById(R.id.sysEnabled)).setText((mainActivity.PiResponses[0].equals("false")) ? "Disabled" : "Enabled");
-//            ((TextView) view.findViewById(R.id.sysEnabled)).setText((mainActivity.PiResponses[0].equals("false")) ? "Disabled" : "Enabled");
-//            ((TextView) mainActivity.findViewById(R.id.moisture)).setText(((JSONArray) mainActivity.Thresholds.get("Moisture")).getInt(0));
-//            ((TextView) mainActivity.findViewById(R.id.tempurature)).setText(((JSONArray) mainActivity.Thresholds.get("Temperature")).getInt(0));
-//            ((TextView) mainActivity.findViewById(R.id.wind)).setText(((JSONArray) mainActivity.Thresholds.get("Wind")).getInt(0));
-//            ((TextView) mainActivity.findViewById(R.id.rain)).setText(((JSONArray) mainActivity.Thresholds.get("Rain")).getInt(0));
+                ((TextView) view.findViewById(R.id.moisture)).setText(((JSONArray) mainActivity.Thresholds.get("Moisture")).getString(0));
+            ((TextView) view.findViewById(R.id.tempurature)).setText(((JSONArray) mainActivity.Thresholds.get("Temperature")).getString(0));
+            ((TextView) view.findViewById(R.id.wind)).setText(((JSONArray) mainActivity.Thresholds.get("Wind")).getString(0));
+            ((TextView) mainActivity.findViewById(R.id.rain)).setText(((JSONArray) mainActivity.Thresholds.get("Rain")).getString(0));
             } catch (Exception e) {
                 e.printStackTrace();
             }

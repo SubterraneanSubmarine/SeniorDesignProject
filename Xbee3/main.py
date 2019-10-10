@@ -13,7 +13,7 @@ import xbee
 import time
 from machine import Pin, ADC
 
-# SLEEP_DURATION = 500
+# SLEEP_DURATION = 500*1000
 SLEEP_DURATION = 10
 
 SELF = xbee.XBee()
@@ -99,6 +99,6 @@ while True:
     # We need to have a way to stop the device from sleeping as it
     # makes reconnecting to the device almost impossible
     if sleep_disable.value():
-        time.sleep(SLEEP_DURATION)
+        time.sleep_ms(SLEEP_DURATION)
     else:
         SELF.sleep_now(SLEEP_DURATION, pin_wake=False)

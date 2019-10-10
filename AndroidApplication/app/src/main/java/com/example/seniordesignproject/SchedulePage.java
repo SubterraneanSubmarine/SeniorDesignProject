@@ -29,6 +29,14 @@ public class SchedulePage extends Fragment {
     private static final String TAG = "S.D.A.SchedulePage";  // Used for debug output
 
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.schedule_layout, container, false);
+        return view;
+    }
+
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
@@ -36,12 +44,20 @@ public class SchedulePage extends Fragment {
 
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.schedule_layout, container, false);
-        return view;
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.d(TAG, "onResume");
+    }
+
+    public void updateValues() {
+        Log.d(TAG, "updateValues -- TODO");
     }
 
     // TODO Create check boxes and text input areas for future data POSTing to Pi

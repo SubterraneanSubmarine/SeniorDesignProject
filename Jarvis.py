@@ -25,6 +25,7 @@ avMoisture = 0
 avWind = 0
 avTemp = 0
 avRain = 0
+avHumid = 0
 
 
 # Threshold values to prevent system from running
@@ -62,6 +63,19 @@ Translates too...
     { '\x00\x13\xa2\x00F\x99B\xc3' : { 'Iteration': 25, 'Value': 323, 'Zone': 1 } }
 Thus, we are able search values like so: SensorStats[<macaddress>]["Iteration"]
 '''
-SensorStats = {}
-
-# TODO Ensure that the MainCoordingator is picked up in the SensorStats
+# SensorStats = {}
+SensorStats = {'xbee1': {'Moisture': 5, 
+                            'Sunlight': 8, 
+                            'Battery': 99, 
+                            'Sector': 9, 
+                            'Iteration': 33333}, 
+                'xbee2': {'Moisture': 5, 
+                            'Sunlight': 8, 
+                            'Battery': 99, 
+                            'Sector': 9, 
+                            'Iteration': 33333}, 
+                'xbee3': {'Moisture': 5, 
+                            'Sunlight': 8, 
+                            'Battery': 99, 
+                            'Sector': 9, 
+                            'Iteration': 33333}}

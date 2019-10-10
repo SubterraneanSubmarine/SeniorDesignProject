@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="System Enabled: "
+        android:text="System Status: "
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@+id/tempuratureLabel"
@@ -21,9 +21,12 @@
         android:id="@+id/sysEnabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="128dp"
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.7"
         app:layout_constraintStart_toEndOf="@+id/sysEnableLabel"
         app:layout_constraintTop_toTopOf="@+id/sysEnableLabel" />
 
@@ -56,6 +59,8 @@
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.28"
         app:layout_constraintStart_toEndOf="@+id/moistureLabel"
         app:layout_constraintTop_toTopOf="@+id/moistureLabel" />
 
@@ -79,6 +84,8 @@
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.28"
         app:layout_constraintStart_toEndOf="@+id/tempuratureLabel"
         app:layout_constraintTop_toTopOf="@+id/tempuratureLabel" />
 
@@ -100,6 +107,8 @@
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.28"
         app:layout_constraintStart_toEndOf="@+id/windLabel"
         app:layout_constraintTop_toTopOf="@+id/windLabel" />
 
@@ -108,7 +117,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Av. Rain"
+        android:text="Av. Rain: "
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@+id/windLabel"
@@ -121,20 +130,11 @@
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.28"
         app:layout_constraintStart_toEndOf="@+id/rainLable"
         app:layout_constraintTop_toTopOf="@+id/rainLable" />
 
-
-    <!--    <fragment-->
-<!--        android:id="@+id/mainfrag"-->
-<!--        android:name="com.example.seniordesignproject.MainPage"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/constServerConnectionConnection"-->
-<!--        tools:layout="@layout/main_layout" />-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -35,6 +35,23 @@ def SprinklerRunner():
         # If the sprinkler system is enabled/on
         if Jarvis.SystemEnabled:
             # Here we do lots of checks. We can check threshold values, days/times enabled, etc -- this is the logic for triggering the relays to start sprinkling
+            
+            '''
+            if Jarvis.NewSensorData:
+                with Jarvis.lock:
+                    Jarvis.NewSensorData = False  # HAL.py/TalkToXbee will set to True
+                
+                # Rotate through the list of Xbee nodes, and check which have a low moisture reading.
+                    # When low, prep to do a watering of that sector
+                    # If node is reported LowHealth, check default watering schedule
+
+                if Jarvis.avMoisture > 55555555:  #cumulative yard, or per-sector?
+                    if CurrentWind > 5:
+                        
+                    
+            '''
+            
+
 
             # If [today is enabled] AND the CURRENT_TIME is between [start] and [end]: Turn on sprinklers
             if (Jarvis.TimerTriggering.get(datetime.now().strftime("%A"))[0]
