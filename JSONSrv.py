@@ -63,17 +63,21 @@ class PiSrv(BaseHTTPRequestHandler):
             self.set_header()
 
             # We have a valid path requested, return the Data requested
+            # In order to prevent the Android App from truncating any of our responses, 
+            #       three tildes "~~~" will be appended to our transmitted message
+            #       On the Android App side: The stream scanner will use a delimiter value of "~"
+            #       Thus, ensuring* capture of our transmitted message
             if requestPath == AvailablePaths[0]:  # "/TimerControl/State/"
-                self.wfile.write(json.dumps(Jarvis.SystemEnabled).encode("utf-8"))
+                self.wfile.write(json.dumps(Jarvis.SystemEnabled).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[1]: # "/TimerControl/DaysZonesTimes/"
-                self.wfile.write(json.dumps(Jarvis.TimerTriggering).encode("utf-8"))
+                self.wfile.write(json.dumps(Jarvis.TimerTriggering).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[2]: # "/TimerControl/Thresholds/"
-                self.wfile.write(json.dumps(Jarvis.Thresholds).encode("utf-8"))
+                self.wfile.write(json.dumps(Jarvis.Thresholds).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[3]: # "/Xbee3/Dump/"
-                self.wfile.write(json.dumps(Jarvis.SensorStats).encode("utf-8"))
+                self.wfile.write(json.dumps(Jarvis.SensorStats).encode("utf-8") + "~~~".encode("utf-8"))
             #TODO Get data from GPIO \ stored data and return in Dump
 
         else:
