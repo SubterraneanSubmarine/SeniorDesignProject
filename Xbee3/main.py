@@ -47,6 +47,7 @@ sw_bit_0 = Pin("P0", Pin.IN, Pin.PULL_DOWN)
 sw_bit_1 = Pin("P1", Pin.IN, Pin.PULL_DOWN)
 # Sleep disable pin logic should be flipped to maintain consistency
 sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
+#sleep_disable = Pin("P2", Pin.IN, Pin.PULL_UP)
 moisture_sensor_power = Pin("P5", Pin.OUT)
 moisture_probe = ADC("D3")
 light_sensor = ADC("D2")

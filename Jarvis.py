@@ -28,6 +28,28 @@ avRain = 0
 avHumid = 0
 
 
+"""
+David Carlson & Bryce Martin
+ECE 4800 Senior Design Project
+
+This File represents the globally accesed variables/objects/data
+intractions of the Pi and (Xbee and Relays)
+This will also save/load stored data.
+
+Tested in Python3.7 and 3.4(RPi)
+"""
+
+import threading
+
+# TODO Outline what threads are modifying what data -- perhaps create separate mutex locks?
+lock = threading.Lock()  # Mutex for threads to grab when changing values here
+ProgramRunning = True
+
+# Initial States of system
+SystemEnabled = False
+NewSensorData = False
+
+
 # Threshold values to prevent system from running
 # "Name": [AvValue, CurrentSensorValue, TurnOffLimit]
 Thresholds = {
@@ -38,9 +60,9 @@ Thresholds = {
 }
 
 
-# "Day": Active[bool], StartTime[int], EndTime[int]  -> (military time)  # Make sure we handle watering from 2300 to 0100
+# "Day": Active[bool], StartTime[int], EndTime[int]  -> (military time)
 # "Monday": [True, 0, 230] -> 0 == 12:00am, 230 == 2:30am, ... 2314 == 11:14pm
-#TODO reset these to default values
+# TODO reset these to default values
 TimerTriggering = {
     "Sunday": [False, 0, 100],
     "Monday": [False, 100, 230],
@@ -52,30 +74,38 @@ TimerTriggering = {
 }
 
 
+def set_new():
+    with lock:
+        ProgramRunning = True
 
 
-'''
-Nested Dictionaries
-HAL.py builds this up based on received messages from Xbee Coord.
-example:
-    { <sender_eui64>: { <payload from xbee> } }
-Translates too...
-    { '\x00\x13\xa2\x00F\x99B\xc3' : { 'Iteration': 25, 'Value': 323, 'Zone': 1 } }
-Thus, we are able search values like so: SensorStats[<macaddress>]["Iteration"]
-'''
+def get_new():
+    if ProgramRunning:
+        with lock:
+            ProgramRunning = False
+        return True
+    return False
+
+
+SensorStats = [None] * 4
+# TODO Ensure that the Main Coordinator is picked up in the SensorStats
+
+
+
+
 # SensorStats = {}
-SensorStats = {'xbee1': {'Moisture': 5, 
-                            'Sunlight': 8, 
-                            'Battery': 99, 
-                            'Sector': 9, 
-                            'Iteration': 33333}, 
-                'xbee2': {'Moisture': 5, 
-                            'Sunlight': 8, 
-                            'Battery': 99, 
-                            'Sector': 9, 
-                            'Iteration': 33333}, 
-                'xbee3': {'Moisture': 5, 
-                            'Sunlight': 8, 
-                            'Battery': 99, 
-                            'Sector': 9, 
-                            'Iteration': 33333}}
+# SensorStats = {'xbee1': {'Moisture': 5, 
+#                             'Sunlight': 8, 
+#                             'Battery': 99, 
+#                             'Sector': 9, 
+#                             'Iteration': 33333}, 
+#                 'xbee2': {'Moisture': 5, 
+#                             'Sunlight': 8, 
+#                             'Battery': 99, 
+#                             'Sector': 9, 
+#                             'Iteration': 33333}, 
+#                 'xbee3': {'Moisture': 5, 
+#                             'Sunlight': 8, 
+#                             'Battery': 99, 
+#                             'Sector': 9, 
+#                             'Iteration': 33333}}
