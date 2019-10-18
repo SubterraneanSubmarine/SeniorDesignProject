@@ -13,8 +13,8 @@ import xbee
 import time
 from machine import Pin, ADC
 
-# SLEEP_DURATION = 500*1000
-SLEEP_DURATION = 10
+# SLEEP_DURATION = 500*1000  # 1000ms in 1 sec
+SLEEP_DURATION = 10000 #30000 #1800000  # 30*60*1000  # 30min * 60sec/min * 1000ms/sec
 
 SELF = xbee.XBee()
 # Set the identifying string of the radio
@@ -46,7 +46,7 @@ tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
 sw_bit_0 = Pin("P0", Pin.IN, Pin.PULL_DOWN)
 sw_bit_1 = Pin("P1", Pin.IN, Pin.PULL_DOWN)
 # Sleep disable pin logic should be flipped to maintain consistency
-sleep_disable = Pin("P2", Pin.IN, Pin.PULL_UP)
+sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
 moisture_sensor_power = Pin("P5", Pin.OUT)
 moisture_probe = ADC("D3")
 light_sensor = ADC("D2")
@@ -54,6 +54,8 @@ light_sensor = ADC("D2")
 iteration = 0
 
 while True:
+    tilt_high = Pin("P6", Pin.OUT)
+    tilt_high.on()
     # Aggregate data
     if tilt_switch.value():
 
@@ -98,7 +100,11 @@ while True:
     # In order for the device to sleep it must be an end node
     # We need to have a way to stop the device from sleeping as it
     # makes reconnecting to the device almost impossible
-    if sleep_disable.value():
-        time.sleep_ms(SLEEP_DURATION)
-    else:
+    if sleep_enable.value():
         SELF.sleep_now(SLEEP_DURATION, pin_wake=False)
+        time.sleep_ms(10)
+        # xbee.transmit(xbee.ADDR_COORDINATOR, "(deep)Good Morning... Dave -- tilt is: " + str(tilt_switch.value()))
+    else:
+        time.sleep_ms(SLEEP_DURATION)
+        # xbee.transmit(xbee.ADDR_COORDINATOR, "(norm)Good Morning... Dave -- tilt is: " + str(tilt_switch.value()))
+

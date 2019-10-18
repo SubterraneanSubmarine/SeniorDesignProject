@@ -37,6 +37,18 @@ def SprinklerRunner():
             # Here we do lots of checks. We can check threshold values, days/times enabled, etc -- this is the logic for triggering the relays to start sprinkling
             
             '''
+            while wateringQue is not empty AND program is running:
+                if wind < fast:
+                    while wind < hystersis value AND program is running AND water duration is not finished
+                    if temp > veryHigh:
+                        Water the lawn to cool it down   : Minaie wants a paper/reference for this
+                    if light is dark and humidity high:
+                        don't water == fungus among us
+                    if 
+
+
+
+
             if Jarvis.NewSensorData:
                 with Jarvis.lock:
                     Jarvis.NewSensorData = False  # HAL.py/TalkToXbee will set to True

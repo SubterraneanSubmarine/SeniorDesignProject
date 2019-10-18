@@ -49,6 +49,7 @@ def ConvertToDict(bytes_in):
     payload = "{" + splitList[1] + splitList[3][2:]     # ==> {'payload': {'Iteration': 0, 'Value': 345, 'Zone': 2}',
     payload = payload[:-3] + "}"                        # ==> {'payload': {'Iteration': 0, 'Value': 345, 'Zone': 2}}
 
+
     temp = splitList[0] + splitList[5] + splitList[6]   # ==> {'profile': 49413, 'dest_ep': 232, 'broadcast': False, 'sender_nwk': 38204, 'source_ep': 232, 'sender_eui64': b'\x00\x13\xa2\x00A\x99O\xcc', 'cluster': 17}
     
     # Get our modified strings ready for JSON-ifying
@@ -59,7 +60,7 @@ def ConvertToDict(bytes_in):
     payload = json.loads(payload)
     temp = json.loads(temp)
     temp.update(payload)  # Merge dictionaries -- get the payload into the object
-    return temp  # Returns a nested Dictionary Object
+    return payload #temp  # Returns a nested Dictionary Object
 
 def TalkToXbee():
     if platform == "linux":
@@ -82,17 +83,21 @@ def TalkToXbee():
                 except:
                     print("We have failed to convert the payload...")
 
-                # If the payload contains a sender_eui64...
-                if temp.get("sender_eui64") != None:
+                # If the payload contains a sender_eui64...         # Change this to Zone!
+                # if temp.get("sender_eui64") != None:
+                if temp.get("Payload")["Zone"] != None:
 
                     # If the eui_64 does not exist in our database (dictionary)
-                    if Jarvis.SensorStats.get(temp["sender_eui64"]) == None:
+                    # if Jarvis.SensorStats.get(temp["sender_eui64"]) == None:
+                    if Jarvis.SensorStats.get(temp["Payload"]["Zone"]) == None:
                         # Then add it as a Key
-                        Jarvis.SensorStats[temp["sender_eui64"]] = {}
+                        # Jarvis.SensorStats[temp["sender_eui64"]] = {}
+                        Jarvis.SensorStats[temp["Payload"]["Zone"]] = {}
                         # TODO And save a "Last seen"
                         
                     # The eui_64 is already in our database (dictionary): Update its Value with the new information from the Xbee
-                    Jarvis.SensorStats[temp["sender_eui64"]].update(temp["payload"])
+                    # Jarvis.SensorStats[temp["sender_eui64"]].update(temp["payload"])
+                    Jarvis.SensorStats[temp["Payload"]["Zone"]].update(temp["Payload"])
                     with Jarvis.lock:
                         Jarvis.NewSensorData = True
                     
@@ -154,4 +159,4 @@ RecieveStrings = [b"{'profile': 49413, 'dest_ep': 232, 'broadcast': False, 'send
 if __name__=='__main__':
     temp = ConvertToDict(RecieveStrings[0])
     print("Payload: ", temp["payload"])
-    print("Payload->Value: ", temp["payload"]["Value"])
+    print("Payload->Value: ", temp["payload"]["Zone"])
