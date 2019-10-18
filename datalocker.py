@@ -49,6 +49,19 @@ ProgramRunning = True
 SystemEnabled = False
 NewSensorData = False
 
+def set_new():
+    with lock:
+        NewSensorData = True
+
+
+def get_new():
+    if ProgramRunning:
+        with lock:
+            NewSensorData = False
+        return True
+    return False
+
+
 
 # Threshold values to prevent system from running
 # "Name": [AvValue, CurrentSensorValue, TurnOffLimit]
@@ -74,17 +87,6 @@ TimerTriggering = {
 }
 
 
-def set_new():
-    with lock:
-        ProgramRunning = True
-
-
-def get_new():
-    if ProgramRunning:
-        with lock:
-            ProgramRunning = False
-        return True
-    return False
 
 
 SensorStats = [None] * 4

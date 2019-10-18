@@ -9,11 +9,11 @@ Tested in Python3.7 and 3.4(RPi)
 """
 from time import sleep
 from sys import platform
+from collections import deque
 import datalocker
 import busio
 import digitalio
 import board
-
 
 
 # TODO During initial setup from android app -- ask for time+timezone+dst! (or base everything off utc?)
@@ -55,6 +55,10 @@ def sprinkler_runner():
             # When the moisture of an area falls below the threshold add to watering queue
             if datalocker.get_new():
 
+                someval = []
+                # TODO interate through Nodes, added low moisture nodes to que
+                # TODO Do lots of checks on que -- if tests pass, start watering and remove from que
+                
                 # Manage the watering queue by evaluating the current weather conditions
 
                 # If conditions are met start watering
@@ -70,12 +74,6 @@ def sprinkler_runner():
                             don't water == fungus among us
                         if 
 
-
-
-
-                if Jarvis.NewSensorData:
-                    with Jarvis.lock:
-                        Jarvis.NewSensorData = False  # HAL.py/TalkToXbee will set to True
                     
                     # Rotate through the list of Xbee nodes, and check which have a low moisture reading.
                         # When low, prep to do a watering of that sector

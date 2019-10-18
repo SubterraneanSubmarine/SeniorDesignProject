@@ -67,12 +67,6 @@ def convert_to_dict(bytes_in):
     return returndict  #temp  # Returns a nested Dictionary Object
 
 
-
-
-
-
-
-
 def talk_to_xbee():
     serial_set = False
 
