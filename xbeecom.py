@@ -132,7 +132,7 @@ def talk_to_xbee():
             datalocker.SensorStats[temp.get('Sector')] = temp
             datalocker.set_new()
 
-            # TODO Do XbeeHealthCheck!
+            # TODO Do XbeeHealthCheck! -- Here, or in scheduler?
                         # rotate through list of Xbee's. Update its 'last seen'
                         # if a Xbee misses an update 6 times, User needs Alert!
                         # if a nodes light level -- reletive to the others is low, for 4 samples, User needs Alert!

@@ -19,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import json
 # import ssl
-import Jarvis
+import datalocker
 
 
 # Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}
@@ -63,13 +63,10 @@ class PiSrv(BaseHTTPRequestHandler):
             self.set_header()
 
             # We have a valid path requested, return the Data requested
-<<<<<<< HEAD
             # In order to prevent the Android App from truncating any of our responses, 
             #       three tildes "~~~" will be appended to our transmitted message
             #       On the Android App side: The stream scanner will use a delimiter value of "~"
             #       Thus, ensuring* capture of our transmitted message
-=======
->>>>>>> 078a39316d2041b84276a880c93c80054a22d3b3
             if requestPath == AvailablePaths[0]:  # "/TimerControl/State/"
                 self.wfile.write(json.dumps(Jarvis.SystemEnabled).encode("utf-8") + "~~~".encode("utf-8"))
 

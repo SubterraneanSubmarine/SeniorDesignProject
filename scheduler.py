@@ -84,7 +84,8 @@ def sprinkler_runner():
             if len(wateringQue) > 0:
                 for inQue in wateringQue:
                     current_time = int(datetime.now().strftime("%H%M"))
-                    fallback_endTime = current_time + 
+                    # TODO This about duration/fallback time -- doing it this way will result in erroneous durations...
+                    # fallback_endTime = current_time + (datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[2] - datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[1])
                     if (inQue["Wind"] < wind_limit
                             # Short Circuit when it is Very Hot! # TODO: perhaps don't check this here, but after passing all the other tests (To decide how long to water the lawn)
                             and ((inQue["Temperature"] > temp_ceil and current_time in range(700, 2100)) 

@@ -13,9 +13,9 @@ import signal
 import sys
 from time import sleep
 import JSONSrv
-import Edith
-import Hal
-import Jarvis
+import scheduler
+import xbeecom
+import datalocker
 
 
 #TODO First Run:

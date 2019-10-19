@@ -27,28 +27,6 @@ avTemp = 0
 avRain = 0
 avHumid = 0
 
-
-"""
-David Carlson & Bryce Martin
-ECE 4800 Senior Design Project
-
-This File represents the globally accesed variables/objects/data
-intractions of the Pi and (Xbee and Relays)
-This will also save/load stored data.
-
-Tested in Python3.7 and 3.4(RPi)
-"""
-
-import threading
-
-# TODO Outline what threads are modifying what data -- perhaps create separate mutex locks?
-lock = threading.Lock()  # Mutex for threads to grab when changing values here
-ProgramRunning = True
-
-# Initial States of system
-SystemEnabled = False
-NewSensorData = False
-
 def set_new():
     with lock:
         NewSensorData = True
@@ -62,7 +40,7 @@ def get_new():
     return False
 
 
-
+# TODO Do we want to use this?
 # Threshold values to prevent system from running
 # "Name": [AvValue, CurrentSensorValue, TurnOffLimit]
 Thresholds = {
