@@ -179,11 +179,11 @@ RecieveStrings = [b"{'profile': 49413, 'dest_ep': 232, 'broadcast': False, 'send
 
 SAMPLE DATA
 {'Iteration': 301, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2289, 'Second': 27, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 302, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2288, 'Second': 37, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 303, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2285, 'Second': 47, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 304, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2284, 'Second': 57, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
+{'Iteration': 302, 'Sector': 2, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2288, 'Second': 37, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
+{'Iteration': 303, 'Sector': 3, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2285, 'Second': 47, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
+{'Iteration': 304, 'Sector': 0, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2284, 'Second': 57, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
 {'Iteration': 305, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2282, 'Second': 7, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 306, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2282, 'Second': 17, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
+{'Iteration': 306, 'Sector': 3, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2282, 'Second': 17, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
 {'Iteration': 307, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2279, 'Second': 28, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
 {'Iteration': 308, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2279, 'Second': 38, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
 {'Iteration': 309, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2278, 'Second': 48, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
