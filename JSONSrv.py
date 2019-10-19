@@ -19,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import json
 # import ssl
-import Jarvis
+import datalocker
 
 
 # Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}

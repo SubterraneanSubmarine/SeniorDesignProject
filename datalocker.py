@@ -27,7 +27,20 @@ avTemp = 0
 avRain = 0
 avHumid = 0
 
+def set_new():
+    with lock:
+        NewSensorData = True
 
+
+def get_new():
+    if ProgramRunning:
+        with lock:
+            NewSensorData = False
+        return True
+    return False
+
+
+# TODO Do we want to use this?
 # Threshold values to prevent system from running
 # "Name": [AvValue, CurrentSensorValue, TurnOffLimit]
 Thresholds = {
@@ -38,9 +51,9 @@ Thresholds = {
 }
 
 
-# "Day": Active[bool], StartTime[int], EndTime[int]  -> (military time)  # Make sure we handle watering from 2300 to 0100
+# "Day": Active[bool], StartTime[int], EndTime[int]  -> (military time)
 # "Monday": [True, 0, 230] -> 0 == 12:00am, 230 == 2:30am, ... 2314 == 11:14pm
-#TODO reset these to default values
+# TODO reset these to default values
 TimerTriggering = {
     "Sunday": [False, 0, 100],
     "Monday": [False, 100, 230],
@@ -54,28 +67,25 @@ TimerTriggering = {
 
 
 
-'''
-Nested Dictionaries
-HAL.py builds this up based on received messages from Xbee Coord.
-example:
-    { <sender_eui64>: { <payload from xbee> } }
-Translates too...
-    { '\x00\x13\xa2\x00F\x99B\xc3' : { 'Iteration': 25, 'Value': 323, 'Zone': 1 } }
-Thus, we are able search values like so: SensorStats[<macaddress>]["Iteration"]
-'''
+SensorStats = [None] * 4
+# TODO Ensure that the Main Coordinator is picked up in the SensorStats
+
+
+
+
 # SensorStats = {}
-SensorStats = {'xbee1': {'Moisture': 5, 
-                            'Sunlight': 8, 
-                            'Battery': 99, 
-                            'Sector': 9, 
-                            'Iteration': 33333}, 
-                'xbee2': {'Moisture': 5, 
-                            'Sunlight': 8, 
-                            'Battery': 99, 
-                            'Sector': 9, 
-                            'Iteration': 33333}, 
-                'xbee3': {'Moisture': 5, 
-                            'Sunlight': 8, 
-                            'Battery': 99, 
-                            'Sector': 9, 
-                            'Iteration': 33333}}
+# SensorStats = {'xbee1': {'Moisture': 5, 
+#                             'Sunlight': 8, 
+#                             'Battery': 99, 
+#                             'Sector': 9, 
+#                             'Iteration': 33333}, 
+#                 'xbee2': {'Moisture': 5, 
+#                             'Sunlight': 8, 
+#                             'Battery': 99, 
+#                             'Sector': 9, 
+#                             'Iteration': 33333}, 
+#                 'xbee3': {'Moisture': 5, 
+#                             'Sunlight': 8, 
+#                             'Battery': 99, 
+#                             'Sector': 9, 
+#                             'Iteration': 33333}}
