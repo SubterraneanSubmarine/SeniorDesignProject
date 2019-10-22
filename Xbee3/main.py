@@ -12,12 +12,11 @@ import xbee
 import time
 from machine import Pin, ADC
 
-
 SLEEP_DURATION = 300 * 1000  # In seconds between soil samples
 AVERAGE_SAMPLES = 3  # Number of soil samples to be taken before transmission
 LOW_VOLT_THRESH = 2300  # Voltage floor before sleep duration time is increased.
-LOW_LIGHT_THRESH = 4000  # Photoresistor ceiling before sleep duration time is increased.
-SLEEP_MULTIPLIER = 2  # Sleep duration will be multiplied by this number if one of the above conditions are met
+LOW_LIGHT_THRESH = 4000  # Photo resistor ceiling before sleep duration time is increased.
+SLEEP_MULTIPLIER = 3  # Sleep duration will be multiplied by this number if one of the above conditions are met
 
 # Configure some basic network settings
 network_settings = {"AV": 2, "EE": 0, "ID": 0xABCD, "SM": 6}
@@ -38,16 +37,13 @@ operating_network = ["OI", "OP", "CH"]
 print("Operating network parameters:")
 for cmd in operating_network:
     print("{}: {}".format(cmd, xbee.atcmd(cmd)))
-
 # Wait for hub acknowledgement
 
-
 # Pin Setup
-tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
 moisture_sensor_power = Pin("P5", Pin.OUT)
-sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
 moisture_probe = ADC("D3")
 light_sensor = ADC("D2")
+sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
 
 # Unused Pins are set as outputs to reduce sleep current
 Pin("D1", Pin.OUT)
@@ -68,53 +64,58 @@ ambiance = 0  # Light readings are also kept between loop iterations for evaluat
 
 while True:
     # Aggregate data
-    if tilt_switch.value():
-        sw_bit_0 = Pin("P0", Pin.IN, Pin.PULL_DOWN)
-        sw_bit_1 = Pin("P1", Pin.IN, Pin.PULL_DOWN)
+    sw_bit_0 = Pin("P0", Pin.IN, Pin.PULL_DOWN)
+    sw_bit_1 = Pin("P1", Pin.IN, Pin.PULL_DOWN)
+    tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
 
-        # Evaluate current iteration number
-        iteration += 1
+    # Evaluate current iteration number
+    iteration += 1
 
-        if iteration > AVERAGE_SAMPLES:
-            moisture = moisture_average / AVERAGE_SAMPLES
-            ambiance = light_average / AVERAGE_SAMPLES
+    if iteration > AVERAGE_SAMPLES:
+        moisture = moisture_average / AVERAGE_SAMPLES
+        ambiance = light_average / AVERAGE_SAMPLES
 
-            # Zero out iteration and running average variables
-            iteration = 0
-            moisture_average = 0
-            light_average = 0
+        # Zero out iteration and running average variables
+        iteration = 0
+        moisture_average = 0
+        light_average = 0
 
-            # Evaluate voltage of power supply rail
-            battery = xbee.atcmd("%V")
-            # Evaluate dip switch positions
-            zone = 0x3 & (sw_bit_1.value() << 1) | (sw_bit_0.value())
+        # Evaluate voltage of power supply rail
+        battery = xbee.atcmd("%V")
+        switch = tilt_switch.value()
+        # Evaluate dip switch positions
+        zone = 0x3 & (sw_bit_1.value() << 1) | (sw_bit_0.value())
 
-            try:
-                print("Sector: " + str(zone) +
-                      "\nMoisture: " + str(moisture) +
-                      "\nSunlight: " + str(ambiance) +
-                      "\nBattery: " + str(battery) +
-                      "\n")
-                xbee.transmit(xbee.ADDR_COORDINATOR,
-                              (", 'Sector': " + str(zone) +
-                              ", 'Moisture': " + str(moisture) +
-                              ", 'Sunlight': " + str(ambiance) +
-                              ", 'Battery': " + str(battery) + "}")
-                              )
-            except Exception as err:
-                print(err)
-        else:
-            # Read data from moisture probe
-            moisture_sensor_power.on()
-            time.sleep_ms(100)
-            moisture_average += moisture_probe.read()
-            moisture_sensor_power.off()
+        try:
+            print("Sector: " + str(zone) +
+                  "\nMoisture: " + str(moisture) +
+                  "\nSunlight: " + str(ambiance) +
+                  "\nBattery: " + str(battery) +
+                  "\nTilt: " + str(switch) +
+                  "\n")
+            xbee.transmit(xbee.ADDR_COORDINATOR,
+                          (", 'Sector': " + str(zone) +
+                           ", 'Moisture': " + str(moisture) +
+                           ", 'Sunlight': " + str(ambiance) +
+                           ", 'Battery': " + str(battery) +
+                           ", 'Tilt': " + str(switch) +
+                           "}")
+                          )
+        except Exception as err:
+            print(err)
+    else:
+        # Read data from moisture probe
+        moisture_sensor_power.on()
+        time.sleep_ms(100)
+        moisture_average += moisture_probe.read()
+        moisture_sensor_power.off()
 
-            # Evaluate ambient light in area
-            light_average += light_sensor.read()
+        # Evaluate ambient light in area
+        light_average += light_sensor.read()
 
-        sw_bit_0 = Pin("P0", Pin.OUT)
-        sw_bit_1 = Pin("P1", Pin.OUT)
+    sw_bit_0 = Pin("P0", Pin.OUT)
+    sw_bit_1 = Pin("P1", Pin.OUT)
+    tilt_switch = Pin("D8", Pin.OUT)
 
     # Sleep duration evaluation
     sleep = SLEEP_DURATION
