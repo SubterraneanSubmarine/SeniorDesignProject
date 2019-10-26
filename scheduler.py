@@ -44,18 +44,14 @@ def log_data(payload):
     file_out.close()
 
 
-
 # TODO, determine all of these threshold values  --  use all of them?
-wind_limit = 6  # m/s
-wind_hystersis = 8
+wind_limit = 10  # m/s
 humid_limit = 45  # RH
-humid_hystersis = 50
 light_limit = 10
-light_hystersis = 15
-temp_ceil = 42  # C
 temp_floor = 6  # C
 moist_target = datalocker.Thresholds["Moisture"][2] + 10  # TODO Do we want to hit a target moisture level
 moist_floor = datalocker.Thresholds["Moisture"][2]
+start_time = 0
 
 """
 User can set fallback times/durations
@@ -63,7 +59,6 @@ User can set default watering duration -- Moisture trigger --> water for X mins 
 Stretch goal: User edits wind limits
 User can adjust humidity threshold
 User can adjust light settings
-
 """
 
 wateringQue = []
@@ -85,7 +80,8 @@ def sprinkler_runner():
         # If the sprinkler system is enabled/on
         if datalocker.SystemEnabled:
             # When the moisture of an area falls below the threshold add to watering queue
-            current_time = int(datetime.timestamp(datetime.now()))
+            current_time_seconds = int(datetime.timestamp(datetime.now()))
+            
             if datalocker.get_new():
                 number_of_sensors = datalocker.SensorCount()
                 for sensor in datalocker.SensorStats:
@@ -100,13 +96,12 @@ def sprinkler_runner():
 
                     # Do HealthCheck // compare light level of nodes to an average of each other. Record last update as well
                     
-
                     # If this is the first time we have seen this node, initialize the history
                     # The 'Sector' will be the index to the history list
                     if datalocker.NodeLastSeen_Light[sensor["Sector"]][datalocker.HISTORY_LENGTH - 1] is None:
                         while i < datalocker.HISTORY_LENGTH:
                             datalocker.NodeLastSeen_Light[sensor["Sector"]][i] = sensor["Light"]
-                            datalocker.NodeLastSeen_Time[sensor["Sector"]][i] = current_time
+                            datalocker.NodeLastSeen_Time[sensor["Sector"]][i] = current_time_seconds
                             i = i + 1
                         i = 0                       
                     else:
@@ -114,7 +109,7 @@ def sprinkler_runner():
                         datalocker.NodeLastSeen_Light[sensor["Sector"]].pop(0)
                         datalocker.NodeLastSeen_Time[sensor["Sector"]].pop(0)
                         datalocker.NodeLastSeen_Light[sensor["Sector"]].append(sensor["Light"])
-                        datalocker.NodeLastSeen_Time[sensor["Sector"]].append(current_time)
+                        datalocker.NodeLastSeen_Time[sensor["Sector"]].append(current_time_seconds)
 
                         # Values have been updated. Ready for HealthCheck
                         # This loop we are in will allow us to compare each available sensor to its neighbors
@@ -175,30 +170,18 @@ def sprinkler_runner():
                             datalocker.NodeHealthStatus[sensor["Sector"]] = "Green"
 
 
-                
-            # TODO Do lots of checks on que -- if tests pass, start watering and remove from que
             # Manage the watering queue by evaluating the current weather conditions
             # If conditions are met start watering
-            if len(wateringQue) > 0:
-                # TODO This about duration/fallback time -- doing it this way will result in erroneous durations...
-                # fallback_endTime = current_time + (datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[2] - datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[1])
+            if len(wateringQue) > 0 and not start_time:
+                current_time_HM = int(datetime.now().strftime("%H%M"))
                 if (wateringQue[0]["Wind"] < wind_limit
                     and (current_time <= 700 or current_time >= 2100)  # Between 9:00pm and 7:00am
                     and wateringQue[0]["Humidity"] < humid_limit 
                     and wateringQue[0]["Temperature"] > temp_floor       
-                    ):  # Then we have passed all tests, pop d'a que, start a'h wadderin'
+                    ):  # Then we have passed all tests
                     
-                    # Do a watering cycle
-                    while (datalocker.ProgramRunning and datalocker.SystemEnabled
-                            # TODO Read the latest sensor data? OR Run for a User input time?  --  Xbee's will send updates every ______ 10? min
-                            and datalocker.SensorStats[wateringQue[0]["Sector"]]["Wind"] < wind_hystersis
-                            and datalocker.SensorStats[wateringQue[0]["Sector"]]["Moisture"] < moist_target
-                            ):
-                        relays[inQue["Sector"]].value = True
-                    # Water cycle is complete, turn off sector
-                    relays[inQue["Sector"]].value = False
-                    # Remove sector from watering que
-                    wateringQue.pop(0)
+                    relays[wateringQue[0]["Sector"]].value = True
+                    start_time = datetime.timestamp(datetime.now())
 
                 else:  # failed tests 
                     # if the Wind is down AND Today is Enabled AND we are at the user specified start time
@@ -206,20 +189,10 @@ def sprinkler_runner():
                         and datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[0]
                         and int(datetime.now().strftime("%H%M")) >= datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[1]):
                         # Start watering
-                        
-
-                    """
-                    
-                    
-
-                    # If [today is enabled] AND the CURRENT_TIME is between [start] and [end]: Turn on sprinklers  --- ALSO: What is 'today'? 9:00pm to 7:00am?, or the imperical decree of the users watering desire?
-                    if (datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[0]
-                        and int(datetime.now().strftime("%H%M")) >= datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[1]
-                            and int(datetime.now().strftime("%H%M")) < datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[2]):
-                        # Then do this:
-                        # TODO Have user provide a fall-back watering duration
-                        while (datalocker.ProgramRunning 
-                                and datalocker.SystemEnabled
-                                and ):
-                        print("Enable the GPIO for the correct zone!!!!")
-                    """
+                        relays[wateringQue[0]["Sector"]].value = True
+                        start_time = datetime.timestamp(datetime.now())
+            
+            if (datetime.timestamp(datetime.now()) - start_time) > (datalocker.watering_duration_minutes * 60):
+                relays[wateringQue[0]["Sector"]].value = False
+                wateringQue.pop(0)
+                start_time = 0
