@@ -20,6 +20,7 @@ import socketserver
 import json
 # import ssl
 import datalocker
+USE_PORT = 8008
 
 
 # Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}
@@ -68,16 +69,16 @@ class PiSrv(BaseHTTPRequestHandler):
             #       On the Android App side: The stream scanner will use a delimiter value of "~"
             #       Thus, ensuring* capture of our transmitted message
             if requestPath == AvailablePaths[0]:  # "/TimerControl/State/"
-                self.wfile.write(json.dumps(Jarvis.SystemEnabled).encode("utf-8") + "~~~".encode("utf-8"))
+                self.wfile.write(json.dumps(datalocker.SystemEnabled).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[1]: # "/TimerControl/DaysZonesTimes/"
-                self.wfile.write(json.dumps(Jarvis.TimerTriggering).encode("utf-8") + "~~~".encode("utf-8"))
+                self.wfile.write(json.dumps(datalocker.TimerTriggering).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[2]: # "/TimerControl/Thresholds/"
-                self.wfile.write(json.dumps(Jarvis.Thresholds).encode("utf-8") + "~~~".encode("utf-8"))
+                self.wfile.write(json.dumps(datalocker.Thresholds).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[3]: # "/Xbee3/Dump/"
-                self.wfile.write(json.dumps(Jarvis.SensorStats).encode("utf-8") + "~~~".encode("utf-8"))
+                self.wfile.write(json.dumps(datalocker.SensorStats).encode("utf-8") + "~~~".encode("utf-8"))
             #TODO Get data from GPIO \ stored data and return in Dump
 
         else:
@@ -113,15 +114,15 @@ class PiSrv(BaseHTTPRequestHandler):
                         state = bodyData.get("State")
                         if state in ["True", "False"]:  # Check if the Value being sent is True or False
                             if state == "True":
-                                with Jarvis.lock:  # TODO Consider not using a lock -- only this thread touches this data
-                                    Jarvis.SystemEnabled = True
+                                with datalocker.lock:  # TODO Consider not using a lock -- only this thread touches this data
+                                    datalocker.SystemEnabled = True
                             elif state == "False":
-                                with Jarvis.lock:
-                                    Jarvis.SystemEnabled = False
+                                with datalocker.lock:
+                                    datalocker.SystemEnabled = False
                             self.set_header()
                             # Send reply with current state of system
                             self.wfile.write(json.dumps(
-                                Jarvis.SystemEnabled).encode("utf-8"))
+                                datalocker.SystemEnabled).encode("utf-8"))
                         else:
                             self.send_error(
                                 400, "Expected \'True or False\' value")
@@ -131,15 +132,15 @@ class PiSrv(BaseHTTPRequestHandler):
                 # "/TimerControl/DaysZonesTimes/"
                 if requestPath == AvailablePaths[1]:
                     # Check to make sure there are no more than 7 days passed in
-                    if bodyData.keys() <= Jarvis.TimerTriggering.keys():
+                    if bodyData.keys() <= datalocker.TimerTriggering.keys():
                         for key in bodyData.keys():
                             # Check to make sure we have the array of [bool, int, int] with our Key
                             if len(bodyData[key]) == 3:
                                 if bool == type(bodyData[key][0]) and int == type(bodyData[key][1]) and int == type(bodyData[key][2]):
                                     # TODO Range-check the military integer values (?)
-                                    with Jarvis.lock:
+                                    with datalocker.lock:
                                         # We have the correct Data. Save it!
-                                        Jarvis.TimerTriggering[key] = bodyData[key]
+                                        datalocker.TimerTriggering[key] = bodyData[key]
                                 else:
                                     self.send_error(
                                         400, "Expected value type error")
@@ -148,19 +149,19 @@ class PiSrv(BaseHTTPRequestHandler):
                         # Send reply
                         self.set_header()
                         self.wfile.write(json.dumps(
-                            Jarvis.TimerTriggering).encode("utf-8"))
+                            datalocker.TimerTriggering).encode("utf-8"))
                     else:
                         self.send_error(400, "Expected Week\\Day key")
 
                 # "/TimerControl/Thresholds/"
                 if requestPath == AvailablePaths[2]:
                     # Ensure the incoming data is not bigger than the current data/object
-                    if bodyData.keys() <= Jarvis.Thresholds.keys():
+                    if bodyData.keys() <= datalocker.Thresholds.keys():
                         for key in bodyData.keys():
                             if len(bodyData[key]) == 2:
                                 if int == type(bodyData[key][1]):
-                                    with Jarvis.lock:
-                                        Jarvis.Thresholds[key][1] = bodyData[key][1]
+                                    with datalocker.lock:
+                                        datalocker.Thresholds[key][1] = bodyData[key][1]
                                 else:
                                     self.send_error(
                                         400, "Expected value type error")
@@ -168,7 +169,7 @@ class PiSrv(BaseHTTPRequestHandler):
                                 self.send_error(400, "Expected 2 values")
                         self.set_header()
                         self.wfile.write(json.dumps(
-                            Jarvis.Thresholds).encode("utf-8"))
+                            datalocker.Thresholds).encode("utf-8"))
                     else:
                         self.send_error(400, "Expected Threshold keys")
 
@@ -186,7 +187,7 @@ class PiSrv(BaseHTTPRequestHandler):
 
 # From Python documentaion: https://docs.python.org/3/library/http.server.html
 # Here, we pre-define several of our HTTPServer variables for the run function -- if run() is called without any arguments
-def run(server_class=HTTPServer, handler_class=PiSrv, port=8008):
+def run(server_class=HTTPServer, handler_class=PiSrv, port=USE_PORT, DEBUG_MODE=False):
     # listen on any IP-Address\Interface but only on the given port
     server_address = ('', port)
 
@@ -198,7 +199,7 @@ def run(server_class=HTTPServer, handler_class=PiSrv, port=8008):
     print(' ADD TO DEBUG OUTPUT: Starting RPiSrv on port ', port)
 
     # Since this http.server is spawned on a thread, we will watch the ProgramRunning variable to know when to stop and shutdown the server.
-    while Jarvis.ProgramRunning:
+    while datalocker.ProgramRunning:
         try:
             RPiSrv.handle_request()  # Wait 0.5 seconds for a request
         except:

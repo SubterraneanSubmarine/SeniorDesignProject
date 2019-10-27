@@ -10,13 +10,15 @@ import re
 import datalocker
 from datetime import datetime
 from time import sleep
-import serial
-import busio
-import digitalio
-import board
-import adafruit_dht
-import adafruit_mcp3xxx.mcp3008 as mcp
-from adafruit_mcp3xxx.analog_in import AnalogIn
+from sys import platform
+if platform == "linux":
+    import serial
+    import busio
+    import digitalio
+    import board
+    import adafruit_dht
+    import adafruit_mcp3xxx.mcp3008 as mcp
+    from adafruit_mcp3xxx.analog_in import AnalogIn
 
 # The Xbee (under MicroPython API) forwards a byte object/string that
 # needs to be formated before we can manipulate it as a data object
@@ -67,7 +69,14 @@ def convert_to_dict(bytes_in):
     return returndict  #temp  # Returns a nested Dictionary Object
 
 
-def talk_to_xbee():
+def talk_to_xbee(DEBUG_MODE=False):
+    if DEBUG_MODE:
+        print("# TODO")  # TODO
+        if platform == "win32":
+            print("xbeecomm exiting")
+            return 0
+    
+
     serial_set = False
 
     spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
