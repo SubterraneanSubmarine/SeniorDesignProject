@@ -59,7 +59,25 @@ def convert_to_dict(bytes_in):
     payload = json.loads(payload)
     temp = json.loads(temp)
     temp.update(payload)  # Merge dictionaries -- get the payload into the object
-    return payload  # Returns a nested Dictionary Object
+
+    returndict = {}
+    for keys in payload["payload"].keys():
+        returndict[keys] = payload["payload"][keys]
+
+    return returndict  #temp  # Returns a nested Dictionary Object
+
+
+def log_data(payload):
+    with open("log.csv", 'a') as file_out:
+        file_out.write("{}/{}/{}, {}:{}, Unix Epoch: {}, Sector #{}, Moisture {}, Sunlight {}, Battery {}mV, "
+                       "Temperature {}C, Humidity {}%, Wind {}m/s".format(
+            str(payload['Year']), str(payload['Month']), str(payload['Day']),
+            str(payload['Hour']), str(payload['Minute']), str(payload['Timestamp']),
+            str(payload['Sector']), str(payload['Moisture']), str(payload['Sunlight']),
+            str(payload['Battery']), str(payload['Temperature']), str(payload['Humidity']),
+            str(payload['Wind'])
+        ))
+    file_out.close()
 
 
 def talk_to_xbee():
@@ -75,7 +93,6 @@ def talk_to_xbee():
     speed_average = [0, 0, 0, 0, 0]
     temp_average = [0, 0, 0, 0, 0]
     humidity_average = [0, 0, 0, 0, 0]
-    anemometer_voffset = 0;
     pointer = 0
 
     while not serial_set and datalocker.ProgramRunning:
@@ -100,11 +117,11 @@ def talk_to_xbee():
     pointer = 0
 
     # Possibly average this value
-    anemometer_voffset = anemometer.voltage
+    anemometer_offset = anemometer.voltage
 
     while pointer < 5:
         try:
-            speed_average[pointer] = abs((anemometer.voltage - anemometer_voffset) * 20.25)
+            speed_average[pointer] = abs((anemometer.voltage - anemometer_offset) * 20.25)
             pointer = pointer + 1
         except RuntimeError as e:
             sleep(10)
@@ -114,7 +131,7 @@ def talk_to_xbee():
 
         if port.inWaiting() > 0:
             temp = convert_to_dict(port.readline())
-            temp['Second'] = datetime.now().second
+            temp['Timestamp'] = datetime.timestamp(datetime.now())
             temp['Minute'] = datetime.now().minute
             temp['Hour'] = datetime.now().hour
             temp['Day'] = datetime.now().day
@@ -123,6 +140,8 @@ def talk_to_xbee():
             temp['Temperature'] = sum(temp_average)/len(temp_average)
             temp['Humidity'] = sum(humidity_average)/len(humidity_average)
             temp['Wind'] = sum(speed_average)/len(speed_average)
+
+            log_data(temp)
 
             datalocker.SensorStats[temp.get('Sector')] = temp
             datalocker.set_new()
@@ -148,18 +167,3 @@ if __name__ == '__main__':
     temporary = convert_to_dict(RecieveStrings[0])
     print("Payload: ", temporary["payload"])
     print("Payload->Value: ", temporary["payload"]["Value"])
-
-"""
-SAMPLE DATA
-{'Iteration': 301, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2289, 'Second': 27, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 302, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2288, 'Second': 37, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 303, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2285, 'Second': 47, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 304, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2284, 'Second': 57, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 305, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2282, 'Second': 7, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 306, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2282, 'Second': 17, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 307, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2279, 'Second': 28, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 308, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2279, 'Second': 38, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 309, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2278, 'Second': 48, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 310, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2274, 'Second': 58, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 311, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2274, 'Second': 9, 'Minute': 42, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-"""
