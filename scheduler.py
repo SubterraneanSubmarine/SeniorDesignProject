@@ -12,9 +12,10 @@ from datetime import datetime
 from sys import platform
 from collections import deque
 import datalocker
-import busio
-import digitalio
-import board
+if platform == "linux":
+    import busio
+    import digitalio
+    import board
 
 
 # TODO During initial setup from android app -- ask for time+timezone+dst! (or base everything off utc?)
@@ -26,10 +27,10 @@ import board
 
 
         # will will also need to collect sensor values from the connected wind and temp/humid sensors (put this on a thread?)
-relays = [digitalio.DigitalInOut(board.D26),  # Sector 1   # TODO Do this I/O's correlate to the sectors of the system?
-          digitalio.DigitalInOut(board.D19),  # Sector 2
-          digitalio.DigitalInOut(board.D13),  # Sector 3
-          digitalio.DigitalInOut(board.D06)]  # Sector 4
+    relays = [digitalio.DigitalInOut(board.D26),  # Sector 1   # TODO Do this I/O's correlate to the sectors of the system?
+            digitalio.DigitalInOut(board.D19),  # Sector 2
+            digitalio.DigitalInOut(board.D13),  # Sector 3
+            digitalio.DigitalInOut(board.D06)]  # Sector 4
 
 
 def log_data(payload):
@@ -44,25 +45,24 @@ def log_data(payload):
     file_out.close()
 
 
-# TODO, determine all of these threshold values  --  use all of them?
-wind_limit = 10  # m/s
-humid_limit = 45  # RH
-light_limit = 10
-temp_floor = 6  # C
-moist_target = datalocker.Thresholds["Moisture"][2] + 10  # TODO Do we want to hit a target moisture level
-moist_floor = datalocker.Thresholds["Moisture"][2]
-start_time = 0
-
 """
 User can set fallback times/durations
 User can set default watering duration -- Moisture trigger --> water for X mins (15min)
 Stretch goal: User edits wind limits
 User can adjust humidity threshold
-User can adjust light settings
 """
 
+temp_floor = 6  # C
+start_time = 0
 wateringQue = []
-def sprinkler_runner():
+def sprinkler_runner(DEBUG_MODE=False):
+    if DEBUG_MODE:
+        print("# TODO")  # TODO
+        if platform == "win32":
+            print("sprklrnnr closing")
+            return 0
+    
+
     # Run thread as long as an interrupt isn't sent
     for relay in relays:
         relay.direction = digitalio.Direction.OUTPUT
@@ -87,7 +87,7 @@ def sprinkler_runner():
                 for sensor in datalocker.SensorStats:
                     if sensor is None: continue
                     # If reading is less than user set threshold  # TODO -- How do we want to handle the threshold value?
-                    if (sensor["Moisture"] < moist_floor
+                    if (sensor["Moisture"] < datalocker.getMoistureFloor()
                         # AND not already in the wateringQue
                         and not next((inQue for inQue in wateringQue if inQue["Sector"] == sensor["Sector"]), False)):
                         # then add the sensor to the wateringQue
@@ -174,8 +174,8 @@ def sprinkler_runner():
             # If conditions are met start watering
             if len(wateringQue) > 0 and not start_time:
                 current_time_HM = int(datetime.now().strftime("%H%M"))
-                if (wateringQue[0]["Wind"] < wind_limit
-                    and (current_time <= 700 or current_time >= 2100)  # Between 9:00pm and 7:00am
+                if (wateringQue[0]["Wind"] < datalocker.getWindLimit()
+                    and (current_time_HM <= 700 or current_time_HM >= 2100)  # Between 9:00pm and 7:00am  # TODO Have user set start/end times?
                     and wateringQue[0]["Humidity"] < humid_limit 
                     and wateringQue[0]["Temperature"] > temp_floor       
                     ):  # Then we have passed all tests
@@ -185,14 +185,14 @@ def sprinkler_runner():
 
                 else:  # failed tests 
                     # if the Wind is down AND Today is Enabled AND we are at the user specified start time
-                    if (wateringQue[0]["Wind"] < wind_limit
+                    if (wateringQue[0]["Wind"] < datalocker.getWindLimit()
                         and datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[0]
                         and int(datetime.now().strftime("%H%M")) >= datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[1]):
                         # Start watering
                         relays[wateringQue[0]["Sector"]].value = True
                         start_time = datetime.timestamp(datetime.now())
             
-            if (datetime.timestamp(datetime.now()) - start_time) > (datalocker.watering_duration_minutes * 60):
+            if (datetime.timestamp(datetime.now()) - start_time) > (datalocker.getWaterDuration() * 60):
                 relays[wateringQue[0]["Sector"]].value = False
                 wateringQue.pop(0)
                 start_time = 0
