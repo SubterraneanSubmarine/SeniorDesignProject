@@ -22,6 +22,15 @@ relays = [digitalio.DigitalInOut(board.D26),  # Sector 1
           digitalio.DigitalInOut(board.D06)]  # Sector 4
 
 watering_queue = []
+days_of_week = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+]
 light_avg = [0] * len(datalocker.SensorStats)
 last_seen = [0] * len(datalocker.SensorStats)
 mia = [False] * len(datalocker.SensorStats)
@@ -82,9 +91,10 @@ def sprinkler_runner():
             # If conditions are met start watering, however fallback schedules are checked first
             if not start_time:
                 current_time = int(datetime.now().strftime("%H%M"))
+                day = days_of_week[datetime.today().weekday()]
                 iterator = 0
                 while iterator < len(mia):
-                    if mia[iterator]:  # and fallback schedule
+                    if mia[iterator] and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]
                         relays[iterator].value = True
                         start_time = datetime.timestamp(datetime.now())
 
