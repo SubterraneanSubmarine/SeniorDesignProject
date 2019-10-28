@@ -12,15 +12,29 @@ from datetime import datetime
 from sys import platform
 from collections import deque
 import datalocker
-import busio
-import digitalio
-import board
+if platform == "linux":
+    import busio
+    import digitalio
+    import board
 
-relays = [digitalio.DigitalInOut(board.D26),  # Sector 1
-          digitalio.DigitalInOut(board.D19),  # Sector 2
-          digitalio.DigitalInOut(board.D13),  # Sector 3
-          digitalio.DigitalInOut(board.D06)]  # Sector 4
 
+# TODO During initial setup from android app -- ask for time+timezone+dst! (or base everything off utc?)
+# datetime.now(timezone(hours=-7))
+# TODO Look into the possible ways of setting the RPi's time in linux, rather than python?
+# Perhaps we set the system with with python? -- or do we poll internet servers for time?
+# TODO using temp sensor values recorded throughout a day, alter/change water duration based on daytime temperatures
+# TODO use moisture values/samples to dictate watering, instead of timmer stuff
+
+
+        # will will also need to collect sensor values from the connected wind and temp/humid sensors (put this on a thread?)
+    relays = [digitalio.DigitalInOut(board.D26),  # Sector 1   # TODO Do this I/O's correlate to the sectors of the system?
+            digitalio.DigitalInOut(board.D19),  # Sector 2
+            digitalio.DigitalInOut(board.D13),  # Sector 3
+            digitalio.DigitalInOut(board.D06)]  # Sector 4
+
+
+
+start_time = 0
 watering_queue = []
 days_of_week = [
     "Monday",
@@ -31,17 +45,19 @@ days_of_week = [
     "Saturday",
     "Sunday"
 ]
+
 light_avg = [0] * len(datalocker.SensorStats)
 last_seen = [0] * len(datalocker.SensorStats)
 mia = [False] * len(datalocker.SensorStats)
 
 
-def sprinkler_runner():
+def sprinkler_runner(DEBUG_MODE=False):
     if DEBUG_MODE:
         print("# TODO")  # TODO
         if platform == "win32":
-            print("Sprinkler runner closing")
+            print("sprklrnnr closing")
             return 0
+    
 
     # Run thread as long as an interrupt isn't sent
     for relay in relays:
@@ -94,7 +110,7 @@ def sprinkler_runner():
                 day = days_of_week[datetime.today().weekday()]
                 iterator = 0
                 while iterator < len(mia):
-                    if mia[iterator] and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]
+                    if mia[iterator] and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]:
                         relays[iterator].value = True
                         start_time = datetime.timestamp(datetime.now())
 

@@ -62,7 +62,6 @@ class PiSrv(BaseHTTPRequestHandler):
             self.set_header()
 
             # We have a valid path requested, return the Data requested
-
             # In order to prevent the Android App from truncating any of our responses, 
             #       three tildes "~~~" will be appended to our transmitted message
             #       On the Android App side: The stream scanner will use a delimiter value of "~"

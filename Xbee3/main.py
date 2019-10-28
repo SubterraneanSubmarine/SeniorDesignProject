@@ -8,7 +8,6 @@ Network setup pulled from Digi manual for XBee3 quick setup/start
 This code runs on the Xbee3 acting as a router sending the data it
 collects to the coordinator. Pins that collect data are labeled.
 """
-
 import xbee
 import time
 from machine import Pin, ADC
@@ -55,7 +54,7 @@ tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
 Pin("D9", Pin.OUT)
 sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
 moisture_sensor_power = Pin("P5", Pin.OUT)
-Pin("P6", Pin.OUT)
+tilt_power = Pin("P6", Pin.OUT)  # XCTU Sets this pin Pin.OUT & Pin.Pull_UP for DC Tilt_Switch_Power
 Pin("P7", Pin.OUT)
 Pin("P8", Pin.OUT)
 Pin("P9", Pin.OUT)
@@ -67,9 +66,12 @@ battery = 0  # Battery readings are kept between iterations of the loop for eval
 ambiance = 0  # Light readings are also kept between loop iterations for evaluation
 
 while True:
+    # Aggregate data
+    tilt_power.on()
     time.sleep_ms(10)
-
+    print("PreTilt"+str(tilt_switch.value()))
     if tilt_switch.value():
+        print("PostTilt")
         sw_bit_0 = Pin("P0", Pin.IN, Pin.PULL_DOWN)
         sw_bit_1 = Pin("P1", Pin.IN, Pin.PULL_DOWN)
 
@@ -93,29 +95,27 @@ while True:
 
             try:
                 print("Sector: " + str(zone) +
-                      "\nMoisture: " + str(moisture) +
-                      "\nSunlight: " + str(ambiance) +
-                      "\nBattery: " + str(battery) +
-                      "\nTilt: " + str(switch) +
-                      "\n")
-
+                  "\nMoisture: " + str(moisture) +
+                  "\nSunlight: " + str(ambiance) +
+                  "\nBattery: " + str(battery) +
+                  "\nTilt: " + str(switch) +
+                  "\n")
                 xbee.transmit(xbee.ADDR_COORDINATOR,
-                              (", 'Sector': " + str(zone) +
-                               ", 'Moisture': " + str(moisture) +
-                               ", 'Sunlight': " + str(ambiance) +
-                               ", 'Battery': " + str(battery) +
-                               ", 'Tilt': " + str(switch) +
-                               "}")
-                              )
+                          (", 'Sector': " + str(zone) +
+                           ", 'Moisture': " + str(moisture) +
+                           ", 'Sunlight': " + str(ambiance) +
+                           ", 'Battery': " + str(battery) +
+                           ", 'Tilt': " + str(switch) +
+                           "}")
+                          )
             except Exception as err:
                 print(err)
-
         else:
+            print("else")
             # Read data from moisture probe
             moisture_sensor_power.on()
             time.sleep_ms(100)
             moisture_average += moisture_probe.read()
-
             moisture_sensor_power.off()
 
             # Evaluate ambient light in area
@@ -124,7 +124,7 @@ while True:
         sw_bit_0 = Pin("P0", Pin.OUT)
         sw_bit_1 = Pin("P1", Pin.OUT)
 
-        # Sleep duration evaluation
+    # Sleep duration evaluation
     sleep = SLEEP_DURATION
     if ambiance > LOW_LIGHT_THRESH or battery < LOW_VOLT_THRESH:
         sleep = SLEEP_DURATION * SLEEP_MULTIPLIER

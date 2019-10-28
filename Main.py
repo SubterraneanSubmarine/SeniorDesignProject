@@ -28,7 +28,7 @@ def signal_handler(sig, frame):
     print("Closing Program...")
     datalocker.ProgramRunning = False  # Signal to all running threads to wrap it up!
 
-    
+
 DEBUG_MODE = False
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -44,12 +44,13 @@ if __name__ == '__main__':
         except Exception as err:
                 print(err)
                 exit()
-
     if args.port:
         if int(args.port) < 1025:
             print("Error: Invalid port value")
             exit()
         JSONSrv.USE_PORT = int(args.port)
+    
+
 
     # Register our signal handerls for the program
     signal.signal(signal.SIGTERM, signal_handler)
@@ -84,13 +85,13 @@ if __name__ == '__main__':
             # TODO get user input for variables -- change/update them as well if set by sensor file
         else:
             sleep(5)
-
+        
     # After a kill signal has changed the ProgramRunning variable to False
     #       We need to wait for all the threads to stop before letting main end
     for thread in threads:
         if thread.isAlive():
             thread.join()
-
+    
     if DEBUG_MODE and args.debug_sensor_file:
         sensorsFile.close()
     print("Program terminated.")

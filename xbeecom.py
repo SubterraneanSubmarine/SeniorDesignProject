@@ -146,15 +146,6 @@ def talk_to_xbee():
             datalocker.SensorStats[temp.get('Sector')] = temp
             datalocker.set_new()
 
-            # TODO Do XbeeHealthCheck!
-                        # rotate through list of Xbee's. Update its 'last seen'
-                        # if a Xbee misses an update 6 times, User needs Alert!
-                        # if a nodes light level -- reletive to the others is low, for 4 samples, User needs Alert!
-
-                    # We now have within SensorState an object like so...
-                    # {"\\x00\\x13\\xa2\\x00A\\x99O\\xcc": {"Iteration": 30796, "Sunlight": 2079, "Battery": 3348, "Moisture": 3239, "Sector": 0}
-                    #   , "\\x00\\x11\\xa3\\x05A\\x94O\\xdd": {"Iter... , ... : 4} }
-
         if datetime.now().minute / 2 == 0:
             try:
                 speed_average[pointer] = abs((anemometer.voltage - anemometer_voffset) * 20.25)
@@ -170,15 +161,3 @@ def talk_to_xbee():
                 print("Temp/Humidity")
 
     port.close()
-
-
-NodeLastSeen = {}
-def XbeeHealthCheck():
-    # TODO Update lastSeen
-    return 0
-
-
-if __name__ == '__main__':
-    temporary = convert_to_dict(RecieveStrings[0])
-    print("Payload: ", temporary["payload"])
-    print("Payload->Value: ", temporary["payload"]["Value"])
