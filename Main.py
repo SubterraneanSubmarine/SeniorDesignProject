@@ -7,7 +7,6 @@ JSONServer, SprinklerControl, and Xbee3 interface
 
 Tested in Python3.7 and 3.4(RPi)
 '''
-
 import threading
 import signal
 import sys
@@ -55,13 +54,11 @@ if __name__ == '__main__':
     # Register our signal handerls for the program
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
-
     print("Program Starting... (Ctrl + C to stop)")
 
     if DEBUG_MODE:
         print("Type here to set/change variables of the system.")
         print("Available settings to change: number of nodes, current sensor/sample values, wind, temp, and humidity.")
-
 
     # Create our threads that will run the system. (Save handles/ID's to list/array)
     threads = []
@@ -75,8 +72,7 @@ if __name__ == '__main__':
     # Start the threads
     for thread in threads:
         thread.start()
-    
-    
+
     # If a kill signal is sent to the program...
     #       Then the signal handler will change ProgramRunning to False
     while datalocker.ProgramRunning:
@@ -85,7 +81,6 @@ if __name__ == '__main__':
             if args.debug_sensor_file:
                 print("---Initializing sensor values with passed in sensor file.---")
                 # TODO Initialize variables using file
-                sensorsFile.close()
             # TODO get user input for variables -- change/update them as well if set by sensor file
         else:
             sleep(5)
@@ -95,7 +90,5 @@ if __name__ == '__main__':
     for thread in threads:
         if thread.isAlive():
             thread.join()
-    
-    if DEBUG_MODE and args.debug_sensor_file:
-        
+            
     print("Program terminated.")

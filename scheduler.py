@@ -26,12 +26,6 @@ if platform == "linux":
 # TODO use moisture values/samples to dictate watering, instead of timmer stuff
 
 
-        # will will also need to collect sensor values from the connected wind and temp/humid sensors (put this on a thread?)
-    relays = [digitalio.DigitalInOut(board.D26),  # Sector 1   # TODO Do this I/O's correlate to the sectors of the system?
-            digitalio.DigitalInOut(board.D19),  # Sector 2
-            digitalio.DigitalInOut(board.D13),  # Sector 3
-            digitalio.DigitalInOut(board.D06)]  # Sector 4
-
 
 def log_data(payload):
     with open("log.csv", 'a') as file_out:
@@ -45,154 +39,104 @@ def log_data(payload):
     file_out.close()
 
 
-"""
-User can set fallback times/durations
-User can set default watering duration -- Moisture trigger --> water for X mins (15min)
-Stretch goal: User edits wind limits
-User can adjust humidity threshold
-"""
-
 temp_floor = 6  # C
 start_time = 0
 wateringQue = []
+
+
+relays = [digitalio.DigitalInOut(board.D26),  # Sector 1
+          digitalio.DigitalInOut(board.D19),  # Sector 2
+          digitalio.DigitalInOut(board.D13),  # Sector 3
+          digitalio.DigitalInOut(board.D06)]  # Sector 4
+
+watering_queue = []
+days_of_week = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+]
+light_avg = [0] * len(datalocker.SensorStats)
+last_seen = [0] * len(datalocker.SensorStats)
+mia = [False] * len(datalocker.SensorStats)
+
+
 def sprinkler_runner(DEBUG_MODE=False):
     if DEBUG_MODE:
         print("# TODO")  # TODO
         if platform == "win32":
-            print("sprklrnnr closing")
+            print("Sprinkler runner closing")
             return 0
-    
 
     # Run thread as long as an interrupt isn't sent
     for relay in relays:
         relay.direction = digitalio.Direction.OUTPUT
         relay.value = False
 
-    # Initialize our history lists
-    i = 0
-    while i < datalocker.HISTORY_LENGTH:
-        datalocker.NodeLastSeen_Light[i] = [None] * datalocker.HISTORY_LENGTH
-        datalocker.NodeLastSeen_Time[i] = [None] * datalocker.HISTORY_LENGTH
-        i = i + 1
-    i = 0
-
     while datalocker.ProgramRunning:
         # If the sprinkler system is enabled/on
         if datalocker.SystemEnabled:
-            # When the moisture of an area falls below the threshold add to watering queue
-            current_time_seconds = int(datetime.timestamp(datetime.now()))
-            
+            # Update the watering_queue and find missing sensors when a new Xbee packet is available
             if datalocker.get_new():
-                number_of_sensors = datalocker.SensorCount()
                 for sensor in datalocker.SensorStats:
-                    if sensor is None: continue
-                    # If reading is less than user set threshold  # TODO -- How do we want to handle the threshold value?
-                    if (sensor["Moisture"] < datalocker.getMoistureFloor()
-                        # AND not already in the wateringQue
-                        and not next((inQue for inQue in wateringQue if inQue["Sector"] == sensor["Sector"]), False)):
-                        # then add the sensor to the wateringQue
-                        wateringQue.append(sensor)
-                    
+                    if sensor is None:
+                        continue
 
-                    # Do HealthCheck // compare light level of nodes to an average of each other. Record last update as well
-                    
-                    # If this is the first time we have seen this node, initialize the history
-                    # The 'Sector' will be the index to the history list
-                    if datalocker.NodeLastSeen_Light[sensor["Sector"]][datalocker.HISTORY_LENGTH - 1] is None:
-                        while i < datalocker.HISTORY_LENGTH:
-                            datalocker.NodeLastSeen_Light[sensor["Sector"]][i] = sensor["Light"]
-                            datalocker.NodeLastSeen_Time[sensor["Sector"]][i] = current_time_seconds
-                            i = i + 1
-                        i = 0                       
+                    # Update last seen array
+                    last_seen[sensor['Sector']] = sensor['Timestamp']
+
+                    # Update light value arrays for every active sector
+                    if not mia[sensor['Sector']]:
+                        light_avg.append(sensor['Sunlight'])
+
+                    # Check for readings that are a day or older
+                    if datetime.timestamp(datetime.now()) - last_seen[sensor['Sector']] > 86400:
+                        print("Sector {}'s sensor has gone MIA!".format(sensor['Sector']))  # Inform the user
+                        mia[sensor['Sector']] = True
+                        # Note that this will execute every time new data is put into the sensorstats array
                     else:
-                        # We have seen this node before, Update our history
-                        datalocker.NodeLastSeen_Light[sensor["Sector"]].pop(0)
-                        datalocker.NodeLastSeen_Time[sensor["Sector"]].pop(0)
-                        datalocker.NodeLastSeen_Light[sensor["Sector"]].append(sensor["Light"])
-                        datalocker.NodeLastSeen_Time[sensor["Sector"]].append(current_time_seconds)
+                        mia[sensor['Sector']] = False
 
-                        # Values have been updated. Ready for HealthCheck
-                        # This loop we are in will allow us to compare each available sensor to its neighbors
-                        avLight_of_otherNodes = 0
-                        avTime_of_otherNodes = 0
-                        avLight_of_currNode = 0
-                        avTime_of_currNode = 0
-                        count = 0
-                        while i < number_of_sensors:
-                            if i != sensor["Sector"]:
-                                # Here we average the Light level of the neighbors together
-                                avLight_of_otherNodes = avLight_of_otherNodes + sum(datalocker.NodeLastSeen_Light[i]) / datalocker.HISTORY_LENGTH
+                        # If reading is less than user set threshold  # TODO -- How do we want to handle the threshold value?
+                        if (sensor["Moisture"] < datalocker.thresholds["Dry"]
+                            # AND not already in the wateringQue
+                                and not next((for item in watering_queue if item["Sector"] == sensor["Sector"]), False)):
+                            # then add the sensor to the wateringQue
+                            watering_queue.append(sensor)
 
-                                # Here is the   average difference   between check-in's by the neighbors
-                                #   ((Newest Check-in) - (Oldest Check-in))   divided by...
-                                #     ...((# of samples) - ( 1 ))             will equal the average time between updates
-                                avTime_of_otherNodes = avTime_of_otherNodes + (datalocker.NodeLastSeen_Time[i][datalocker.HISTORY_LENGTH - 1] - datalocker.NodeLastSeen_Time[i][0]) / (datalocker.HISTORY_LENGTH - 1)
-                                count = count + 1
-                            else:
-                                # Make an average for the sensor/node to check
-                                avLight_of_currNode = sum(datalocker.NodeLastSeen_Light[i]) / datalocker.HISTORY_LENGTH
-                                avTime_of_currNode = (datalocker.NodeLastSeen_Time[i][datalocker.HISTORY_LENGTH - 1] - datalocker.NodeLastSeen_Time[i][0]) / (datalocker.HISTORY_LENGTH - 1)
-                            i = i + 1
-                        i = 0
-                        if count == 0: count = 1
-                        # Divide the summation of neighbor nodes by their count
-                        avLight_of_otherNodes = avLight_of_otherNodes / count
-                        avTime_of_otherNodes = avTime_of_otherNodes / count
+                light_floor = sum(light_avg) / len(light_avg)
+                light_floor = light_limit - 500 # I've set the number to 500 as the standard deviation will always flag one sector
 
-
-                        # If a Node has missed reporting for X days OR has low health
-                        # seconds in a day: 86400
-                        # in two days: 172800
-                        # four days: 345600
-                        # TODO: Instead of an averaged time difference between reports, do we just compare the more recent report to the current time?
-                        # Do we want to make sure the Sector is added to the wateringQue?
-
-
-
-                        # Next we check the differences and set our alert value: RED, YELLOW, GREEN
-                        # IF node-light is less than neighbors AND has longer check-in time --> RED
-                        if (avLight_of_currNode < avLight_of_otherNodes 
-                            and avTime_of_currNode > avTime_of_otherNodes):
-
-                            datalocker.NodeHealthStatus[sensor["Sector"]] = "Red"
-
-                            # TODO: Keep this wateringQue addition here?
-                            # if the Sector is NOT already in the wateringQue, we will add it
-                            if not next((inQue for inQue in wateringQue if inQue["Sector"] == sensor["Sector"]), False):
-                                wateringQue.append(sensor)
-
-                        # IF it is NOT BOTH --> YELLOW
-                        elif (avLight_of_currNode < avLight_of_otherNodes 
-                              or avTime_of_currNode > avTime_of_otherNodes):
-                            datalocker.NodeHealthStatus[sensor["Sector"]] = "Yellow"
-                        # Otherwise we have a healthy node --> GREEN
-                        else:
-                            datalocker.NodeHealthStatus[sensor["Sector"]] = "Green"
-
+                # Iterate through array once more to find outliers in light readings
+                for sensor in datalocker.SensorStats:
+                    if sensor['Sunlight'] < light_floor:
+                        print("Sector {}'s light is low compared to peers; It may need to be moved")
 
             # Manage the watering queue by evaluating the current weather conditions
-            # If conditions are met start watering
-            if len(wateringQue) > 0 and not start_time:
-                current_time_HM = int(datetime.now().strftime("%H%M"))
-                if (wateringQue[0]["Wind"] < datalocker.getWindLimit()
-                    and (current_time_HM <= 700 or current_time_HM >= 2100)  # Between 9:00pm and 7:00am  # TODO Have user set start/end times?
-                    and wateringQue[0]["Humidity"] < humid_limit 
-                    and wateringQue[0]["Temperature"] > temp_floor       
+            # If conditions are met start watering, however fallback schedules are checked first
+            if not start_time:
+                current_time = int(datetime.now().strftime("%H%M"))
+                day = days_of_week[datetime.today().weekday()]
+                iterator = 0
+                while iterator < len(mia):
+                    if mia[iterator] and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]:
+                        relays[iterator].value = True
+                        start_time = datetime.timestamp(datetime.now())
+
+                if (len(watering_queue) > 0
+                    and watering_queue[0]["Wind"] < datalocker.thresholds["Wind max"]
+                    and datalocker.thresholds["Prohibited time end"] <= current_time <= datalocker.thresholds["Prohibited time start"]
+                    and watering_queue[0]["Humidity"] < datalocker.thresholds["Humidity max"]
+                    and watering_queue[0]["Temperature"] > datalocker.thresholds["Temperature min"]
                     ):  # Then we have passed all tests
-                    
-                    relays[wateringQue[0]["Sector"]].value = True
+
+                    relays[watering_queue[0]["Sector"]].value = True
                     start_time = datetime.timestamp(datetime.now())
 
-                else:  # failed tests 
-                    # if the Wind is down AND Today is Enabled AND we are at the user specified start time
-                    if (wateringQue[0]["Wind"] < datalocker.getWindLimit()
-                        and datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[0]
-                        and int(datetime.now().strftime("%H%M")) >= datalocker.TimerTriggering.get(datetime.now().strftime("%A"))[1]):
-                        # Start watering
-                        relays[wateringQue[0]["Sector"]].value = True
-                        start_time = datetime.timestamp(datetime.now())
-            
-            if (datetime.timestamp(datetime.now()) - start_time) > (datalocker.getWaterDuration() * 60):
-                relays[wateringQue[0]["Sector"]].value = False
-                wateringQue.pop(0)
+            if (datetime.timestamp(datetime.now()) - start_time) > (datalocker.thresholds["Water Duration"]):
+                relays[watering_queue[0]["Sector"]].value = False
+                watering_queue.pop(0)
                 start_time = 0

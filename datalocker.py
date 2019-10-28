@@ -75,7 +75,3 @@ SensorStats = [None] * 4
 def SensorCount():
     return len(SensorStats)
 
-HISTORY_LENGTH = 5
-NodeLastSeen_Light = [None] * HISTORY_LENGTH
-NodeLastSeen_Time = [None] * HISTORY_LENGTH
-NodeHealthStatus = [None] * HISTORY_LENGTH

@@ -12,12 +12,11 @@ import xbee
 import time
 from machine import Pin, ADC
 
-SLEEP_DURATION = 300 * 1000  # In seconds between soil samples
+SLEEP_DURATION = 600 * 1000  # In seconds between soil samples
 AVERAGE_SAMPLES = 3  # Number of soil samples to be taken before transmission
 LOW_VOLT_THRESH = 2300  # Voltage floor before sleep duration time is increased.
 LOW_LIGHT_THRESH = 4000  # Photoresistor ceiling before sleep duration time is increased.
 SLEEP_MULTIPLIER = 3  # Sleep duration will be multiplied by this number if one of the above conditions are met
-
 
 # Set the identifying string of the radio
 xbee.atcmd("NI", "Sensor Probe")
@@ -44,6 +43,13 @@ for cmd in operating_network:
 # Wait for hub acknowledgement
 
 # Pin Setup
+# Unused Pins are set as outputs to reduce sleep current
+Pin("D1", Pin.OUT)
+light_sensor = ADC("D2")
+moisture_probe = ADC("D3")
+Pin("D4", Pin.OUT)
+Pin("D6", Pin.OUT)
+Pin("D7", Pin.OUT)
 tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
 moisture_sensor_power = Pin("P5", Pin.OUT)
 moisture_probe = ADC("D3")
@@ -97,23 +103,24 @@ while True:
 
             try:
                 print("Sector: " + str(zone) +
-                  "\nMoisture: " + str(moisture) +
-                  "\nSunlight: " + str(ambiance) +
-                  "\nBattery: " + str(battery) +
-                  "\nTilt: " + str(switch) +
-                  "\n")
+                      "\nMoisture: " + str(moisture) +
+                      "\nSunlight: " + str(ambiance) +
+                      "\nBattery: " + str(battery) +
+                      "\nTilt: " + str(switch) +
+                      "\n")
+
                 xbee.transmit(xbee.ADDR_COORDINATOR,
-                          (", 'Sector': " + str(zone) +
-                           ", 'Moisture': " + str(moisture) +
-                           ", 'Sunlight': " + str(ambiance) +
-                           ", 'Battery': " + str(battery) +
-                           ", 'Tilt': " + str(switch) +
-                           "}")
-                          )
+                              (", 'Sector': " + str(zone) +
+                               ", 'Moisture': " + str(moisture) +
+                               ", 'Sunlight': " + str(ambiance) +
+                               ", 'Battery': " + str(battery) +
+                               ", 'Tilt': " + str(switch) +
+                               "}")
+                              )
             except Exception as err:
                 print(err)
+
         else:
-            print("else")
             # Read data from moisture probe
             moisture_sensor_power.on()
             time.sleep_ms(100)
@@ -131,22 +138,19 @@ while True:
     if ambiance > LOW_LIGHT_THRESH or battery < LOW_VOLT_THRESH:
         sleep = SLEEP_DURATION * SLEEP_MULTIPLIER
 
-    # Deep sleep or wait if sleep switch is closed
+        # Deep sleep or wait if sleep switch is closed
+    tilt_switch = Pin("D8", Pin.OUT)
     if sleep_enable.value():
         sleep_enable = Pin("P2", Pin.OUT)
-        tilt_switch = Pin("D8", Pin.OUT)
-        print("PreDeep")
         xbee.XBee().sleep_now(sleep, pin_wake=False)
         while xbee.atcmd("AI") != 0:
             time.sleep_ms(100)
         sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
-        tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
+
     else:
         sleep_enable = Pin("P2", Pin.OUT)
-        tilt_switch = Pin("D8", Pin.OUT)
-        print("PreNorm")
         time.sleep_ms(sleep)
         while xbee.atcmd("AI") != 0:
             time.sleep_ms(100)
         sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
-        tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
+    tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
