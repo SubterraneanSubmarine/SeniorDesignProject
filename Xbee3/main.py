@@ -51,17 +51,9 @@ Pin("D4", Pin.OUT)
 Pin("D6", Pin.OUT)
 Pin("D7", Pin.OUT)
 tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
-moisture_sensor_power = Pin("P5", Pin.OUT)
-moisture_probe = ADC("D3")
-light_sensor = ADC("D2")
-sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
-
-# Unused Pins are set as outputs to reduce sleep current
-Pin("D1", Pin.OUT)
-Pin("D4", Pin.OUT)
-Pin("D6", Pin.OUT)
-Pin("D7", Pin.OUT)
 Pin("D9", Pin.OUT)
+sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
+moisture_sensor_power = Pin("P5", Pin.OUT)
 tilt_power = Pin("P6", Pin.OUT)  # XCTU Sets this pin Pin.OUT & Pin.Pull_UP for DC Tilt_Switch_Power
 Pin("P7", Pin.OUT)
 Pin("P8", Pin.OUT)
@@ -103,24 +95,23 @@ while True:
 
             try:
                 print("Sector: " + str(zone) +
-                      "\nMoisture: " + str(moisture) +
-                      "\nSunlight: " + str(ambiance) +
-                      "\nBattery: " + str(battery) +
-                      "\nTilt: " + str(switch) +
-                      "\n")
-
+                  "\nMoisture: " + str(moisture) +
+                  "\nSunlight: " + str(ambiance) +
+                  "\nBattery: " + str(battery) +
+                  "\nTilt: " + str(switch) +
+                  "\n")
                 xbee.transmit(xbee.ADDR_COORDINATOR,
-                              (", 'Sector': " + str(zone) +
-                               ", 'Moisture': " + str(moisture) +
-                               ", 'Sunlight': " + str(ambiance) +
-                               ", 'Battery': " + str(battery) +
-                               ", 'Tilt': " + str(switch) +
-                               "}")
-                              )
+                          (", 'Sector': " + str(zone) +
+                           ", 'Moisture': " + str(moisture) +
+                           ", 'Sunlight': " + str(ambiance) +
+                           ", 'Battery': " + str(battery) +
+                           ", 'Tilt': " + str(switch) +
+                           "}")
+                          )
             except Exception as err:
                 print(err)
-
         else:
+            print("else")
             # Read data from moisture probe
             moisture_sensor_power.on()
             time.sleep_ms(100)

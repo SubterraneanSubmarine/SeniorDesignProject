@@ -27,16 +27,6 @@ if platform == "linux":
 
 
 
-def log_data(payload):
-    with open("log.csv", 'a') as file_out:
-        file_out.write("{}/{}/{}, {}:{}:{}, {}, {}, {}, {}, {}, {}, {}".format(
-            str(payload['Year']), str(payload['Month']), str(payload['Day']),
-            str(payload['Hour']), str(payload['Minute']), str(payload['Second']),
-            str(payload['Sector']), str(payload['Moisture']), str(payload['Sunlight']),
-            str(payload['Battery']), str(payload['Temperature']), str(payload['Humidity']),
-            str(payload['Wind'])
-        ))
-    file_out.close()
 
 
 temp_floor = 6  # C
@@ -59,6 +49,7 @@ days_of_week = [
     "Saturday",
     "Sunday"
 ]
+
 light_avg = [0] * len(datalocker.SensorStats)
 last_seen = [0] * len(datalocker.SensorStats)
 mia = [False] * len(datalocker.SensorStats)
@@ -68,7 +59,7 @@ def sprinkler_runner(DEBUG_MODE=False):
     if DEBUG_MODE:
         print("# TODO")  # TODO
         if platform == "win32":
-            print("Sprinkler runner closing")
+            print("sprklrnnr closing")
             return 0
 
     # Run thread as long as an interrupt isn't sent

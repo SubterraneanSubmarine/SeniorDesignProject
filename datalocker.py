@@ -21,18 +21,8 @@ SystemEnabled = False
 NewSensorData = False
 
 
-def set_new():
-    with lock:
-        NewSensorData = True
 
-
-def get_new():
-    if ProgramRunning:
-        with lock:
-            NewSensorData = False
-        return True
-    return False
-
+SensorStats = [None] * 4
 
 # TODO Do we want to use this?
 # Threshold values to prevent system from running
@@ -72,6 +62,15 @@ TimerTriggering = {
 # Array of Dict.
 SensorStats = [None] * 4
 
-def SensorCount():
-    return len(SensorStats)
 
+def set_new():
+    with lock:
+        ProgramRunning = True
+
+
+def get_new():
+    if ProgramRunning:
+        with lock:
+            ProgramRunning = False
+        return True
+    return False

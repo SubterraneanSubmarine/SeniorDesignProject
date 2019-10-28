@@ -66,7 +66,7 @@ if __name__ == '__main__':
     threads.append(t1)
     t2 = threading.Thread(target=xbeecom.talk_to_xbee, kwargs={'DEBUG_MODE': DEBUG_MODE})
     threads.append(t2)
-    t3 = threading.Thread(target=JSONSrv.run, kwargs={'port': 8008, 'DEBUG_MODE': DEBUG_MODE})  #TODO Redirect stdout to null unless DEBUG
+    t3 = threading.Thread(target=JSONSrv.run, kwargs={'port': USE_PORT, 'DEBUG_MODE': DEBUG_MODE})  #TODO Redirect stdout to null unless DEBUG
     threads.append(t3)
 
     # Start the threads
