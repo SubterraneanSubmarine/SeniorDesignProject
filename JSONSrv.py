@@ -24,7 +24,7 @@ import datalocker
 AvailablePaths = [
     "/TimerControl/State/",
     "/TimerControl/DaysZonesTimes/",
-    "/TimerControl/Thresholds/",
+    "/TimerControl/thresholds/",
     "/Xbee3/Dump/",
     "/DateTime/"  # TODO code in the datetime elements: We need to be able to set and read the date/time of RPi from android app
                   #TODO Consider adding in TempDisable?
@@ -69,10 +69,10 @@ class PiSrv(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(datalocker.SystemEnabled).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[1]: # "/TimerControl/DaysZonesTimes/"
-                self.wfile.write(json.dumps(datalocker.TimerTriggering).encode("utf-8") + "~~~".encode("utf-8"))
+                self.wfile.write(json.dumps(datalocker.timer_triggering).encode("utf-8") + "~~~".encode("utf-8"))
 
-            if requestPath == AvailablePaths[2]: # "/TimerControl/Thresholds/"
-                self.wfile.write(json.dumps(datalocker.Thresholds).encode("utf-8") + "~~~".encode("utf-8"))
+            if requestPath == AvailablePaths[2]: # "/TimerControl/thresholds/"
+                self.wfile.write(json.dumps(datalocker.thresholds).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[3]: # "/Xbee3/Dump/"
                 self.wfile.write(json.dumps(datalocker.SensorStats).encode("utf-8") + "~~~".encode("utf-8"))
@@ -125,7 +125,7 @@ class PiSrv(BaseHTTPRequestHandler):
                 # "/TimerControl/DaysZonesTimes/"
                 if requestPath == AvailablePaths[1]:
                     # Check to make sure there are no more than 7 days passed in
-                    if bodyData.keys() <= datalocker.TimerTriggering.keys():
+                    if bodyData.keys() <= datalocker.timer_triggering.keys():
                         for key in bodyData.keys():
                             # Check to make sure we have the array of [bool, int, int] with our Key
                             if len(bodyData[key]) == 3:
@@ -133,7 +133,7 @@ class PiSrv(BaseHTTPRequestHandler):
                                     # TODO Range-check the military integer values (?)
                                     with datalocker.lock:
                                         # We have the correct Data. Save it!
-                                        datalocker.TimerTriggering[key] = bodyData[key]
+                                        datalocker.timer_triggering[key] = bodyData[key]
                                 else:
                                     self.send_error(
                                         400, "Expected value type error")
@@ -142,19 +142,19 @@ class PiSrv(BaseHTTPRequestHandler):
                         # Send reply
                         self.set_header()
                         self.wfile.write(json.dumps(
-                            datalocker.TimerTriggering).encode("utf-8"))
+                            datalocker.timer_triggering).encode("utf-8"))
                     else:
                         self.send_error(400, "Expected Week\\Day key")
 
-                # "/TimerControl/Thresholds/"
+                # "/TimerControl/thresholds/"
                 if requestPath == AvailablePaths[2]:
                     # Ensure the incoming data is not bigger than the current data/object
-                    if bodyData.keys() <= datalocker.Thresholds.keys():
+                    if bodyData.keys() <= datalocker.thresholds.keys():
                         for key in bodyData.keys():
                             if len(bodyData[key]) == 2:
                                 if int == type(bodyData[key][1]):
                                     with datalocker.lock:
-                                        datalocker.Thresholds[key][1] = bodyData[key][1]
+                                        datalocker.thresholds[key][1] = bodyData[key][1]
                                 else:
                                     self.send_error(
                                         400, "Expected value type error")
@@ -162,7 +162,7 @@ class PiSrv(BaseHTTPRequestHandler):
                                 self.send_error(400, "Expected 2 values")
                         self.set_header()
                         self.wfile.write(json.dumps(
-                            datalocker.Thresholds).encode("utf-8"))
+                            datalocker.thresholds).encode("utf-8"))
                     else:
                         self.send_error(400, "Expected Threshold keys")
 

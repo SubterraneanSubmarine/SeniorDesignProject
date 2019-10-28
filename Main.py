@@ -78,7 +78,7 @@ if __name__ == '__main__':
     while datalocker.ProgramRunning:
         if DEBUG_MODE:
             # TODO print("We are in debug mode: Handle some user input")
-            if args.debug_sensor_file:
+            if args.debug_fake_data:
                 print("---Initializing sensor values with passed in sensor file.---")
                 # TODO Initialize variables using file
             # TODO get user input for variables -- change/update them as well if set by sensor file

@@ -26,14 +26,6 @@ if platform == "linux":
 # TODO use moisture values/samples to dictate watering, instead of timmer stuff
 
 
-
-
-
-temp_floor = 6  # C
-start_time = 0
-wateringQue = []
-
-
 relays = [digitalio.DigitalInOut(board.D26),  # Sector 1
           digitalio.DigitalInOut(board.D19),  # Sector 2
           digitalio.DigitalInOut(board.D13),  # Sector 3
@@ -49,6 +41,8 @@ days_of_week = [
     "Saturday",
     "Sunday"
 ]
+
+start_time = 0
 
 light_avg = [0] * len(datalocker.SensorStats)
 last_seen = [0] * len(datalocker.SensorStats)
@@ -99,7 +93,8 @@ def sprinkler_runner(DEBUG_MODE=False):
                             watering_queue.append(sensor)
 
                 light_floor = sum(light_avg) / len(light_avg)
-                light_floor = light_limit - 500 # I've set the number to 500 as the standard deviation will always flag one sector
+                light_floor = light_floor - 500  # I've set the number to 500 as the standard deviation will always flag one sector  
+                                                # (Quick/Dirty stdev:  (max-min) / 4) ==> 4096 / 4 = 1024
 
                 # Iterate through array once more to find outliers in light readings
                 for sensor in datalocker.SensorStats:
@@ -116,6 +111,7 @@ def sprinkler_runner(DEBUG_MODE=False):
                     if mia[iterator] and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]:
                         relays[iterator].value = True
                         start_time = datetime.timestamp(datetime.now())
+                    iterator = iterator + 1
 
                 if (len(watering_queue) > 0
                     and watering_queue[0]["Wind"] < datalocker.thresholds["Wind max"]

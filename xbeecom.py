@@ -80,7 +80,11 @@ def log_data(payload):
     file_out.close()
 
 
-def talk_to_xbee():
+def talk_to_xbee(DEBUG_MODE=False):
+    if DEBUG_MODE:
+        print("TODO")
+        return 0
+    
     serial_set = False
 
     spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
@@ -148,7 +152,7 @@ def talk_to_xbee():
 
         if datetime.now().minute / 2 == 0:
             try:
-                speed_average[pointer] = abs((anemometer.voltage - anemometer_voffset) * 20.25)
+                speed_average[pointer] = abs((anemometer.voltage - anemometer_offset) * 20.25)
                 pointer = (pointer + 1) % 5
             except RuntimeError as e:
                 print("Wind speed retrieve failed")

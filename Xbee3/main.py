@@ -71,7 +71,6 @@ while True:
     time.sleep_ms(10)
     print("PreTilt"+str(tilt_switch.value()))
     if tilt_switch.value():
-        print("PostTilt")
         sw_bit_0 = Pin("P0", Pin.IN, Pin.PULL_DOWN)
         sw_bit_1 = Pin("P1", Pin.IN, Pin.PULL_DOWN)
 
