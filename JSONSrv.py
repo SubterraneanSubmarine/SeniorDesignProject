@@ -11,7 +11,6 @@ Inspiration for this code sourced from GitHub user: Nitaku
 Git gist: https://gist.github.com/nitaku/10d0662536f37a087e1b
 '''
 
-
 # Additional class\library information for PythonHTTPServer:
 # https://docs.python.org/3/library/http.server.html
 #### From Python Documentaion: "http.server is not recommended for production. It only implements basic security checks." ####
@@ -20,19 +19,16 @@ import socketserver
 import json
 # import ssl
 import datalocker
-USE_PORT = 8008
-
 
 # Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}
 AvailablePaths = [
     "/TimerControl/State/",
     "/TimerControl/DaysZonesTimes/",
-    "/TimerControl/Thresholds/",
+    "/TimerControl/thresholds/",
     "/Xbee3/Dump/",
     "/DateTime/"  # TODO code in the datetime elements: We need to be able to set and read the date/time of RPi from android app
                   #TODO Consider adding in TempDisable?
 ]
-
 
 """
 Here, we define a class that takes a BaseHTTPRequestHandler
@@ -45,6 +41,7 @@ The BaseHTTPRequestHandler has defined functions that we can expand upon
             do_POST
         They relate the the http/tcp request types of GET, POST, PUT, etc
 """
+
 class PiSrv(BaseHTTPRequestHandler):
     # Header segment of an http/tcp packet -- informing a client what the data will be
     def set_header(self):
@@ -55,7 +52,7 @@ class PiSrv(BaseHTTPRequestHandler):
     # PythonHTTPServer function name -- Define the header of our packet
     def do_HEAD(self):
         self.set_header()
-        
+
     # PythonHTTPServer function name
     # GET simply responds to a request with data
     def do_GET(self):
@@ -72,10 +69,10 @@ class PiSrv(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(datalocker.SystemEnabled).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[1]: # "/TimerControl/DaysZonesTimes/"
-                self.wfile.write(json.dumps(datalocker.TimerTriggering).encode("utf-8") + "~~~".encode("utf-8"))
+                self.wfile.write(json.dumps(datalocker.timer_triggering).encode("utf-8") + "~~~".encode("utf-8"))
 
-            if requestPath == AvailablePaths[2]: # "/TimerControl/Thresholds/"
-                self.wfile.write(json.dumps(datalocker.Thresholds).encode("utf-8") + "~~~".encode("utf-8"))
+            if requestPath == AvailablePaths[2]: # "/TimerControl/thresholds/"
+                self.wfile.write(json.dumps(datalocker.thresholds).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[3]: # "/Xbee3/Dump/"
                 self.wfile.write(json.dumps(datalocker.SensorStats).encode("utf-8") + "~~~".encode("utf-8"))
@@ -84,11 +81,10 @@ class PiSrv(BaseHTTPRequestHandler):
         else:
             self.send_error(400, "Unexpected Path")
 
-
+            
     # PythonHTTPServer function name
     # POST will handle incoming data, and doing something with it
     def do_POST(self):
-
         # refuse to receive non-json content
         if self.headers.get_content_type() != 'application/json':
             self.send_error(400, "Expected \'application/json\' header")
@@ -100,14 +96,11 @@ class PiSrv(BaseHTTPRequestHandler):
             # Get the size of the packet body/payload (number of bytes)
             contentlength = int(self.headers.get("content-length"))
             if contentlength:  # if there is no data, Error!
-
                 # Then, with the size of the payload, we read the bytes-data into an object
                 serializedBodyData = self.rfile.read(
                     contentlength).decode("utf-8")
                 bodyData = json.loads(serializedBodyData)  # Creates Dict data type
-
                 # Now that we have the payload/body in an object, read the Path from the http request to determin how to handle the data
-
                 # "/TimerControl/State/"
                 if requestPath == AvailablePaths[0]:
                     if "State" in bodyData:
@@ -132,7 +125,7 @@ class PiSrv(BaseHTTPRequestHandler):
                 # "/TimerControl/DaysZonesTimes/"
                 if requestPath == AvailablePaths[1]:
                     # Check to make sure there are no more than 7 days passed in
-                    if bodyData.keys() <= datalocker.TimerTriggering.keys():
+                    if bodyData.keys() <= datalocker.timer_triggering.keys():
                         for key in bodyData.keys():
                             # Check to make sure we have the array of [bool, int, int] with our Key
                             if len(bodyData[key]) == 3:
@@ -140,7 +133,7 @@ class PiSrv(BaseHTTPRequestHandler):
                                     # TODO Range-check the military integer values (?)
                                     with datalocker.lock:
                                         # We have the correct Data. Save it!
-                                        datalocker.TimerTriggering[key] = bodyData[key]
+                                        datalocker.timer_triggering[key] = bodyData[key]
                                 else:
                                     self.send_error(
                                         400, "Expected value type error")
@@ -149,19 +142,19 @@ class PiSrv(BaseHTTPRequestHandler):
                         # Send reply
                         self.set_header()
                         self.wfile.write(json.dumps(
-                            datalocker.TimerTriggering).encode("utf-8"))
+                            datalocker.timer_triggering).encode("utf-8"))
                     else:
                         self.send_error(400, "Expected Week\\Day key")
 
-                # "/TimerControl/Thresholds/"
+                # "/TimerControl/thresholds/"
                 if requestPath == AvailablePaths[2]:
                     # Ensure the incoming data is not bigger than the current data/object
-                    if bodyData.keys() <= datalocker.Thresholds.keys():
+                    if bodyData.keys() <= datalocker.thresholds.keys():
                         for key in bodyData.keys():
                             if len(bodyData[key]) == 2:
                                 if int == type(bodyData[key][1]):
                                     with datalocker.lock:
-                                        datalocker.Thresholds[key][1] = bodyData[key][1]
+                                        datalocker.thresholds[key][1] = bodyData[key][1]
                                 else:
                                     self.send_error(
                                         400, "Expected value type error")
@@ -169,7 +162,7 @@ class PiSrv(BaseHTTPRequestHandler):
                                 self.send_error(400, "Expected 2 values")
                         self.set_header()
                         self.wfile.write(json.dumps(
-                            datalocker.Thresholds).encode("utf-8"))
+                            datalocker.thresholds).encode("utf-8"))
                     else:
                         self.send_error(400, "Expected Threshold keys")
 
@@ -177,27 +170,22 @@ class PiSrv(BaseHTTPRequestHandler):
                 if requestPath == AvailablePaths[3]:  # Deny efforts to push data into the Xbee's
                     # TODO Do we want to try and post changes/data to the Xbee's?
                     self.send_error(400, "Post Not Available")
-
                 #TODO TempDisable (?)
             else:
                 self.send_error(400, "No Content")
         else:
             self.send_error(400, "Unexpected Path")
 
-
 # From Python documentaion: https://docs.python.org/3/library/http.server.html
 # Here, we pre-define several of our HTTPServer variables for the run function -- if run() is called without any arguments
-def run(server_class=HTTPServer, handler_class=PiSrv, port=USE_PORT, DEBUG_MODE=False):
+def run(server_class=HTTPServer, handler_class=PiSrv, port=8008, DEBUG_MODE=False):
     # listen on any IP-Address\Interface but only on the given port
     server_address = ('', port)
-
     # Next, we call the server_call function (part of the python http.server library) with instructions on how to hand requests -- the PiSrv class dictates this
     RPiSrv = server_class(server_address, handler_class)
     RPiSrv.timeout = 0.5  # Do not block program/thread waiting for a request
-
     #RPiSrv.socket = ssl.wrap_socket(RPiSrv.socket, keyfile="key.pem", certfile="cert.pem", server_side=True)  # Oneday we could look into using SSL for the server
     print(' ADD TO DEBUG OUTPUT: Starting RPiSrv on port ', port)
-
     # Since this http.server is spawned on a thread, we will watch the ProgramRunning variable to know when to stop and shutdown the server.
     while datalocker.ProgramRunning:
         try:
@@ -205,5 +193,3 @@ def run(server_class=HTTPServer, handler_class=PiSrv, port=USE_PORT, DEBUG_MODE=
         except:
             pass  # If there is a bad request, ignore it and start again
     RPiSrv.server_close()  # Close socket
-
-

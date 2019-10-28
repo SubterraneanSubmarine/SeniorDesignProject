@@ -12,12 +12,11 @@ import xbee
 import time
 from machine import Pin, ADC
 
-SLEEP_DURATION = 300 * 1000  # In seconds between soil samples
+SLEEP_DURATION = 600 * 1000  # In seconds between soil samples
 AVERAGE_SAMPLES = 3  # Number of soil samples to be taken before transmission
 LOW_VOLT_THRESH = 2300  # Voltage floor before sleep duration time is increased.
 LOW_LIGHT_THRESH = 4000  # Photoresistor ceiling before sleep duration time is increased.
 SLEEP_MULTIPLIER = 3  # Sleep duration will be multiplied by this number if one of the above conditions are met
-
 
 # Set the identifying string of the radio
 xbee.atcmd("NI", "Sensor Probe")
@@ -44,18 +43,17 @@ for cmd in operating_network:
 # Wait for hub acknowledgement
 
 # Pin Setup
-tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
-moisture_sensor_power = Pin("P5", Pin.OUT)
-moisture_probe = ADC("D3")
-light_sensor = ADC("D2")
-sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
-
 # Unused Pins are set as outputs to reduce sleep current
 Pin("D1", Pin.OUT)
+light_sensor = ADC("D2")
+moisture_probe = ADC("D3")
 Pin("D4", Pin.OUT)
 Pin("D6", Pin.OUT)
 Pin("D7", Pin.OUT)
+tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
 Pin("D9", Pin.OUT)
+sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
+moisture_sensor_power = Pin("P5", Pin.OUT)
 tilt_power = Pin("P6", Pin.OUT)  # XCTU Sets this pin Pin.OUT & Pin.Pull_UP for DC Tilt_Switch_Power
 Pin("P7", Pin.OUT)
 Pin("P8", Pin.OUT)
@@ -73,7 +71,6 @@ while True:
     time.sleep_ms(10)
     print("PreTilt"+str(tilt_switch.value()))
     if tilt_switch.value():
-        print("PostTilt")
         sw_bit_0 = Pin("P0", Pin.IN, Pin.PULL_DOWN)
         sw_bit_1 = Pin("P1", Pin.IN, Pin.PULL_DOWN)
 
@@ -131,22 +128,19 @@ while True:
     if ambiance > LOW_LIGHT_THRESH or battery < LOW_VOLT_THRESH:
         sleep = SLEEP_DURATION * SLEEP_MULTIPLIER
 
-    # Deep sleep or wait if sleep switch is closed
+        # Deep sleep or wait if sleep switch is closed
+    tilt_switch = Pin("D8", Pin.OUT)
     if sleep_enable.value():
         sleep_enable = Pin("P2", Pin.OUT)
-        tilt_switch = Pin("D8", Pin.OUT)
-        print("PreDeep")
         xbee.XBee().sleep_now(sleep, pin_wake=False)
         while xbee.atcmd("AI") != 0:
             time.sleep_ms(100)
         sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
-        tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
+
     else:
         sleep_enable = Pin("P2", Pin.OUT)
-        tilt_switch = Pin("D8", Pin.OUT)
-        print("PreNorm")
         time.sleep_ms(sleep)
         while xbee.atcmd("AI") != 0:
             time.sleep_ms(100)
         sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
-        tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
+    tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
