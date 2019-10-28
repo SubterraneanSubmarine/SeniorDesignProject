@@ -10,15 +10,13 @@ import re
 import datalocker
 from datetime import datetime
 from time import sleep
-from sys import platform
-if platform == "linux":
-    import serial
-    import busio
-    import digitalio
-    import board
-    import adafruit_dht
-    import adafruit_mcp3xxx.mcp3008 as mcp
-    from adafruit_mcp3xxx.analog_in import AnalogIn
+import serial
+import busio
+import digitalio
+import board
+import adafruit_dht
+import adafruit_mcp3xxx.mcp3008 as mcp
+from adafruit_mcp3xxx.analog_in import AnalogIn
 
 # The Xbee (under MicroPython API) forwards a byte object/string that
 # needs to be formated before we can manipulate it as a data object
@@ -69,14 +67,20 @@ def convert_to_dict(bytes_in):
     return returndict  #temp  # Returns a nested Dictionary Object
 
 
-def talk_to_xbee(DEBUG_MODE=False):
-    if DEBUG_MODE:
-        print("# TODO")  # TODO
-        if platform == "win32":
-            print("xbeecomm exiting")
-            return 0
-    
+def log_data(payload):
+    with open("log.csv", 'a') as file_out:
+        file_out.write("{}/{}/{}, {}:{}, Unix Epoch: {}, Sector #{}, Moisture {}, Sunlight {}, Battery {}mV, "
+                       "Temperature {}C, Humidity {}%, Wind {}m/s".format(
+            str(payload['Year']), str(payload['Month']), str(payload['Day']),
+            str(payload['Hour']), str(payload['Minute']), str(payload['Timestamp']),
+            str(payload['Sector']), str(payload['Moisture']), str(payload['Sunlight']),
+            str(payload['Battery']), str(payload['Temperature']), str(payload['Humidity']),
+            str(payload['Wind'])
+        ))
+    file_out.close()
 
+
+def talk_to_xbee():
     serial_set = False
 
     spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
@@ -89,7 +93,6 @@ def talk_to_xbee(DEBUG_MODE=False):
     speed_average = [0, 0, 0, 0, 0]
     temp_average = [0, 0, 0, 0, 0]
     humidity_average = [0, 0, 0, 0, 0]
-    anemometer_voffset = 0;
     pointer = 0
 
     while not serial_set and datalocker.ProgramRunning:
@@ -114,22 +117,21 @@ def talk_to_xbee(DEBUG_MODE=False):
     pointer = 0
 
     # Possibly average this value
-    anemometer_voffset = anemometer.voltage
+    anemometer_offset = anemometer.voltage
 
     while pointer < 5:
         try:
-            speed_average[pointer] = abs((anemometer.voltage - anemometer_voffset) * 20.25)  # 20.25 represents the slope/scale factor of the anemometer
+            speed_average[pointer] = abs((anemometer.voltage - anemometer_offset) * 20.25)
             pointer = pointer + 1
         except RuntimeError as e:
             sleep(10)
     pointer = 0
-    speed_pointer = 0
 
     while datalocker.ProgramRunning:
 
         if port.inWaiting() > 0:
             temp = convert_to_dict(port.readline())
-            temp['Second'] = datetime.now().second
+            temp['Timestamp'] = datetime.timestamp(datetime.now())
             temp['Minute'] = datetime.now().minute
             temp['Hour'] = datetime.now().hour
             temp['Day'] = datetime.now().day
@@ -139,15 +141,15 @@ def talk_to_xbee(DEBUG_MODE=False):
             temp['Humidity'] = sum(humidity_average)/len(humidity_average)
             temp['Wind'] = sum(speed_average)/len(speed_average)
 
+            log_data(temp)
+
             datalocker.SensorStats[temp.get('Sector')] = temp
             datalocker.set_new()
-
-            
 
         if datetime.now().minute / 2 == 0:
             try:
                 speed_average[pointer] = abs((anemometer.voltage - anemometer_voffset) * 20.25)
-                speed_pointer = (speed_pointer + 1) % 5
+                pointer = (pointer + 1) % 5
             except RuntimeError as e:
                 print("Wind speed retrieve failed")
 
