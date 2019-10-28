@@ -159,35 +159,3 @@ def talk_to_xbee(DEBUG_MODE=False):
                 print("Temp/Humidity")
 
     port.close()
-
-
-
-
-
-
-if __name__ == '__main__':
-    temporary = convert_to_dict(RecieveStrings[0])
-    print("Payload: ", temporary["payload"])
-    print("Payload->Value: ", temporary["payload"]["Value"])
-
-"""
-# TODO delete all this debug/troubleshooting help stuff -- below this line --
-# {'profile': 49413, 'dest_ep': 232, 'broadcast': False, 'sender_nwk': 38204, 'source_ep': 232, 'payload': b'"Iteration": 0, "ADCRead": 169, "Zone": 2', 'sender_eui64': b'\x00\x13\xa2\x00A\x99O\xcc', 'cluster': 17}
-RecieveStrings = [b"{'profile': 49413, 'dest_ep': 232, 'broadcast': False, 'sender_nwk': 38204, 'source_ep': 232, 'payload': b'{'Iteration': 0, 'Value': 345, 'Zone': 2}', 'sender_eui64': b'\\x00\\x13\\xa2\\x00A\\x99O\\xcc', 'cluster': 17}",
-                  b"{'profile': 49413, 'dest_ep': 232, 'broadcast': False, 'sender_nwk': 38204, 'source_ep': 232, 'payload': b'{'Iteration': 55, 'Value': 555, 'Zone': 1}', 'sender_eui64': b'\\x00\\x13\\xa2\\x00F\\x99B\\xc3', 'cluster': 17}"]
-
-
-
-SAMPLE DATA
-{'Iteration': 301, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2289, 'Second': 27, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 302, 'Sector': 2, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2288, 'Second': 37, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 303, 'Sector': 3, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2285, 'Second': 47, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 304, 'Sector': 0, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2284, 'Second': 57, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 305, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2282, 'Second': 7, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 306, 'Sector': 3, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2282, 'Second': 17, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 307, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2279, 'Second': 28, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 308, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2279, 'Second': 38, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 309, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2278, 'Second': 48, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 310, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2274, 'Second': 58, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-{'Iteration': 311, 'Sector': 1, 'Moisture': 0, 'Sunlight': 0, 'Battery': 2274, 'Second': 9, 'Minute': 42, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 35.5, 'Wind': 2.748697642481118}
-"""

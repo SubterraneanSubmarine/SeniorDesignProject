@@ -20,7 +20,6 @@ import socketserver
 import json
 # import ssl
 import datalocker
-USE_PORT = 8008
 
 
 # Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}
@@ -187,7 +186,7 @@ class PiSrv(BaseHTTPRequestHandler):
 
 # From Python documentaion: https://docs.python.org/3/library/http.server.html
 # Here, we pre-define several of our HTTPServer variables for the run function -- if run() is called without any arguments
-def run(server_class=HTTPServer, handler_class=PiSrv, port=USE_PORT, DEBUG_MODE=False):
+def run(server_class=HTTPServer, handler_class=PiSrv, port=8008, DEBUG_MODE=False):
     # listen on any IP-Address\Interface but only on the given port
     server_address = ('', port)
 
