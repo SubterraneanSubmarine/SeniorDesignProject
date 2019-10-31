@@ -185,7 +185,7 @@ def run(server_class=HTTPServer, handler_class=PiSrv, port=8008, DEBUG_MODE=Fals
     RPiSrv = server_class(server_address, handler_class)
     RPiSrv.timeout = 0.5  # Do not block program/thread waiting for a request
     #RPiSrv.socket = ssl.wrap_socket(RPiSrv.socket, keyfile="key.pem", certfile="cert.pem", server_side=True)  # Oneday we could look into using SSL for the server
-    print(' ADD TO DEBUG OUTPUT: Starting RPiSrv on port ', port)
+    # print(' ADD TO DEBUG OUTPUT: Starting RPiSrv on port ', port)
     # Since this http.server is spawned on a thread, we will watch the ProgramRunning variable to know when to stop and shutdown the server.
     while datalocker.ProgramRunning:
         try:

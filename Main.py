@@ -10,14 +10,15 @@ Tested in Python3.7 and 3.4(RPi)
 import threading
 import signal
 import sys
+import os
 import argparse
+from datetime import datetime
 from time import sleep
+import subprocess
 import JSONSrv
 import scheduler
 import xbeecom
 import datalocker
-
-
 
 # Here are some command-line options can be used for testing/help
 parser = argparse.ArgumentParser(description="Smart Sprinkler Controller.", epilog="Senior Project by Bryce and David.")
@@ -30,6 +31,22 @@ def signal_handler(sig, frame):
     print("Closing Program...")
     datalocker.ProgramRunning = False  # Signal to all running threads to wrap it up!
 
+def printSensors():
+    message = ""
+    for sensor in datalocker.SensorStats:
+        if sensor == None:
+            continue
+        message = message + "\n" + str(sensor)
+    return message
+
+def printWaterQue():
+    message = ""
+    if len(scheduler.watering_queue) > 0:
+        for qued in scheduler.watering_queue:
+            if qued == None:
+                continue
+            message = message + "\n" + str(qued)
+    return message
 
 USE_PORT = 8008
 DEBUG_MODE = False
@@ -54,11 +71,10 @@ if __name__ == '__main__':
     # Register our signal handerls for the program
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
-    print("Program Starting... (Ctrl + C to stop)")
-
-    if DEBUG_MODE:
-        print("Type here to set/change variables of the system.")
-        print("Available settings to change: number of nodes, current sensor/sample values, wind, temp, and humidity.")
+    
+    if not DEBUG_MODE:
+        print("Program Starting... (Ctrl + C to stop)")
+        
 
     # Create our threads that will run the system. (Save handles/ID's to list/array)
     threads = []
@@ -77,7 +93,51 @@ if __name__ == '__main__':
     #       Then the signal handler will change ProgramRunning to False
     while datalocker.ProgramRunning:
         if DEBUG_MODE:
-            # TODO print("We are in debug mode: Handle some user input")
+            os.system('clear')
+            print("Date\\Time: ", datetime.now().strftime("%A %H%M"),"\tProgramRunning(", ("True" if datalocker.ProgramRunning else "False"), ")\tSystemEnabled(", ("True" if datalocker.SystemEnabled else "False"), ")\tJSONSrv Port: ", USE_PORT)
+            print("-----------------------Current Thresholds-----------------------\n", datalocker.thresholds)
+            print("-----------------------Current TimerTrigg-----------------------\n", datalocker.timer_triggering)
+            print("-----------------------Current SensorStats-----------------------", printSensors())
+            print("-----------------------Current WateringQue-----------------------StarTime: "+ str(scheduler.start_time_Global), printWaterQue())
+            print("-----------------------Node Health(s)-----------------------\n", datalocker.NodeHealthStatus)
+            print("-----------------------Node LastSeen-----------------------\n", scheduler.last_seen)
+            sys.stdout.flush()
+            usr_input = input("1: Set ProgramRunning-->True\n2: Set ProgramRunning-->False  (This will stop the program)\n3: Set SystemEnabled-->True\n4: Set SystemEnabled-->False\n5: Set timer_trigger...\n6: Set threshold...\n7: Set Date/Time...\n0: Clear Screen\n\nEnter Selection: ")
+            try:
+                usr_input = int(usr_input)
+            except Exception as err:
+                sys.stdout.flush()
+            if usr_input == 1:
+                datalocker.ProgramRunning = True
+            elif usr_input == 2:
+                datalocker.ProgramRunning = False
+                DEBUG_MODE = False
+            elif usr_input == 3:
+                datalocker.SystemEnabled = True
+            elif usr_input == 4:
+                datalocker.SystemEnabled = False
+            elif usr_input == 5:
+                day = input("Enter a Day: ")
+                boool = int(input("1(True) or 0(False): "))
+                time = input("HHMM: ")
+                datalocker.timer_triggering[day][0] = True if boool == 1 else False
+                datalocker.timer_triggering[day][1] = int(time)
+            elif usr_input == 6:
+                a_key = input("Key: ")
+                a_value = int(input("Value: "))
+                datalocker.thresholds[a_key] = a_value
+            elif usr_input == 7:
+                set_time = input("Set RPi Time \"Wed, Oct 30 2019 14:14:00 MDT\": ")
+                upDate = subprocess.Popen(["sudo", "date", "-s", set_time])
+                upDate.communicate()
+                upDate.wait()
+            
+            elif usr_input == 0:
+                os.system('clear')
+            else:
+                print("Error. Try again.")
+
+
             if args.debug_fake_data:
                 print("---Initializing sensor values with passed in sensor file.---")
                 # TODO Initialize variables using file

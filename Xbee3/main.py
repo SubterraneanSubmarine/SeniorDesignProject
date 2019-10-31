@@ -100,7 +100,7 @@ while True:
                   "\nTilt: " + str(switch) +
                   "\n")
                 xbee.transmit(xbee.ADDR_COORDINATOR,
-                          (", 'Sector': " + str(zone) +
+                          ("{'Sector': " + str(zone) +
                            ", 'Moisture': " + str(moisture) +
                            ", 'Sunlight': " + str(ambiance) +
                            ", 'Battery': " + str(battery) +

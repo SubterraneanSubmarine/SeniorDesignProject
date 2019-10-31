@@ -29,7 +29,7 @@ if platform == "linux":
 relays = [digitalio.DigitalInOut(board.D26),  # Sector 1
           digitalio.DigitalInOut(board.D19),  # Sector 2
           digitalio.DigitalInOut(board.D13),  # Sector 3
-          digitalio.DigitalInOut(board.D06)]  # Sector 4
+          digitalio.DigitalInOut(board.D6)]  # Sector 4
 
 watering_queue = []
 days_of_week = [
@@ -42,14 +42,16 @@ days_of_week = [
     "Sunday"
 ]
 
-start_time = 0
-
+start_time_Global = 0
 light_avg = [0] * len(datalocker.SensorStats)
 last_seen = [0] * len(datalocker.SensorStats)
 mia = [False] * len(datalocker.SensorStats)
 
 
 def sprinkler_runner(DEBUG_MODE=False):
+    start_time = 0
+    global start_time_Global
+    start_time_Global = start_time
     if DEBUG_MODE:
         print("# TODO")  # TODO
         if platform == "win32":
@@ -66,6 +68,7 @@ def sprinkler_runner(DEBUG_MODE=False):
         if datalocker.SystemEnabled:
             # Update the watering_queue and find missing sensors when a new Xbee packet is available
             if datalocker.get_new():
+                print("New Data!")
                 for sensor in datalocker.SensorStats:
                     if sensor is None:
                         continue
@@ -80,26 +83,32 @@ def sprinkler_runner(DEBUG_MODE=False):
                     # Check for readings that are a day or older
                     if datetime.timestamp(datetime.now()) - last_seen[sensor['Sector']] > 86400:
                         print("Sector {}'s sensor has gone MIA!".format(sensor['Sector']))  # Inform the user
+                        datalocker.NodeHealthStatus[sensor["Sector"]] = "Red"
                         mia[sensor['Sector']] = True
                         # Note that this will execute every time new data is put into the sensorstats array
                     else:
                         mia[sensor['Sector']] = False
+                        datalocker.NodeHealthStatus[sensor["Sector"]] = "Green"
 
-                        # If reading is less than user set threshold  # TODO -- How do we want to handle the threshold value?
-                        if (sensor["Moisture"] < datalocker.thresholds["Dry"]
-                            # AND not already in the wateringQue
-                                and not next((for item in watering_queue if item["Sector"] == sensor["Sector"]), False)):
-                            # then add the sensor to the wateringQue
-                            watering_queue.append(sensor)
+                    # If reading is less than user set threshold  # TODO -- How do we want to handle the threshold value?
+                    if (sensor["Moisture"] < datalocker.thresholds["Dry"]
+                        # AND not already in the wateringQue
+                            and not next((item for item in watering_queue if item["Sector"] == sensor["Sector"]), False)):
+                        # then add the sensor to the wateringQue
+                        watering_queue.append(sensor)
 
                 light_floor = sum(light_avg) / len(light_avg)
                 light_floor = light_floor - 500  # I've set the number to 500 as the standard deviation will always flag one sector  
                                                 # (Quick/Dirty stdev:  (max-min) / 4) ==> 4096 / 4 = 1024
+                light_avg.clear()
 
                 # Iterate through array once more to find outliers in light readings
                 for sensor in datalocker.SensorStats:
+                    if sensor is None:
+                        continue
                     if sensor['Sunlight'] < light_floor:
                         print("Sector {}'s light is low compared to peers; It may need to be moved")
+                        datalocker.NodeHealthStatus["Sensor"] = "Yellow"
 
             # Manage the watering queue by evaluating the current weather conditions
             # If conditions are met start watering, however fallback schedules are checked first
@@ -111,19 +120,35 @@ def sprinkler_runner(DEBUG_MODE=False):
                     if mia[iterator] and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]:
                         relays[iterator].value = True
                         start_time = datetime.timestamp(datetime.now())
+                        start_time_Global = start_time
+                        watering_queue.append({'Sector': iterator})
+                        print("MIA watering started")
                     iterator = iterator + 1
 
                 if (len(watering_queue) > 0
                     and watering_queue[0]["Wind"] < datalocker.thresholds["Wind max"]
-                    and datalocker.thresholds["Prohibited time end"] <= current_time <= datalocker.thresholds["Prohibited time start"]
+                    and (datalocker.thresholds["Prohibited time end"] <= current_time <= 2359
+                         or current_time <= datalocker.thresholds["Prohibited time start"])
                     and watering_queue[0]["Humidity"] < datalocker.thresholds["Humidity max"]
                     and watering_queue[0]["Temperature"] > datalocker.thresholds["Temperature min"]
                     ):  # Then we have passed all tests
 
+                    print("Sector: ", watering_queue[0]["Sector"], " watering has started.")
                     relays[watering_queue[0]["Sector"]].value = True
                     start_time = datetime.timestamp(datetime.now())
+                    start_time_Global = start_time
 
-            if (datetime.timestamp(datetime.now()) - start_time) > (datalocker.thresholds["Water Duration"]):
+
+            if (start_time and datetime.timestamp(datetime.now()) - start_time) > (datalocker.thresholds["Water Duration"]):
                 relays[watering_queue[0]["Sector"]].value = False
+                print("Sector: ", watering_queue[0]["Sector"], " watering has ended.")
                 watering_queue.pop(0)
                 start_time = 0
+                start_time_Global = start_time
+
+
+if __name__ == '__main__':
+    datalocker.ProgramRunning = True
+    datalocker.SystemEnabled = True
+    while True:
+        sprinkler_runner()

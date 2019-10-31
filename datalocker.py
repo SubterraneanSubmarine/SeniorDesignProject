@@ -22,14 +22,17 @@ NewSensorData = False
 
 SensorStats = [None] * 4
 
+NodeHealthStatus = ["UnSet", "UnSet", "UnSet", "UnSet"]
+
+
 # "Day": Active[bool], StartTime[int]  -> (military time)
 # "Monday": [True, 230] -> 230 == 2:30am
 timer_triggering = {
-    "Sunday": [False, 0],
-    "Monday": [False, 0],
+    "Sunday": [False, 1850],
+    "Monday": [True, 0],
     "Tuesday": [False, 0],
-    "Wednesday": [False, 0],
-    "Thursday": [False, 0],
+    "Wednesday": [True, 0],
+    "Thursday": [True, 0],
     "Friday": [False, 0],
     "Saturday": [False, 0]
 }
@@ -41,18 +44,20 @@ thresholds = {
     "Temperature min": 8,
     "Prohibited time start": 1100,
     "Prohibited time end": 1800,
-    "Water Duration": 900
+    "Water Duration": 180  #900
 }
 
 
 def set_new():
+    global NewSensorData
     with lock:
-        ProgramRunning = True
+        NewSensorData = True
 
 
 def get_new():
-    if ProgramRunning:
+    global NewSensorData
+    if NewSensorData:
         with lock:
-            ProgramRunning = False
+            NewSensorData = False
         return True
     return False
