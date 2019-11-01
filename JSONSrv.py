@@ -22,12 +22,12 @@ import datalocker
 
 # Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}
 AvailablePaths = [
-    "/TimerControl/State/",
-    "/TimerControl/DaysZonesTimes/",
-    "/TimerControl/thresholds/",
-    "/Xbee3/Dump/",
-    "/DateTime/"  # TODO code in the datetime elements: We need to be able to set and read the date/time of RPi from android app
-                  #TODO Consider adding in TempDisable?
+    "/SystemEnabled/",
+    "/TimerTriggering/",
+    "/Thresholds/",
+    "/SensorStats/",
+    "/DateTime/",  # TODO code in the datetime elements: We need to be able to set and read the date/time of RPi from android app
+    "/NodeHealthStatus/"              #TODO Consider adding in TempDisable?
 ]
 
 """
@@ -65,16 +65,16 @@ class PiSrv(BaseHTTPRequestHandler):
             #       three tildes "~~~" will be appended to our transmitted message
             #       On the Android App side: The stream scanner will use a delimiter value of "~"
             #       Thus, ensuring* capture of our transmitted message
-            if requestPath == AvailablePaths[0]:  # "/TimerControl/State/"
+            if requestPath == AvailablePaths[0]:  # "/SystemEnabled/"
                 self.wfile.write(json.dumps(datalocker.SystemEnabled).encode("utf-8") + "~~~".encode("utf-8"))
 
-            if requestPath == AvailablePaths[1]: # "/TimerControl/DaysZonesTimes/"
+            if requestPath == AvailablePaths[1]: # "/TimerTriggering/"
                 self.wfile.write(json.dumps(datalocker.timer_triggering).encode("utf-8") + "~~~".encode("utf-8"))
 
-            if requestPath == AvailablePaths[2]: # "/TimerControl/thresholds/"
+            if requestPath == AvailablePaths[2]: # "/Thresholds/"
                 self.wfile.write(json.dumps(datalocker.thresholds).encode("utf-8") + "~~~".encode("utf-8"))
 
-            if requestPath == AvailablePaths[3]: # "/Xbee3/Dump/"
+            if requestPath == AvailablePaths[3]: # "/SensorStats/"
                 self.wfile.write(json.dumps(datalocker.SensorStats).encode("utf-8") + "~~~".encode("utf-8"))
             #TODO Get data from GPIO \ stored data and return in Dump
 

@@ -150,7 +150,8 @@ def talk_to_xbee(DEBUG_MODE=False):
             temp['Humidity'] = sum(humidity_average)/len(humidity_average)
             temp['Wind'] = sum(speed_average)/len(speed_average)
 
-            log_data(temp)
+            if datalocker.NodeHealthStatus[temp["Sector"]] == "Red":
+                log_data(temp)
 
             datalocker.SensorStats[temp.get('Sector')] = temp
             datalocker.set_new()
