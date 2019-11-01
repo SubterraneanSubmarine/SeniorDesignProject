@@ -26,10 +26,26 @@ if platform == "linux":
 # TODO use moisture values/samples to dictate watering, instead of timmer stuff
 
 
-relays = [digitalio.DigitalInOut(board.D26),  # Sector 1
+if platform == "linux":
+    relays = [digitalio.DigitalInOut(board.D26),  # Sector 1
           digitalio.DigitalInOut(board.D19),  # Sector 2
           digitalio.DigitalInOut(board.D13),  # Sector 3
           digitalio.DigitalInOut(board.D6)]  # Sector 4
+else:
+    class fakeIo():
+        def __init__(self, pin):
+            self.pin = pin
+            self.enabled = False
+            self.direction = False
+        def direction(self, dir):
+            self.direction = dir
+        def value(self, en):
+            self.enable = en
+    relays = [fakeIo(0), fakeIo(1), fakeIo(2), fakeIo(3)]
+
+
+
+
 
 watering_queue = []
 days_of_week = [
@@ -45,7 +61,6 @@ days_of_week = [
 start_time_Global = 0
 light_avg = [0] * len(datalocker.SensorStats)
 last_seen = [0] * len(datalocker.SensorStats)
-mia = [False] * len(datalocker.SensorStats)
 
 
 def sprinkler_runner(DEBUG_MODE=False):
@@ -60,7 +75,10 @@ def sprinkler_runner(DEBUG_MODE=False):
 
     # Run thread as long as an interrupt isn't sent
     for relay in relays:
-        relay.direction = digitalio.Direction.OUTPUT
+        if platform == "linux":
+            relay.direction = digitalio.Direction.OUTPUT
+        else:
+            relay.direction = True
         relay.value = False
 
     while datalocker.ProgramRunning:
@@ -77,17 +95,15 @@ def sprinkler_runner(DEBUG_MODE=False):
                     last_seen[sensor['Sector']] = sensor['Timestamp']
 
                     # Update light value arrays for every active sector
-                    if not mia[sensor['Sector']]:
+                    if datalocker.NodeHealthStatus[sensor['Sector']] != "Red":
                         light_avg.append(sensor['Sunlight'])
 
                     # Check for readings that are a day or older
                     if datetime.timestamp(datetime.now()) - last_seen[sensor['Sector']] > 86400:
                         print("Sector {}'s sensor has gone MIA!".format(sensor['Sector']))  # Inform the user
                         datalocker.NodeHealthStatus[sensor["Sector"]] = "Red"
-                        mia[sensor['Sector']] = True
                         # Note that this will execute every time new data is put into the sensorstats array
                     else:
-                        mia[sensor['Sector']] = False
                         datalocker.NodeHealthStatus[sensor["Sector"]] = "Green"
 
                     # If reading is less than user set threshold  # TODO -- How do we want to handle the threshold value?
@@ -116,8 +132,8 @@ def sprinkler_runner(DEBUG_MODE=False):
                 current_time = int(datetime.now().strftime("%H%M"))
                 day = days_of_week[datetime.today().weekday()]
                 iterator = 0
-                while iterator < len(mia):
-                    if mia[iterator] and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]:
+                while iterator < len(datalocker.NodeHealthStatus):
+                    if datalocker.NodeHealthStatus[iterator] == "Red" and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]:
                         relays[iterator].value = True
                         start_time = datetime.timestamp(datetime.now())
                         start_time_Global = start_time
