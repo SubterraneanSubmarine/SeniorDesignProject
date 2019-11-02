@@ -17,34 +17,13 @@ if platform == "linux":
     import digitalio
     import board
 
-
-# TODO During initial setup from android app -- ask for time+timezone+dst! (or base everything off utc?)
-# datetime.now(timezone(hours=-7))
-# TODO Look into the possible ways of setting the RPi's time in linux, rather than python?
-# Perhaps we set the system with with python? -- or do we poll internet servers for time?
-# TODO using temp sensor values recorded throughout a day, alter/change water duration based on daytime temperatures
-# TODO use moisture values/samples to dictate watering, instead of timmer stuff
-
-
-if platform == "linux":
     relays = [digitalio.DigitalInOut(board.D26),  # Sector 1
           digitalio.DigitalInOut(board.D19),  # Sector 2
           digitalio.DigitalInOut(board.D13),  # Sector 3
           digitalio.DigitalInOut(board.D6)]  # Sector 4
 else:
-    class fakeIo():
-        def __init__(self, pin):
-            self.pin = pin
-            self.enabled = False
-            self.direction = False
-        def direction(self, dir):
-            self.direction = dir
-        def value(self, en):
-            self.enable = en
-    relays = [fakeIo(0), fakeIo(1), fakeIo(2), fakeIo(3)]
-
-
-
+    import fakedata
+    relays = [fakedata.fakeIO2(0), fakedata.fakeIO2(1), fakedata.fakeIO2(2), fakedata.fakeIO2(3)]
 
 
 watering_queue = []
@@ -58,15 +37,12 @@ days_of_week = [
     "Sunday"
 ]
 
-start_time_Global = 0
 light_avg = [0] * len(datalocker.SensorStats)
 last_seen = [0] * len(datalocker.SensorStats)
 
 
 def sprinkler_runner(DEBUG_MODE=False):
     start_time = 0
-    global start_time_Global
-    start_time_Global = start_time
     if DEBUG_MODE:
         print("# TODO")  # TODO
         if platform == "win32":
@@ -136,7 +112,8 @@ def sprinkler_runner(DEBUG_MODE=False):
                     if datalocker.NodeHealthStatus[iterator] == "Red" and datalocker.timer_triggering[day][0] and current_time == datalocker.timer_triggering[day][1]:
                         relays[iterator].value = True
                         start_time = datetime.timestamp(datetime.now())
-                        start_time_Global = start_time
+                        if DEBUG_MODE:
+                            datalocker.DEBUGSectorWatering[iterator] = datetime.now().strftime("%H%M")
                         watering_queue.append({'Sector': iterator})
                         print("MIA watering started")
                     iterator = iterator + 1
@@ -152,7 +129,8 @@ def sprinkler_runner(DEBUG_MODE=False):
                     print("Sector: ", watering_queue[0]["Sector"], " watering has started.")
                     relays[watering_queue[0]["Sector"]].value = True
                     start_time = datetime.timestamp(datetime.now())
-                    start_time_Global = start_time
+                    if DEBUG_MODE:
+                        datalocker.DEBUGSectorWatering[watering_queue[0]["Sector"]] = datetime.now().strftime("%H%M")
 
 
             if (start_time and datetime.timestamp(datetime.now()) - start_time) > (datalocker.thresholds["Water Duration"]):
@@ -160,11 +138,7 @@ def sprinkler_runner(DEBUG_MODE=False):
                 print("Sector: ", watering_queue[0]["Sector"], " watering has ended.")
                 watering_queue.pop(0)
                 start_time = 0
-                start_time_Global = start_time
+                if DEBUG_MODE:
+                    datalocker.DEBUGSectorWatering[watering_queue[0]["Sector"]] = 0
 
-
-if __name__ == '__main__':
-    datalocker.ProgramRunning = True
-    datalocker.SystemEnabled = True
-    while True:
-        sprinkler_runner()
+    

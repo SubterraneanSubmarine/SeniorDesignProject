@@ -20,68 +20,14 @@ if platform == "linux":
     import adafruit_mcp3xxx.mcp3008 as MCP
     from adafruit_mcp3xxx.analog_in import AnalogIn
 else:
-    class fakeIO():
-        temperature = 0
-        humidity = 0
-        voltage = 0
-        def __init__(self, val1, val2):
-            self.val1 = val1
-            self.val2 = val2
-            # self.val3 = val3
-        def SPI(clock, MISO, MOSI):
-            clock = clock
-            MISO = MISO
-            MOSI = MOSI
-            return 0
-        def DigitalInOut(self):
-            self.board = self
-            return 0
-        def SCK(self):
-            return 0
-        def MISO(self):
-            return 0
-        def MOSI(self):
-            return 0
-        def Serial(val1, val2):
-            val1 = val1
-            val2 = val2
-            inWaiting = 0
-            return fakeIO
-            def inWaiting():
-                return 0
-            def SerialException():
-                return 0
-        def MCP3008(val1, val2):
-            val1 = val1
-            val2 = val2
-            return 0
-        def DHT22(self):
-            temperature = 0
-            humidity = 0
-            return fakeIO
-        def D25(self):
-            self.board = self
-            return 0
-        def D21(self):
-            self.board = self
-            return 0
-        def P0(self):
-            self.board = self
-        def inWaiting():
-            return 0
-        def close():
-            return 0
-        def AnalogIn(self, val1, val2):
-            voltage = 0
-        
-        
-    busio = fakeIO
-    digitalio = fakeIO
-    board = fakeIO
-    serial = fakeIO
-    adafruit_dht = fakeIO
-    MCP = fakeIO
-    # AnalogIn = fakeIO
+    import fakedata
+    busio = fakedata.fakeIO
+    digitalio = fakedata.fakeIO
+    board = fakedata.fakeIO
+    serial = fakedata.fakeIO
+    adafruit_dht = fakedata.fakeIO
+    MCP = fakedata.fakeIO
+    AnalogIn = fakedata.fakeIO
 
     
 
