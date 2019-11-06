@@ -20,16 +20,26 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.Iterator;
 
 public class MainPage extends Fragment {
     private static final String TAG = "S.D.A.MainPage";  // Used for debug output
+
+    public RecyclerView recyclerView;
+    public RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager layoutManager;
 
     MainActivity mainActivity;
     private View view;
@@ -40,7 +50,89 @@ public class MainPage extends Fragment {
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.main_layout, container, false);
         mainActivity = (MainActivity) getActivity();
+
+        ((ToggleButton) view.findViewById(R.id.sysEnabledToggle)).setEnabled(false);
+        ((EditText) view.findViewById(R.id.sysTimeEdit)).setEnabled(false);
+
+        // Inform our Recycler view where it will put/show our data
+        recyclerView = (RecyclerView) view.findViewById(R.id.waterQueRecycle);
+        recyclerView.setHasFixedSize(true);  // Optional
+        layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+
+
+
         return view;
+    }
+
+    public class MyAdapterQue extends RecyclerView.Adapter<MyAdapterQue.ViewHolder> {
+        private LayoutInflater mInflater;
+//        private ItemClickListener mClickListener;
+
+        // data is passed into the constructor
+        JSONObject jsonObject;
+        MyAdapterQue(JSONObject data) {
+            this.mInflater = LayoutInflater.from(getContext());
+            this.jsonObject = data;
+//            this.mData3 = data2;
+        }
+
+        // inflates the row layout from xml when needed
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.waterque_recycler_rows, parent, false);
+            return new ViewHolder(view);
+        }
+
+        // binds the data to the TextView in each row
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            // We pass in our JSONObject, then iterate through it -- for ever item in side it, the
+            // recycler view will create sufficient rows to hold our items
+            // Ever time this 'onBindViewHolder' is called, the position value in incremented by 1
+            JSONObject jsonObjectSubValues;
+
+            Iterator<String> obs = jsonObject.keys();
+
+            String jsonResult = obs.next();  // get our first Xbee KEY out of the dictionary
+            String zone = "Unset";
+
+
+            // Move our JSONObject iterator  position  number of times
+            for (int i = 0; i < position; i++) jsonResult = obs.next();  // get the next KEY
+
+            try {
+                jsonObjectSubValues = jsonObject.getJSONObject(jsonResult);
+                zone = jsonObjectSubValues.getString("Sector");
+
+
+                // Set the values of the TextViews
+                holder.xbeeSector.setText("Zone: " + zone);
+
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                holder.xbeeSector.setText("Nothing In Queue at this time");
+            }
+        }
+
+        // total number of rows
+        @Override
+        public int getItemCount() {
+            return  jsonObject.length();  // How many keys are in our XbeeJSONObject
+        }
+
+
+        // stores and recycles views as they are scrolled off screen
+        public class ViewHolder extends RecyclerView.ViewHolder/*implements View.OnClickListener*/ {
+            TextView xbeeSector;
+
+            ViewHolder(View itemView) {
+                super(itemView);
+                xbeeSector = itemView.findViewById(R.id.sectorWater);
+            }
+        }
     }
 
     @Override
@@ -48,7 +140,7 @@ public class MainPage extends Fragment {
         super.onAttach(context);
 
         Log.d(TAG, "onAttach()");
-        //if (mainActivity.HaveData) updateValues();
+        //if (mainActivity.HAVEDATA) updateValues();
     }
 
     @Override
@@ -64,13 +156,51 @@ public class MainPage extends Fragment {
 
         mainActivity = (MainActivity) getActivity();
 
-        if (mainActivity.HaveData) {
+        if (mainActivity.HAVEDATA) {
             try {
-                ((TextView) view.findViewById(R.id.sysEnabled)).setText((mainActivity.PiResponses[0].equals("false")) ? "Disabled" : "Enabled");
-                ((TextView) view.findViewById(R.id.moisture)).setText(((JSONArray) mainActivity.Thresholds.get("Moisture")).getString(0));
-            ((TextView) view.findViewById(R.id.tempurature)).setText(((JSONArray) mainActivity.Thresholds.get("Temperature")).getString(0));
-            ((TextView) view.findViewById(R.id.wind)).setText(((JSONArray) mainActivity.Thresholds.get("Wind")).getString(0));
-            ((TextView) mainActivity.findViewById(R.id.rain)).setText(((JSONArray) mainActivity.Thresholds.get("Rain")).getString(0));
+                // An 'Adapter'
+                mAdapter = new MyAdapterQue(mainActivity.WateringQue);
+                recyclerView.setAdapter(mAdapter);
+
+                double avTemp = 0.0;
+                int avMoist = 0;
+                int avSun = 0;
+                double avHum = 0.0;
+                double avWind = 0.0;
+                int count = 0;
+                Iterator<String> keys = mainActivity.SensorStats.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+
+                    avTemp += Double.parseDouble((((JSONObject) (mainActivity.SensorStats.get(key))).get("Temperature").toString()));
+                    avMoist += Integer.parseInt((((JSONObject) (mainActivity.SensorStats.get(key))).get("Moisture").toString()));
+                    avSun += Integer.parseInt((((JSONObject) (mainActivity.SensorStats.get(key))).get("Sunlight").toString()));
+                    avHum += Double.parseDouble((((JSONObject) (mainActivity.SensorStats.get(key))).get("Humidity").toString()));
+                    avWind += Double.parseDouble((((JSONObject) (mainActivity.SensorStats.get(key))).get("Wind").toString()));
+                    count++;
+                }
+                avTemp /= count;
+                avMoist /= count;
+                avSun /= count;
+                avHum /= count;
+                avWind /= count;
+
+//                boolean sysEnabled = Boolean.parseBoolean(mainActivity.PiResponses[0]);
+                boolean sysEnabled = Boolean.parseBoolean(mainActivity.SystemState.getString("State"));
+
+
+                // Enable user interface items
+                ((ToggleButton) view.findViewById(R.id.sysEnabledToggle)).setEnabled(true);
+                ((EditText) view.findViewById(R.id.sysTimeEdit)).setEnabled(true);
+
+                // Set display values
+                ((ToggleButton) view.findViewById(R.id.sysEnabledToggle)).setChecked(sysEnabled);
+                ((EditText) view.findViewById(R.id.sysTimeEdit)).setText(mainActivity.DateTime);
+                ((TextView) view.findViewById(R.id.moisture)).setText(String.format("%d", avMoist));
+                ((TextView) view.findViewById(R.id.tempurature)).setText(String.format("%.2f", avTemp)+" \u00B0C");
+                ((TextView) view.findViewById(R.id.wind)).setText(String.format("%.2f", avWind)+" m/s");
+                ((TextView) view.findViewById(R.id.sun)).setText(String.format("%d", avSun));
+                ((TextView) view.findViewById(R.id.humid)).setText(String.format("%.2f", avHum)+" RH");
             } catch (Exception e) {
                 e.printStackTrace();
             }

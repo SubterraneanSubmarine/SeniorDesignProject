@@ -70,7 +70,7 @@ public class SensorsPage extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         // An 'Adapter'
-        mAdapter = new MyAdapter(mainActivity.XbeeSensors);
+        mAdapter = new MyAdapter(mainActivity.SensorStats);
         recyclerView.setAdapter(mAdapter);
 
         return view;
@@ -111,9 +111,11 @@ public class SensorsPage extends Fragment {
 
             String jsonResult = obs.next();  // get our first Xbee KEY out of the dictionary
             String zone = "Unset";
+            String health = "Unset";
             String moisture = "Unset";
             String battery = "Unset";
             String sunlight = "Unset";
+            String checkin = "Unset";
 
             // Move our JSONObject iterator  position  number of times
             for (int i = 0; i < position; i++) jsonResult = obs.next();  // get the next KEY
@@ -121,18 +123,21 @@ public class SensorsPage extends Fragment {
             try {
                 jsonObjectSubValues = jsonObject.getJSONObject(jsonResult);
                 zone = jsonObjectSubValues.getString("Sector");
+                health = jsonObjectSubValues.getString("Health");
                 moisture = jsonObjectSubValues.getString("Moisture");
                 battery = jsonObjectSubValues.getString("Battery");
                 sunlight = jsonObjectSubValues.getString("Sunlight");
+                checkin =  jsonObjectSubValues.getString("Month") + "/" + jsonObjectSubValues.getString("Day") + "/" + jsonObjectSubValues.getString("Year") + " at " + jsonObjectSubValues.getString("Hour") + ":" + jsonObjectSubValues.getString("Minute");
                 Log.d(TAG, "onBindView(  " + jsonResult + ": Zone=" + jsonObjectSubValues.get("Sector"));
 
 
                 // Set the values of the TextViews
                 holder.xbeeSector.setText("Zone: " + zone);
-                holder.xbeeChild.setText("Moisture: " + moisture);
-                holder.xbeeChild1.setText("Battery: " + battery);
-                holder.xbeeChild2.setText("Sunlight: " + sunlight);
-                holder.xbeeChild3.setText("MACAddr: " + jsonResult);
+                holder.xbeeChild0.setText("Health Status: "+ health);
+                holder.xbeeChild1.setText("Moisture: " + moisture);
+                holder.xbeeChild2.setText("Battery: " + battery);
+                holder.xbeeChild3.setText("Sunlight: " + sunlight);
+                holder.xbeeChild4.setText("LastSeen: " + checkin);
 
             }
             catch (Exception e){
@@ -150,18 +155,20 @@ public class SensorsPage extends Fragment {
         // stores and recycles views as they are scrolled off screen
         public class ViewHolder extends RecyclerView.ViewHolder/*implements View.OnClickListener*/ {
             TextView xbeeSector;
-            TextView xbeeChild;
+            TextView xbeeChild0;
             TextView xbeeChild1;
             TextView xbeeChild2;
             TextView xbeeChild3;
+            TextView xbeeChild4;
 
             ViewHolder(View itemView) {
                 super(itemView);
                 xbeeSector = itemView.findViewById(R.id.xbeeZone);
-                xbeeChild = itemView.findViewById(R.id.xbeeKeyValue1);
-                xbeeChild1 = itemView.findViewById(R.id.xbeeKeyValue2);
-                xbeeChild2 = itemView.findViewById(R.id.xbeeKeyValue3);
-                xbeeChild3 = itemView.findViewById(R.id.xbeeKeyValue4);
+                xbeeChild0 = itemView.findViewById(R.id.xbeeKeyValue0);
+                xbeeChild1 = itemView.findViewById(R.id.xbeeKeyValue1);
+                xbeeChild2 = itemView.findViewById(R.id.xbeeKeyValue2);
+                xbeeChild3 = itemView.findViewById(R.id.xbeeKeyValue3);
+                xbeeChild4 = itemView.findViewById(R.id.xbeeKeyValue4);
 //                itemView.setOnClickListener(this);
             }
 //            @Override
@@ -209,10 +216,10 @@ public class SensorsPage extends Fragment {
 
         mainActivity = (MainActivity) getActivity();
 
-        if (mainActivity.HaveData) {
+        if (mainActivity.HAVEDATA) {
             try {
 //                recyclerView.getAdapter().notifyDataSetChanged();
-                mAdapter = new MyAdapter(mainActivity.XbeeSensors);
+                mAdapter = new MyAdapter(mainActivity.SensorStats);
                 recyclerView.setAdapter(mAdapter);
 //                ((TextView) view.findViewById(R.id.sysEnabled)).setText((mainActivity.PiResponses[0].equals("false")) ? "Disabled" : "Enabled");
 //            ((TextView) view.findViewById(R.id.sysEnabled)).setText((mainActivity.PiResponses[0].equals("false")) ? "Disabled" : "Enabled");
