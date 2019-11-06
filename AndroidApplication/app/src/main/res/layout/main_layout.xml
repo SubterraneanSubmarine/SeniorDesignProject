@@ -8,59 +8,38 @@
 
     <TextView
         android:id="@+id/sysEnableLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_width="129dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="32dp"
         android:text="System Status: "
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/tempuratureLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/sysEnabled"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="128dp"
-        android:text=". . . . ."
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.7"
-        app:layout_constraintStart_toEndOf="@+id/sysEnableLabel"
-        app:layout_constraintTop_toTopOf="@+id/sysEnableLabel" />
-
-    <Switch
-        android:id="@+id/sysEnabledSw"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="false"
-        android:showText="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/sysEnabled"
-        app:layout_constraintTop_toTopOf="@+id/sysEnabled"
-        tools:checked="false" />
 
     <TextView
         android:id="@+id/moistureLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Av. Moisture: "
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="68dp"
+        android:text="Av. Moisture"
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/sysEnableLabel"
-        app:layout_constraintTop_toBottomOf="@+id/sysEnableLabel" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sysTimeLabel" />
 
     <TextView
         android:id="@+id/moisture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.28"
+        app:layout_constraintBottom_toBottomOf="@+id/moistureLabel"
         app:layout_constraintStart_toEndOf="@+id/moistureLabel"
         app:layout_constraintTop_toTopOf="@+id/moistureLabel" />
 
@@ -68,24 +47,22 @@
         android:id="@+id/tempuratureLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="Av. Temperature: "
+        android:layout_marginTop="8dp"
+        android:text="Temperature: "
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@+id/moistureLabel"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/moistureLabel" />
 
     <TextView
         android:id="@+id/tempurature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.28"
+        app:layout_constraintBottom_toBottomOf="@+id/tempuratureLabel"
         app:layout_constraintStart_toEndOf="@+id/tempuratureLabel"
         app:layout_constraintTop_toTopOf="@+id/tempuratureLabel" />
 
@@ -93,8 +70,8 @@
         android:id="@+id/windLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Current Wind: "
+        android:layout_marginTop="8dp"
+        android:text="Wind: "
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@+id/tempuratureLabel"
@@ -104,37 +81,170 @@
         android:id="@+id/wind"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.28"
+        app:layout_constraintBottom_toBottomOf="@+id/windLabel"
         app:layout_constraintStart_toEndOf="@+id/windLabel"
         app:layout_constraintTop_toTopOf="@+id/windLabel" />
 
     <TextView
-        android:id="@+id/rainLable"
+        android:id="@+id/sunLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Av. Rain: "
+        android:layout_marginTop="8dp"
+        android:text="Av. Sunlight"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@+id/windLabel"
         app:layout_constraintTop_toBottomOf="@+id/windLabel" />
 
     <TextView
-        android:id="@+id/rain"
+        android:id="@+id/sun"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:text=". . . . ."
         android:textColor="@android:color/black"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.28"
-        app:layout_constraintStart_toEndOf="@+id/rainLable"
-        app:layout_constraintTop_toTopOf="@+id/rainLable" />
+        app:layout_constraintBottom_toBottomOf="@+id/sunLabel"
+        app:layout_constraintStart_toEndOf="@+id/sunLabel"
+        app:layout_constraintTop_toTopOf="@+id/sunLabel" />
 
+    <TextView
+        android:id="@+id/humidLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Humidity"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/sunLabel"
+        app:layout_constraintTop_toBottomOf="@+id/sunLabel" />
+
+    <TextView
+        android:id="@+id/humid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text=". . . . ."
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/humidLabel"
+        app:layout_constraintStart_toEndOf="@+id/humidLabel"
+        app:layout_constraintTop_toTopOf="@+id/humidLabel" />
+
+    <ToggleButton
+        android:id="@+id/sysEnabledToggle"
+        android:layout_width="91dp"
+        android:layout_height="38dp"
+        android:padding="0dp"
+        android:paddingStart="0dp"
+        android:paddingLeft="0dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="0dp"
+        android:paddingRight="0dp"
+        android:paddingBottom="0dp"
+        android:text="ToggleButton"
+        android:textOff="Disabled"
+        android:textOn="Enabled"
+        app:layout_constraintBottom_toBottomOf="@+id/sysEnableLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/sysEnableLabel"
+        app:layout_constraintTop_toTopOf="@+id/sysEnableLabel" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toTopOf="@+id/moisture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sysEnableLabel" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="-- System Overview --"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="-- Watering Que (at update) --"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/humidLabel" />
+
+    <TextView
+        android:id="@+id/sysTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="System Time"
+        android:textColor="@android:color/black"
+        app:layout_constraintEnd_toEndOf="@+id/sysEnableLabel"
+        app:layout_constraintStart_toStartOf="@+id/sysEnableLabel"
+        app:layout_constraintTop_toBottomOf="@+id/sysEnableLabel" />
+
+    <EditText
+        android:id="@+id/sysTimeEdit"
+        android:layout_width="175dp"
+        android:layout_height="31dp"
+        android:ems="10"
+        android:inputType="date|datetime|text|time"
+        android:padding="0dp"
+        android:paddingStart="0dp"
+        android:paddingLeft="0dp"
+        android:paddingTop="0dp"
+        android:paddingEnd="0dp"
+        android:paddingRight="0dp"
+        android:paddingBottom="0dp"
+        android:selectAllOnFocus="false"
+        android:text="Mon Nov  4 22:34:88 2019"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/sysTimeLabel"
+        app:layout_constraintEnd_toEndOf="@+id/sysEnabledToggle"
+        app:layout_constraintStart_toStartOf="@+id/sysEnabledToggle"
+        app:layout_constraintTop_toTopOf="@+id/sysTimeLabel" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/waterQueRecycle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="54dp"
+        android:layout_marginEnd="54dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toTopOf="@+id/textView3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/humidLabel"
+        app:layout_constraintVertical_bias="0.65" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,10 +15,16 @@ https://app.pluralsight.com/library/courses/android-fundamentals-fragments/table
  */
 import android.util.Log;
 import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Scanner;
 
 // Here we define a class that will interface with the RPi server
@@ -82,9 +88,40 @@ public class ServerConnect {
         }
     }
 
-    public static String postJson(URL url, JSONObject payload) throws IOException {
-        // TODO Push data to the server
-        return "TODO";
+    public static void postJson(URL url, String payload) throws IOException {
+        Log.d(TAG, "postJson from URL=" + url + " Payload: " + payload);
+        // Using the Android class/library HttpURLConnection, we open a
+        // connection to the RPi server. If it doesn't work, an Exception is thrown.
+
+        // https://stackoverflow.com/questions/46328854/post-request-with-java-asynctask
+        // https://developer.android.com/reference/java/net/HttpURLConnection
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        try {
+            // Inform the connection we will be POSTing JSON data.
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setFixedLengthStreamingMode(payload.length());
+
+            // Prep to write packet that will to transmitted
+            OutputStream outputStream = new BufferedOutputStream(connection.getOutputStream());
+            outputStream.write(payload.getBytes(Charset.forName("UTF-8")));
+            outputStream.flush();
+            outputStream.close();
+
+            // Packet ready for shipping. Make connection to RPi
+            connection.connect();
+
+            // Get a response code for logging
+            Log.d(TAG, "PostJSON:Response: "+ connection.getResponseCode() + "  payload: " + payload);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        // Close the connection.
+        finally {
+            connection.disconnect();
+        }
     }
 }
 
