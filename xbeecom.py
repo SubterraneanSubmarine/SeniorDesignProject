@@ -11,13 +11,36 @@ import datalocker
 from datetime import datetime
 from time import sleep
 from sys import platform
-import serial
-import busio
-import digitalio
-import board
-import adafruit_dht
-import adafruit_mcp3xxx.mcp3008 as MCP
-from adafruit_mcp3xxx.analog_in import AnalogIn
+if platform == "linux":
+    import serial
+    import busio
+    import digitalio
+    import board
+    import adafruit_dht
+    import adafruit_mcp3xxx.mcp3008 as MCP
+    from adafruit_mcp3xxx.analog_in import AnalogIn
+else:
+    import fakedata
+    busio = fakedata.fakeIO
+    digitalio = fakedata.fakeIO
+    board = fakedata.fakeIO
+    serial = fakedata.fakeIO
+    adafruit_dht = fakedata.fakeIO
+    MCP = fakedata.fakeIO
+    AnalogIn = fakedata.fakeIO
+
+    
+
+    
+    
+    
+
+
+
+    
+    
+    
+    
 
 # The Xbee (under MicroPython API) forwards a byte object/string that
 # needs to be formated before we can manipulate it as a data object
@@ -84,9 +107,9 @@ def log_data(payload):
 def talk_to_xbee(DEBUG_MODE=False):
     if DEBUG_MODE:
         print("# TODO")  # TODO
-        if platform == "win32":
-            print("sprklrnnr closing")
-            return 0
+        # if platform == "win32":
+        #     print("sprklrnnr closing")
+        #     return 0
     
     serial_set = False
 

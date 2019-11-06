@@ -23,7 +23,7 @@ NewSensorData = False
 SensorStats = [None] * 4
 
 NodeHealthStatus = ["UnSet", "UnSet", "UnSet", "UnSet"]
-
+DEBUGSectorWatering = [None] * 4
 
 # "Day": Active[bool], StartTime[int]  -> (military time)
 # "Monday": [True, 230] -> 230 == 2:30am
@@ -51,6 +51,7 @@ thresholds = {
 def set_new():
     global NewSensorData
     with lock:
+        print("SetNewdata")
         NewSensorData = True
 
 
