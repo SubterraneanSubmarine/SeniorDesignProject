@@ -7,10 +7,10 @@ from sys import platform
 
 
 SensorStats = [
-    {'Tilt': 1, 'Sector': 0, 'Moisture': 3333, 'Sunlight': 3666, 'Battery': 2284, 'Second': 57, 'Minute': 40, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 30.5, 'Wind': 2.748697642481118},
-    {'Tilt': 1, 'Sector': 1, 'Moisture': 3456, 'Sunlight': 3887, 'Battery': 2289, 'Second': 27, 'Minute': 41, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 27.2, 'Humidity': 41.5, 'Wind': 2.748697642481118},
-    {'Tilt': 1, 'Sector': 2, 'Moisture': 2011, 'Sunlight': 3667, 'Battery': 2288, 'Second': 37, 'Minute': 28, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 26.5, 'Humidity': 41.5, 'Wind': 2.748697642481118},
-    {'Tilt': 0, 'Sector': 3, 'Moisture': 2001, 'Sunlight': 3988, 'Battery': 2285, 'Second': 47, 'Minute': 37, 'Hour': 18, 'Day': 17, 'Month': 10, 'Year': 2019, 'Temperature': 27.4, 'Humidity': 45.5, 'Wind': 2.748697642481118}
+    {'Tilt': 1, 'Sector': 0, 'Moisture': 3333, 'Sunlight': 3666, 'Battery': 2284, 'Timestamp': 1572840686, 'Minute': 11, 'Hour': 21, 'Day': 17, 'Month': 11, 'Year': 2019, 'Temperature': 25.2, 'Humidity': 30.5, 'Wind': 2.748697642481118},
+    {'Tilt': 1, 'Sector': 1, 'Moisture': 3456, 'Sunlight': 3887, 'Battery': 2289, 'Timestamp': 1572840686, 'Minute': 11, 'Hour': 21, 'Day': 17, 'Month': 11, 'Year': 2019, 'Temperature': 27.2, 'Humidity': 41.5, 'Wind': 2.748697642481118},
+    {'Tilt': 1, 'Sector': 2, 'Moisture': 2011, 'Sunlight': 3667, 'Battery': 2288, 'Timestamp': 1572840686, 'Minute': 11, 'Hour': 21, 'Day': 17, 'Month': 11, 'Year': 2019, 'Temperature': 26.5, 'Humidity': 41.5, 'Wind': 2.748697642481118},
+    {'Tilt': 0, 'Sector': 3, 'Moisture': 2001, 'Sunlight': 3988, 'Battery': 2285, 'Timestamp': 1572840686, 'Minute': 11, 'Hour': 21, 'Day': 17, 'Month': 11, 'Year': 2019, 'Temperature': 27.4, 'Humidity': 45.5, 'Wind': 2.748697642481118}
 ]
 
 
@@ -79,14 +79,11 @@ class fakeIO2():
         def value(self, en):
             self.enable = en
 
-    
 
 
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    import datalocker
+    for item in datalocker.timer_triggering:
+        for subitem in datalocker.timer_triggering[item]:
+            print(item, subitem)
 

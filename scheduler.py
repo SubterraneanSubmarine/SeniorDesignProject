@@ -45,9 +45,9 @@ def sprinkler_runner(DEBUG_MODE=False):
     start_time = 0
     if DEBUG_MODE:
         print("# TODO")  # TODO
-        if platform == "win32":
-            print("sprklrnnr closing")
-            return 0
+        # if platform == "win32":
+        #     print("sprklrnnr closing")
+        #     return 0
 
     # Run thread as long as an interrupt isn't sent
     for relay in relays:
@@ -100,7 +100,7 @@ def sprinkler_runner(DEBUG_MODE=False):
                         continue
                     if sensor['Sunlight'] < light_floor:
                         print("Sector {}'s light is low compared to peers; It may need to be moved")
-                        datalocker.NodeHealthStatus["Sensor"] = "Yellow"
+                        datalocker.NodeHealthStatus[sensor["Sector"]] = "Yellow"
 
             # Manage the watering queue by evaluating the current weather conditions
             # If conditions are met start watering, however fallback schedules are checked first

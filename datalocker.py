@@ -51,6 +51,7 @@ thresholds = {
 def set_new():
     global NewSensorData
     with lock:
+        print("SetNewdata")
         NewSensorData = True
 
 

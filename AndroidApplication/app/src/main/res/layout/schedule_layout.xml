@@ -6,17 +6,921 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="schedule layout xml"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-<!--    <fragment-->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:scrollbars="vertical">
+
+            <TextView
+                android:id="@+id/waterSchedSatLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Saturday"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedFriLabel"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedFriLabel" />
+
+            <TextView
+                android:id="@+id/dryTrgTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Dry Trigger"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/TrigTreshLabel"
+                app:layout_constraintTop_toBottomOf="@+id/TrigTreshLabel" />
+
+            <TextView
+                android:id="@+id/waterDurTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Watering\nDuration"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/tempMinTxt"
+                app:layout_constraintTop_toBottomOf="@+id/tempMinTxt" />
+
+            <TextView
+                android:id="@+id/prohibStartTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="From Time"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tempMinTxt"
+                app:layout_constraintTop_toBottomOf="@+id/prohibWaterLabel" />
+
+            <TextView
+                android:id="@+id/tempMinTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Min. Temp"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/humidStopTxt"
+                app:layout_constraintTop_toBottomOf="@+id/humidStopTxt" />
+
+            <TextView
+                android:id="@+id/humidStopTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Humid Stop"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/windTrgTxt"
+                app:layout_constraintTop_toBottomOf="@+id/windTrgTxt" />
+
+            <TextView
+                android:id="@+id/prohibEndTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="To Time"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/prohibStartTxt"
+                app:layout_constraintTop_toBottomOf="@+id/prohibStartTxt" />
+
+            <TextView
+                android:id="@+id/windTrgTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Wind Trigger"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/dryTrgTxt"
+                app:layout_constraintTop_toBottomOf="@+id/dryTrgTxt" />
+
+            <TextView
+                android:id="@+id/TrigTreshLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:layout_marginTop="16dp"
+                android:text="Triggering\nThresholds"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/trigThrshCurrLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Current Value"
+                app:layout_constraintBottom_toBottomOf="@+id/TrigTreshLabel"
+                app:layout_constraintStart_toEndOf="@+id/TrigTreshLabel" />
+
+            <TextView
+                android:id="@+id/trigThreshNewLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:text="Settable Range"
+                app:layout_constraintBottom_toBottomOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintStart_toEndOf="@+id/trigThrshCurrLabel" />
+
+            <TextView
+                android:id="@+id/waterSchedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="64dp"
+                android:text="Traditional\nWater Schedule"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/prohibEndTxt" />
+
+            <TextView
+                android:id="@+id/waterSchedSunLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Sunday"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedLabel"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedLabel" />
+
+            <TextView
+                android:id="@+id/waterSchedMonLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Monday"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedSunLabel"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedSunLabel" />
+
+            <TextView
+                android:id="@+id/waterSchedTueLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Tuesday"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedMonLabel"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedMonLabel" />
+
+            <TextView
+                android:id="@+id/waterSchedWedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Wednesday"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedTueLabel"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedTueLabel" />
+
+            <TextView
+                android:id="@+id/waterSchedThurLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Thursday"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedWedLabel"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedWedLabel" />
+
+            <TextView
+                android:id="@+id/waterSchedFriLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Friday"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedThurLabel"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedThurLabel" />
+
+            <ToggleButton
+                android:id="@+id/waterSchedSundayToggle"
+                android:layout_width="94dp"
+                android:layout_height="33dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="6dp"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:text="ToggleButton"
+                android:textOff="Disabled"
+                android:textOn="Enabled"
+                app:layout_constraintBottom_toTopOf="@+id/waterSchedMonLabel"
+                app:layout_constraintStart_toEndOf="@+id/waterSchedSunLabel"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedLabel" />
+
+            <ToggleButton
+                android:id="@+id/waterSchedTuesdayToggle"
+                android:layout_width="94dp"
+                android:layout_height="33dp"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:text="ToggleButton"
+                android:textOff="Disabled"
+                android:textOn="Enabled"
+                app:layout_constraintBottom_toTopOf="@+id/waterSchedWedLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedMondayToggle"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedMonLabel" />
+
+            <ToggleButton
+                android:id="@+id/waterSchedThursdayToggle"
+                android:layout_width="94dp"
+                android:layout_height="33dp"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:text="ToggleButton"
+                android:textOff="Disabled"
+                android:textOn="Enabled"
+                app:layout_constraintBottom_toTopOf="@+id/waterSchedFriLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedWednesdayToggle"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedWedLabel" />
+
+            <ToggleButton
+                android:id="@+id/waterSchedSaturdayToggle"
+                android:layout_width="94dp"
+                android:layout_height="33dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="16dp"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:text="ToggleButton"
+                android:textOff="Disabled"
+                android:textOn="Enabled"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedFridayToggle"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedFriLabel" />
+
+            <ToggleButton
+                android:id="@+id/waterSchedWednesdayToggle"
+                android:layout_width="94dp"
+                android:layout_height="33dp"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:text="ToggleButton"
+                android:textOff="Disabled"
+                android:textOn="Enabled"
+                app:layout_constraintBottom_toTopOf="@+id/waterSchedThurLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedTuesdayToggle"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedTueLabel" />
+
+            <ToggleButton
+                android:id="@+id/waterSchedFridayToggle"
+                android:layout_width="94dp"
+                android:layout_height="33dp"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:text="ToggleButton"
+                android:textOff="Disabled"
+                android:textOn="Enabled"
+                app:layout_constraintBottom_toTopOf="@+id/waterSchedSatLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedThursdayToggle"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedThurLabel" />
+
+            <ToggleButton
+                android:id="@+id/waterSchedMondayToggle"
+                android:layout_width="94dp"
+                android:layout_height="33dp"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:text="ToggleButton"
+                android:textOff="Disabled"
+                android:textOn="Enabled"
+                app:layout_constraintBottom_toTopOf="@+id/waterSchedTueLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedSundayToggle"
+                app:layout_constraintTop_toBottomOf="@+id/waterSchedSunLabel" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintBottom_toTopOf="@+id/waterSchedLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/prohibEndTxt" />
+
+            <TextView
+                android:id="@+id/waterSchedCurrLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:text="Current Start\nTime"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.38"
+                app:layout_constraintStart_toEndOf="@+id/waterSchedLabel" />
+
+            <TextView
+                android:id="@+id/waterSchedNewLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settable Range\n-- Military Time --"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/waterSchedCurrLabel" />
+
+            <TextView
+                android:id="@+id/prohibWaterLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="Prohibit Day Watering..."
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/waterDurTxt" />
+
+            <EditText
+                android:id="@+id/waterSchedSunEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedSunLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedSunLabel" />
+
+            <EditText
+                android:id="@+id/waterSchedThuEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedThurLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedThurLabel" />
+
+            <EditText
+                android:id="@+id/waterSchedSatEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedSatLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedSatLabel" />
+
+            <EditText
+                android:id="@+id/waterSchedFriEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedFriLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedFriLabel" />
+
+            <EditText
+                android:id="@+id/waterSchedWedEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedWedLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedWedLabel" />
+
+            <EditText
+                android:id="@+id/waterSchedTueEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedTueLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedTueLabel" />
+
+            <EditText
+                android:id="@+id/waterSchedMonEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedMonLabel"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedMonLabel" />
+
+            <EditText
+                android:id="@+id/prohibEndEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/prohibEndTxt"
+                app:layout_constraintEnd_toEndOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/prohibEndTxt" />
+
+            <EditText
+                android:id="@+id/prohibStartEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/prohibStartTxt"
+                app:layout_constraintEnd_toEndOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/prohibStartTxt" />
+
+            <EditText
+                android:id="@+id/waterDurEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="2"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="12"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/waterDurTxt"
+                app:layout_constraintEnd_toEndOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterDurTxt" />
+
+            <EditText
+                android:id="@+id/tempTrgEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="12"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/tempMinTxt"
+                app:layout_constraintEnd_toEndOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/tempMinTxt" />
+
+            <EditText
+                android:id="@+id/humidTrgEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="3"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="45"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/humidStopTxt"
+                app:layout_constraintEnd_toEndOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/humidStopTxt" />
+
+            <EditText
+                android:id="@+id/windTrgEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="2"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="8"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/windTrgTxt"
+                app:layout_constraintEnd_toEndOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/windTrgTxt" />
+
+            <EditText
+                android:id="@+id/dryTrgEdit"
+                android:layout_width="50dp"
+                android:layout_height="34dp"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="4"
+                android:padding="0dp"
+                android:paddingHorizontal="0dp"
+                android:paddingVertical="0dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="0dp"
+                android:paddingRight="0dp"
+                android:paddingBottom="0dp"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="1234"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@+id/dryTrgTxt"
+                app:layout_constraintEnd_toEndOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThrshCurrLabel"
+                app:layout_constraintTop_toTopOf="@+id/dryTrgTxt" />
+
+            <TextView
+                android:id="@+id/dryRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 4096"
+                app:layout_constraintBottom_toBottomOf="@+id/dryTrgEdit"
+                app:layout_constraintEnd_toEndOf="@+id/trigThreshNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThreshNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/dryTrgEdit" />
+
+            <TextView
+                android:id="@+id/windrange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 32 (m/s)"
+                app:layout_constraintBottom_toBottomOf="@+id/windTrgEdit"
+                app:layout_constraintEnd_toEndOf="@+id/trigThreshNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThreshNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/windTrgEdit" />
+
+            <TextView
+                android:id="@+id/humidRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 100 (RH)"
+                app:layout_constraintBottom_toBottomOf="@+id/humidTrgEdit"
+                app:layout_constraintEnd_toEndOf="@+id/trigThreshNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThreshNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/humidTrgEdit" />
+
+            <TextView
+                android:id="@+id/tempRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 32 (\u00B0C)"
+                app:layout_constraintBottom_toBottomOf="@+id/tempTrgEdit"
+                app:layout_constraintEnd_toEndOf="@+id/trigThreshNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThreshNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/tempTrgEdit" />
+
+            <TextView
+                android:id="@+id/waterTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 -- to -- 30 (min)"
+                app:layout_constraintBottom_toBottomOf="@+id/waterDurEdit"
+                app:layout_constraintEnd_toEndOf="@+id/trigThreshNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThreshNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterDurEdit" />
+
+            <TextView
+                android:id="@+id/prohibStartRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/prohibStartEdit"
+                app:layout_constraintEnd_toEndOf="@+id/trigThreshNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThreshNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/prohibStartEdit" />
+
+            <TextView
+                android:id="@+id/prohibEndRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/prohibEndEdit"
+                app:layout_constraintEnd_toEndOf="@+id/trigThreshNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/trigThreshNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/prohibEndEdit" />
+
+            <TextView
+                android:id="@+id/schedSunRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedSunEdit"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedSunEdit" />
+
+            <TextView
+                android:id="@+id/schedWedRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedWedEdit"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedWedEdit" />
+
+            <TextView
+                android:id="@+id/schedThuRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedThuEdit"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedThuEdit" />
+
+            <TextView
+                android:id="@+id/schedSatRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedSatEdit"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedSatEdit" />
+
+            <TextView
+                android:id="@+id/schedFriRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedFriEdit"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedFriEdit" />
+
+            <TextView
+                android:id="@+id/schedTueRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedTueEdit"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedTueEdit" />
+
+            <TextView
+                android:id="@+id/schedMonRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 -- to -- 2359"
+                app:layout_constraintBottom_toBottomOf="@+id/waterSchedMonEdit"
+                app:layout_constraintEnd_toEndOf="@+id/waterSchedNewLabel"
+                app:layout_constraintStart_toStartOf="@+id/waterSchedNewLabel"
+                app:layout_constraintTop_toTopOf="@+id/waterSchedMonEdit" />
+
+            <TextView
+                android:id="@+id/prohibMilTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="-- Military Time --"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/prohibStartRange"
+                app:layout_constraintEnd_toEndOf="@+id/prohibStartRange"
+                app:layout_constraintStart_toStartOf="@+id/prohibStartRange" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>-->
+
+
+
+    <!--    <fragment-->
 <!--        android:id="@+id/schedulefrag"-->
 <!--        android:name="com.example.seniordesignproject.SchedulePage"-->
 <!--        android:layout_width="wrap_content"-->

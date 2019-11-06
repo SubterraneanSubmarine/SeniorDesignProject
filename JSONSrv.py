@@ -23,6 +23,7 @@ import subprocess
 from datetime import datetime
 # import ssl
 import datalocker
+import scheduler
 
 # Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}
 AvailablePaths = [
@@ -30,11 +31,11 @@ AvailablePaths = [
     "/TimerTriggering/",
     "/Thresholds/",
     "/SensorStats/",
-    "/DateTime/",  # TODO code in the datetime elements: We need to be able to set and read the date/time of RPi from android app
-    "/NodeHealthStatus/"              #TODO Consider adding in TempDisable?
+    "/DateTime/",
+    "/WateringQue/"
 ]
 
-timestamp = re.compile("(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)  \d{1,2} \d{1,2}:\d{1,2}:\d{1,2} \d{4}")
+REtimestamp = re.compile("(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)  \d{1,2} \d{1,2}:\d{1,2}:\d{1,2} \d{4}")
 
 """
 Here, we define a class that takes a BaseHTTPRequestHandler
@@ -81,11 +82,24 @@ class PiSrv(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(datalocker.thresholds).encode("utf-8") + "~~~".encode("utf-8"))
 
             if requestPath == AvailablePaths[3]: # "/SensorStats/"
-                self.wfile.write(json.dumps(datalocker.SensorStats).encode("utf-8") + "~~~".encode("utf-8"))
+                message = {}
+                for index, itemOriginal in enumerate(datalocker.SensorStats):
+                    item = itemOriginal.copy()
+                    item["Health"] = datalocker.NodeHealthStatus[index]
+                    message[index] = item
+                
+                self.wfile.write(json.dumps(message).encode("utf-8") + "~~~".encode("utf-8"))
             if requestPath == AvailablePaths[4]: # "/DateTime/"
                 self.wfile.write(json.dumps(datetime.now().strftime("%c")).encode("utf-8") + "~~~".encode("utf-8"))
-            if requestPath == AvailablePaths[5]: # "/NodeHealthStatus/"
-                self.wfile.write(json.dumps(datalocker.NodeHealthStatus).encode("utf-8") + "~~~".encode("utf-8"))
+
+            if requestPath == AvailablePaths[5]: # "/WateringQue/"
+                message = {}
+                for index, itemOriginal in enumerate(scheduler.watering_queue):
+                    item = itemOriginal.copy()
+                    message[index] = item
+                if len(message) == 0:
+                    message[0] = "Nothing Queued"
+                self.wfile.write(json.dumps(message).encode("utf-8") + "~~~".encode("utf-8"))
         else:
             self.send_error(400, "Unexpected Path")
 
@@ -112,7 +126,7 @@ class PiSrv(BaseHTTPRequestHandler):
                 # "/SystemEnabled/"
                 if requestPath == AvailablePaths[0]:
                     if "State" in bodyData:
-                        state = bodyData.get("State")
+                        state = str(bodyData.get("State"))
                         if state in ["True", "False"]:  # Check if the Value being sent is True or False
                             if state == "True":
                                 with datalocker.lock:  
@@ -176,7 +190,7 @@ class PiSrv(BaseHTTPRequestHandler):
                 
                 # "/DateTime/"
                 if requestPath == AvailablePaths[4]:
-                    if re.match(timestamp, bodyData["TimeStamp"]):
+                    if re.match(REtimestamp, bodyData["TimeStamp"]):
                         if platform == "linux":
                             upDate = subprocess.Popen(["sudo", "date", "-s", bodyData["TimeStamp"]])
                             upDate.communicate()
@@ -189,10 +203,7 @@ class PiSrv(BaseHTTPRequestHandler):
                     else:
                         self.send_error(400, "Value Error")
                 
-                # "/NodeHealthStatus/"
-                if requestPath == AvailablePaths[5]:
-                    self.send_error(400, "Post Not Available")
-                    
+
             else:
                 self.send_error(400, "No Content")
         else:

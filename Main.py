@@ -11,6 +11,7 @@ import threading
 import signal
 import sys
 import os
+from sys import platform
 import argparse
 from datetime import datetime
 from time import sleep
@@ -101,60 +102,79 @@ if __name__ == '__main__':
     debug_vals_set = True
     while datalocker.ProgramRunning:
         if DEBUG_MODE:
-            os.system('clear')
-            print("Date\\Time: ", datetime.now().strftime("%A %H%M"),"\tProgramRunning(", ("True" if datalocker.ProgramRunning else "False"), ")\tSystemEnabled(", ("True" if datalocker.SystemEnabled else "False"), ")\tJSONSrv Port: ", USE_PORT)
-            print("-----------------------Current Thresholds-----------------------\n", datalocker.thresholds)
-            print("-----------------------Current TimerTrigg-----------------------\n", datalocker.timer_triggering)
-            print("-----------------------Current SensorStats-----------------------", printSensors())
-            print("-----------------------Current WateringQue-----------------------", printWaterQue())
-            print("-----------------------Node Health(s)-----------------------\n", datalocker.NodeHealthStatus)
-            print("-----------------------Node LastSeen-----------------------\n", scheduler.last_seen)
-            sys.stdout.flush()
-            usr_input = input(userInputPrompt2 if FAKE_DATA else userInputPrompt1)
             try:
-                usr_input = int(usr_input)
-            except Exception as err:
-                sys.stdout.flush()
-            if usr_input == 1:
-                datalocker.ProgramRunning = True
-            elif usr_input == 2:
-                datalocker.ProgramRunning = False
-                DEBUG_MODE = False
-            elif usr_input == 3:
-                datalocker.SystemEnabled = True
-            elif usr_input == 4:
-                datalocker.SystemEnabled = False
-            elif usr_input == 5:
-                day = input("Enter a Day: ")
-                boool = int(input("1(True) or 0(False): "))
-                time = input("HHMM: ")
-                datalocker.timer_triggering[day][0] = True if boool == 1 else False
-                datalocker.timer_triggering[day][1] = int(time)
-            elif usr_input == 6:
-                a_key = input("Key: ")
-                a_value = int(input("Value: "))
-                datalocker.thresholds[a_key] = a_value
-            elif usr_input == 7:
-                set_time = input("Set RPi Time \"Wed, Oct 30 2019 14:14:00 MDT\": ")
-                upDate = subprocess.Popen(["sudo", "date", "-s", set_time])
-                upDate.communicate()
-                upDate.wait()
-            elif usr_input == 8 and FAKE_DATA:
-                print("Enter new values for keys. Leave values blank for no change.")
-                sector = input("Sector[0-3]: ")
-                for item in datalocker.SensorStats[int(sector)]:
-                    if item == "Sector": continue
-                    default = datalocker.SensorStats[int(sector)][item]
-                    usrinput = input("Set "+str(item)+" ("+str(default)+") to : ")
-                    if usrinput:
-                        datalocker.SensorStats[int(sector)][item] = usrinput
-            elif usr_input == 9 and FAKE_DATA:
-                datalocker.set_new()
-            elif usr_input == 0:
                 os.system('clear')
-            else:
-                print("Error. Try again.")
+                print("Date\\Time: ", datetime.now().strftime("%A %H%M"),"\tProgramRunning(", ("True" if datalocker.ProgramRunning else "False"), ")\tSystemEnabled(", ("True" if datalocker.SystemEnabled else "False"), ")\tJSONSrv Port: ", USE_PORT)
+                print("-----------------------Current Thresholds-----------------------\n", datalocker.thresholds)
+                print("-----------------------Current TimerTrigg-----------------------\n", datalocker.timer_triggering)
+                print("-----------------------Current SensorStats-----------------------", printSensors())
+                print("-----------------------Current WateringQue-----------------------", printWaterQue())
+                print("-----------------------Watering Sector-----------------------\n", datalocker.DEBUGSectorWatering)
+                print("-----------------------Node Health(s)-----------------------\n", datalocker.NodeHealthStatus)
+                print("-----------------------Node LastSeen-----------------------\n", scheduler.last_seen)
+                sys.stdout.flush()
+                usr_input = input(userInputPrompt2 if FAKE_DATA else userInputPrompt1)
+                try:
+                    usr_input = int(usr_input)
+                except Exception as err:
+                    sys.stdout.flush()
+                if usr_input == 1:
+                    datalocker.ProgramRunning = True
+                elif usr_input == 2:
+                    datalocker.ProgramRunning = False
+                    DEBUG_MODE = False
+                elif usr_input == 3:
+                    datalocker.SystemEnabled = True
+                elif usr_input == 4:
+                    datalocker.SystemEnabled = False
+                elif usr_input == 5:
+                    # for item in datalocker.timer_triggering:
+                    #     for subitem in datalocker.timer_triggering[item]:
 
+                    #     default1 = datalocker.timer_triggering[day][0]
+                    #     default2 = datalocker.timer_triggering[day][1]
+                    day = input("Enter a Day: ")
+                    boool = int(input("1(True) or 0(False): "))
+                    time = input("HHMM: ")
+                    datalocker.timer_triggering[day][0] = True if boool == 1 else False
+                    datalocker.timer_triggering[day][1] = int(time)
+                elif usr_input == 6:
+                    print("Enter new values for keys. Leave values blank for no change.")
+                    for item in datalocker.thresholds:
+                        default = datalocker.thresholds[item]
+                        usrinput = input("Set "+str(item)+" ("+str(default)+") to: ")
+                        if usrinput:
+                            datalocker.thresholds[item] = usrinput
+                elif usr_input == 7:
+                    set_time = input("Set RPi Time  ex:\"Wed, Oct 30 2019 14:14:00 MDT\": ")
+                    if platform == "win32":
+                        print("hello")
+                    else:
+                        upDate = subprocess.Popen(["sudo", "date", "-s", set_time])
+                        upDate.communicate()
+                        upDate.wait()
+                elif usr_input == 8 and FAKE_DATA:
+                    print("Enter new values for keys. Leave values blank for no change.")
+                    sector = input("Sector[0-3]: ")
+                    while int(sector) > 3 or int(sector) < 0:
+                        sector = input("Please enter a correct sector[0-3]: ")
+                    for item in datalocker.SensorStats[int(sector)]:
+                        if item == "Sector": continue
+                        default = datalocker.SensorStats[int(sector)][item]
+                        usrinput = input("Set "+str(item)+" ("+str(default)+") to: ")
+                        if usrinput:
+                            if item == 'Temperature' or item == 'Humidity' or item == 'Wind':
+                                datalocker.SensorStats[int(sector)][item] = float(usrinput)
+                            else:
+                                datalocker.SensorStats[int(sector)][item] = int(usrinput)
+                elif usr_input == 9 and FAKE_DATA:
+                    datalocker.set_new()
+                elif usr_input == 0:
+                    os.system('clear')
+                else:
+                    print("Error. Try again.")
+            except EOFError: 
+                datalocker.ProgramRunning = False
         else:
             sleep(5)
         

@@ -107,9 +107,9 @@ def log_data(payload):
 def talk_to_xbee(DEBUG_MODE=False):
     if DEBUG_MODE:
         print("# TODO")  # TODO
-        if platform == "win32":
-            print("sprklrnnr closing")
-            return 0
+        # if platform == "win32":
+        #     print("sprklrnnr closing")
+        #     return 0
     
     serial_set = False
 
