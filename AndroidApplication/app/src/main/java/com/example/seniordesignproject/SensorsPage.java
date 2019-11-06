@@ -29,13 +29,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import org.json.JSONObject;
-
 import java.util.Iterator;
 
 
-// TODO This page is a work in progress...
 // This is 90% a copy and amalgamation of StackOverflow and Google Developer documentation
 // Still learning how this works.
 
@@ -48,6 +45,7 @@ public class SensorsPage extends Fragment {
     public RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
+    // Local variables/references
     MainActivity mainActivity;
     private View view;
 
@@ -61,6 +59,7 @@ public class SensorsPage extends Fragment {
         // This object represents content and data currently viewed on screen
         view = inflater.inflate(R.layout.sensors_layout, container, false);
 
+        // Here we snag a reference to the mainactivity (access to data/globals)
         mainActivity = (MainActivity) getActivity();
 
         // Inform our Recycler view where it will put/show our data
@@ -69,7 +68,7 @@ public class SensorsPage extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        // An 'Adapter'
+        // An 'Adapter' (we tell the OS/View what data will be displayed by the recycler view
         mAdapter = new MyAdapter(mainActivity.SensorStats);
         recyclerView.setAdapter(mAdapter);
 
@@ -78,20 +77,19 @@ public class SensorsPage extends Fragment {
 
 
 
-
+    // Here we define how our data will be displayed by our RecyclerView->Adapter
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+        // Local variables
         private LayoutInflater mInflater;
-//        private ItemClickListener mClickListener;
+        JSONObject jsonObject;
 
         // data is passed into the constructor
-        JSONObject jsonObject;
         MyAdapter(JSONObject data) {
             this.mInflater = LayoutInflater.from(getContext());
             this.jsonObject = data;
-//            this.mData3 = data2;
         }
 
-        // inflates the row layout from xml when needed
+        // inflates the row layout defined by xml file, when needed
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
@@ -102,13 +100,16 @@ public class SensorsPage extends Fragment {
         // binds the data to the TextView in each row
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            // We pass in our JSONObject, then iterate through it -- for ever item in side it, the
+            // We pass in our JSONObject, then iterate through it -- for every item in side it, the
             // recycler view will create sufficient rows to hold our items
             // Ever time this 'onBindViewHolder' is called, the position value in incremented by 1
+            // The RecyclerView/Adapter/OS Makes these calls based on the USER scrolling
+            // the data shown (and when the data doesn't fit on the screen)
             JSONObject jsonObjectSubValues;
 
             Iterator<String> obs = jsonObject.keys();
 
+            // ViewHolder Local Variables/References
             String jsonResult = obs.next();  // get our first Xbee KEY out of the dictionary
             String zone = "Unset";
             String health = "Unset";
@@ -121,6 +122,7 @@ public class SensorsPage extends Fragment {
             for (int i = 0; i < position; i++) jsonResult = obs.next();  // get the next KEY
 
             try {
+                // Lets try displaying some data!
                 jsonObjectSubValues = jsonObject.getJSONObject(jsonResult);
                 zone = jsonObjectSubValues.getString("Sector");
                 health = jsonObjectSubValues.getString("Health");
@@ -131,7 +133,7 @@ public class SensorsPage extends Fragment {
                 Log.d(TAG, "onBindView(  " + jsonResult + ": Zone=" + jsonObjectSubValues.get("Sector"));
 
 
-                // Set the values of the TextViews
+                // Set the values of the TextViews with our data
                 holder.xbeeSector.setText("Zone: " + zone);
                 holder.xbeeChild0.setText("Health Status: "+ health);
                 holder.xbeeChild1.setText("Moisture: " + moisture);
@@ -148,10 +150,14 @@ public class SensorsPage extends Fragment {
         // total number of rows
         @Override
         public int getItemCount() {
+            // from onCreateView -> mAdapter = new MyAdapter(mainActivity.SensorStats);
+            // This returns the size/length of our SensorStats object (which is utilized by the
+            // onBindView->position argument/value.
             return  jsonObject.length();  // How many keys are in our XbeeJSONObject
         }
 
 
+        // Here we define/declare what visual elements are going to be used for this view
         // stores and recycles views as they are scrolled off screen
         public class ViewHolder extends RecyclerView.ViewHolder/*implements View.OnClickListener*/ {
             TextView xbeeSector;
@@ -169,30 +175,8 @@ public class SensorsPage extends Fragment {
                 xbeeChild2 = itemView.findViewById(R.id.xbeeKeyValue2);
                 xbeeChild3 = itemView.findViewById(R.id.xbeeKeyValue3);
                 xbeeChild4 = itemView.findViewById(R.id.xbeeKeyValue4);
-//                itemView.setOnClickListener(this);
             }
-//            @Override
-//            public void onClick(View view) {
-//                if (mClickListener != null) {
-//                    mClickListener.onItemClick(view, getAdapterPosition());
-//                }
-//            }
         }
-
-        // convenience method for getting data at click position
-//        String getItem(int id) {
-//            return mData.get(id);
-//        }
-
-        // allows clicks events to be caught
-//        void setClickListener(ItemClickListener itemClickListener) {
-//            this.mClickListener = itemClickListener;
-//        }
-
-        // parent activity will implement this method to respond to click events
-//        public interface ItemClickListener {
-//            void onItemClick(View view, int position);
-//        }
     }
 
 
@@ -218,25 +202,18 @@ public class SensorsPage extends Fragment {
 
         if (mainActivity.HAVEDATA) {
             try {
-//                recyclerView.getAdapter().notifyDataSetChanged();
+                // If we have data, then we can initialize the recyclerView!
                 mAdapter = new MyAdapter(mainActivity.SensorStats);
                 recyclerView.setAdapter(mAdapter);
-//                ((TextView) view.findViewById(R.id.sysEnabled)).setText((mainActivity.PiResponses[0].equals("false")) ? "Disabled" : "Enabled");
-//            ((TextView) view.findViewById(R.id.sysEnabled)).setText((mainActivity.PiResponses[0].equals("false")) ? "Disabled" : "Enabled");
-//            ((TextView) mainActivity.findViewById(R.id.moisture)).setText(((JSONArray) mainActivity.Thresholds.get("Moisture")).getInt(0));
-//            ((TextView) mainActivity.findViewById(R.id.tempurature)).setText(((JSONArray) mainActivity.Thresholds.get("Temperature")).getInt(0));
-//            ((TextView) mainActivity.findViewById(R.id.wind)).setText(((JSONArray) mainActivity.Thresholds.get("Wind")).getInt(0));
-//            ((TextView) mainActivity.findViewById(R.id.rain)).setText(((JSONArray) mainActivity.Thresholds.get("Rain")).getInt(0));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    // Callable function to update the data displayed by this fragment
     public void updateValues() {
-
         mainActivity = (MainActivity) getActivity();
-
         if (mainActivity.manager.findFragmentByTag("SensorPage") != null && mainActivity.manager.findFragmentByTag("SensorPage").isVisible()) onResume();
     }
 

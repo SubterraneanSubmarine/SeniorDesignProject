@@ -9,6 +9,19 @@ Tested in Python3.7 and 3.4(RPi)
 Builtin Webserver of python being used to serve/recieve JSON Payloads
 Inspiration for this code sourced from GitHub user: Nitaku
 Git gist: https://gist.github.com/nitaku/10d0662536f37a087e1b
+
+
+
+
+Here, we define a class that takes a BaseHTTPRequestHandler
+      With in this class, we define what the Handler/server will, and how, to respond.
+
+The BaseHTTPRequestHandler has defined functions that we can expand upon
+        The functions are the following
+            do_HEAD
+            do_GET
+            do_POST
+        They relate the the http/tcp request types of GET, POST, PUT, etc
 '''
 
 # Additional class\library information for PythonHTTPServer:
@@ -35,19 +48,9 @@ AvailablePaths = [
     "/WateringQue/"
 ]
 
+# Regex for ensuring we have appropriate datetime data being recieved.
 REtimestamp = re.compile("(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)  \d{1,2} \d{1,2}:\d{1,2}:\d{1,2} \d{4}")
 
-"""
-Here, we define a class that takes a BaseHTTPRequestHandler
-      With in this class, we define what the Handler/server will, and how, to respond.
-
-The BaseHTTPRequestHandler has defined functions that we can expand upon
-        The functions are the following
-            do_HEAD
-            do_GET
-            do_POST
-        They relate the the http/tcp request types of GET, POST, PUT, etc
-"""
 
 class PiSrv(BaseHTTPRequestHandler):
     # Header segment of an http/tcp packet -- informing a client what the data will be

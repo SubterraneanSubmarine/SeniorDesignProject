@@ -32,6 +32,7 @@ import org.json.JSONArray;
 public class SchedulePage extends Fragment {
     private static final String TAG = "S.D.A.SchedulePage";  // Used for debug output
 
+    // Local variables/references
     MainActivity mainActivity;
     private View view;
 
@@ -48,7 +49,6 @@ public class SchedulePage extends Fragment {
     public void onAttach(Context context){
         super.onAttach(context);
         Log.d(TAG, "onAttach()");
-
     }
 
     @Override
@@ -66,6 +66,10 @@ public class SchedulePage extends Fragment {
 
         if (mainActivity.HAVEDATA) {
             try{
+                // We have data -- Get that data displayed!
+
+                // First, we will get all of our data 'unpacked'
+
                 // Thresholds
                 int dryTrig = mainActivity.Thresholds.getInt("Dry");
                 int windTrig = mainActivity.Thresholds.getInt("Wind max");
@@ -93,7 +97,8 @@ public class SchedulePage extends Fragment {
                 int fridayStart = Integer.parseInt(((JSONArray) (mainActivity.TimerTriggering.get("Friday"))).get(1).toString());
                 int saturdayStart = Integer.parseInt(((JSONArray) (mainActivity.TimerTriggering.get("Saturday"))).get(1).toString());
 
-                // Set Display Values
+
+                // Second, Set Display Values
                 // set trigger thresholds
                 ((EditText) view.findViewById(R.id.dryTrgEdit)).setText(String.format("%d", dryTrig));
                 ((EditText) view.findViewById(R.id.windTrgEdit)).setText(String.format("%d", windTrig));
@@ -119,18 +124,15 @@ public class SchedulePage extends Fragment {
                 ((ToggleButton) view.findViewById(R.id.waterSchedFridayToggle)).setChecked(fridayEnable);
                 ((ToggleButton) view.findViewById(R.id.waterSchedSaturdayToggle)).setChecked(saturdayEnable);
 
-
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    // Callable function to update the data displayed by this fragment
     public void updateValues() {
         mainActivity = (MainActivity) getActivity();
         if (mainActivity.manager.findFragmentByTag("SchedulePage") != null && mainActivity.manager.findFragmentByTag("SchedulePage").isVisible()) onResume();
     }
-
-    // TODO Create check boxes and text input areas for future data POSTing to Pi
 }

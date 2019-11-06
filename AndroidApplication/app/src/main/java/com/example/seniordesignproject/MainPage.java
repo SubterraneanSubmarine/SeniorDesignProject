@@ -37,10 +37,12 @@ import java.util.Iterator;
 public class MainPage extends Fragment {
     private static final String TAG = "S.D.A.MainPage";  // Used for debug output
 
+    // Alloc/prep for utilizaton of these views/objects
     public RecyclerView recyclerView;
     public RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
+    // Get a reference to the main activity (for 'global' data)
     MainActivity mainActivity;
     private View view;
 
@@ -51,6 +53,7 @@ public class MainPage extends Fragment {
         view = inflater.inflate(R.layout.main_layout, container, false);
         mainActivity = (MainActivity) getActivity();
 
+        // Once the MainActivity instantiates this fragment, we will pre-set some attributes to some items
         ((ToggleButton) view.findViewById(R.id.sysEnabledToggle)).setEnabled(false);
         ((EditText) view.findViewById(R.id.sysTimeEdit)).setEnabled(false);
 
@@ -60,21 +63,18 @@ public class MainPage extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-
-
         return view;
     }
 
     public class MyAdapterQue extends RecyclerView.Adapter<MyAdapterQue.ViewHolder> {
+        // local variables
         private LayoutInflater mInflater;
-//        private ItemClickListener mClickListener;
+        JSONObject jsonObject;
 
         // data is passed into the constructor
-        JSONObject jsonObject;
         MyAdapterQue(JSONObject data) {
             this.mInflater = LayoutInflater.from(getContext());
             this.jsonObject = data;
-//            this.mData3 = data2;
         }
 
         // inflates the row layout from xml when needed
@@ -106,10 +106,8 @@ public class MainPage extends Fragment {
                 jsonObjectSubValues = jsonObject.getJSONObject(jsonResult);
                 zone = jsonObjectSubValues.getString("Sector");
 
-
                 // Set the values of the TextViews
                 holder.xbeeSector.setText("Zone: " + zone);
-
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -122,7 +120,6 @@ public class MainPage extends Fragment {
         public int getItemCount() {
             return  jsonObject.length();  // How many keys are in our XbeeJSONObject
         }
-
 
         // stores and recycles views as they are scrolled off screen
         public class ViewHolder extends RecyclerView.ViewHolder/*implements View.OnClickListener*/ {
@@ -138,9 +135,7 @@ public class MainPage extends Fragment {
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
-
         Log.d(TAG, "onAttach()");
-        //if (mainActivity.HAVEDATA) updateValues();
     }
 
     @Override
@@ -154,14 +149,18 @@ public class MainPage extends Fragment {
         super.onResume();
         Log.d(TAG, "onResume");
 
+        // 1st, we determine what state the APP is in, and get access to its data
         mainActivity = (MainActivity) getActivity();
 
         if (mainActivity.HAVEDATA) {
             try {
+                // We have data, lets get displaying it!
+
                 // An 'Adapter'
                 mAdapter = new MyAdapterQue(mainActivity.WateringQue);
                 recyclerView.setAdapter(mAdapter);
 
+                // Local variables for temp storage and calculations
                 double avTemp = 0.0;
                 int avMoist = 0;
                 int avSun = 0;
@@ -195,7 +194,7 @@ public class MainPage extends Fragment {
 
                 // Set display values
                 ((ToggleButton) view.findViewById(R.id.sysEnabledToggle)).setChecked(sysEnabled);
-                ((EditText) view.findViewById(R.id.sysTimeEdit)).setText(mainActivity.DateTime);
+                ((EditText) view.findViewById(R.id.sysTimeEdit)).setText(mainActivity.DateTime.getString("TimeStamp"));
                 ((TextView) view.findViewById(R.id.moisture)).setText(String.format("%d", avMoist));
                 ((TextView) view.findViewById(R.id.tempurature)).setText(String.format("%.2f", avTemp)+" \u00B0C");
                 ((TextView) view.findViewById(R.id.wind)).setText(String.format("%.2f", avWind)+" m/s");
@@ -207,13 +206,11 @@ public class MainPage extends Fragment {
         }
     }
 
+    // Callable function to update the data displayed by this fragment
     public void updateValues() {
 
         mainActivity = (MainActivity) getActivity();
         if (mainActivity.manager.findFragmentByTag("MainPage") != null && mainActivity.manager.findFragmentByTag("MainPage").isVisible()) onResume();
 
     }
-
-    // TODO Create a toggle/switch for posting if the system is Enabled or not
-
 }

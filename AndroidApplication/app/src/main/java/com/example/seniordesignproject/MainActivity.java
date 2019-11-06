@@ -59,10 +59,11 @@ public class MainActivity extends AppCompatActivity {
     // Regex string for DateTime entry validation
     String patternSource = "(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)  \\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2} \\d{4}";
 
-    // Here are two static addresses to the RPi
+    // TODO Replace this with a DYNAMIC RPi lookup
+    // Here are static addresses to the RPi
     private String[] URL = {"http://192.168.1.104:8008",
             "http://seniorproject.figureix.com:8008",
-            "http://10.0.2.2:8008"
+            "http://10.0.2.2:8008"  // Loopback IP for Android Emulator to 'LocalHost' of computer
     };
     // And the available file paths on the Pi
     private String[] PATHS = {"/SystemEnabled/",
@@ -75,16 +76,19 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Our Async Task will save variable into this array
-    // [0] <- TimerControl/State
-    // [1] <- TimerControl/TimerTriggering
-    // [2] <- TimerControl/Thresholds
-    // [3] <- Xbee3/Dump
     public String[] PiResponses = {"", "", "", "", "", ""};
+    // [0] <- /SystemEnabled/
+    // [1] <- /TimerTriggering/
+    // [2] <- /Thresholds/
+    // [3] <- /DateTime/
+    // [4] <- /WateringQue/
+
+    // Data-objects for parsing PiResponses into
     public JSONObject SystemState;
     public JSONObject TimerTriggering;
     public JSONObject Thresholds;
     public JSONObject SensorStats;
-    public String DateTime;
+    public JSONObject DateTime;
     public JSONObject WateringQue;
 
 
@@ -124,7 +128,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(1).select();
 
         // https://stackoverflow.com/questions/33646586/tablayout-without-using-viewpager
-        // Here we create a listener object that catches TAB Button input
+        // Not using viewpager due to difficulties in updating data currently displayed on a visible fragment
+        // Here we create a listener object that catches TAB Button input (treating like simple buttons)
         tabLayout.addOnTabSelectedListener(
                 new TabLayout.OnTabSelectedListener() {
 
@@ -138,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                         if(tabLayout.getSelectedTabPosition() == 2) TriggersButton(tabLayout.getRootView());
                     }
 
+                    // Mandatory functions, not using them
                     @Override
                     public void onTabUnselected(TabLayout.Tab tab) {}
 
@@ -236,8 +242,6 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-
-
     // PiQuery is our 'custom/tailored' task to fetch a web page
     public class PiQuery extends AsyncTask<URL, Void, String> {
         // This class defines a Thread process.
@@ -246,8 +250,8 @@ public class MainActivity extends AppCompatActivity {
         // Local Variable
         int saveIndex;
 
-        // Everytime we call this task, we will be passing a different URL/Path, which
-        // will return separate data
+        // Every time we call this task, we will be passing a different URL/Path, which
+        // will return separate data (--Each file path associated to the RPi JSONSrv--)
         // So, we will be passing an index to the AsyncTask,
         // to allow it to save information into an array correctly
         PiQuery(int index) {
@@ -257,14 +261,14 @@ public class MainActivity extends AppCompatActivity {
         // Provide visual feedback that the app is running/working via loading circle
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        // Before the ServerConnect begins, we will create a loading bar for the User to see.
+        // Before the ServerConnect begins, we will show a loading bar for the User to see.
         @Override
         protected void onPreExecute() {
             progressBar.setVisibility(ProgressBar.VISIBLE);
         }
 
         // Do in background: We are attempting to contact the RPi server
-        // and get the data from it -- We don't know how long it could take.
+        // and get the data from it -- We don't know how long it could take (hence, ASYNC task).
         @Override
         protected String doInBackground(URL... urls) { // this is a Library/API specific name/function
             URL searchURL = urls[0];
@@ -294,15 +298,15 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // There is a risk that one of the 1st three URL requests fail, but this still works...
+            // There is a risk that one of the URL requests fail, but this still works...
             // For each AsyncTask that runs, save its return value into our array
             PiResponses[saveIndex] = result;
 
             // If each AsyncTask has completed, except the last one, then the
-            // last one will do data processing
+            // last one will do data processing\saving
             if (PiResponses[5] != "") {
                 connection.setText("Success");
-                // Allow fragments to fetch new data
+                // Allow fragments to fetch new data (and allow buttons to be pressed)
                 HAVEDATA = true;
 
                 // Save our responses into data-objects that we can use
@@ -327,9 +331,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 try {
-                    // A bit redundant, Saving a String to a String
-                    PiResponses[4] = PiResponses[4].replace("\"", "");
-                    DateTime = PiResponses[4];
+                    DateTime = new JSONObject("{'TimeStamp': " + PiResponses[4] + "}");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -357,7 +359,6 @@ public class MainActivity extends AppCompatActivity {
         // Local Variable
         String payload;
 
-        // Stackoverflow passing parameters -- via constructor
         // We will be transmitting the passed in String to the RPi
         PiPush(String payload) {this.payload = payload;}
 
@@ -377,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
             URL searchURL = urls[0];
             String result = null;
 
-            // Try connecting to the PiServer using the passed in URL, and return the payload from it.
+            // Try connecting to the PiServer using the passed in URL and sending the payload
             try {
                 ServerConnect.postJson(searchURL, payload);
                 result = "Pass";
@@ -389,10 +390,9 @@ public class MainActivity extends AppCompatActivity {
             return result;
         }
 
-        // On thread/task finish, return the message body as text -- Save it, and show it to the User
+        // On thread/task finish, check for "Fail"
         @Override
         protected void onPostExecute(String result) {
-//            TextView connection = (TextView) findViewById(R.id.connectStatus);
             progressBar.setVisibility(ProgressBar.INVISIBLE);
 
             // If a server response is bad/empty, then 'break fast'
@@ -422,6 +422,8 @@ public class MainActivity extends AppCompatActivity {
 
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
+        // Here is an attempt at 'dynamic' finding of the RPi server
+        // 1st we will check if we are even connected to a network/internet
         // Check if we Have an IP Address
         String CurrentGatewayAddress = getGatewayAddress();
         if (CurrentGatewayAddress.equals("0.0.0.0")) {
@@ -437,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             int retVal = 1;
 
+            // TODO Uncomment if Pi and Phone will be tested on the same network w/ static IP's
 //            if (CurrentGatewayAddress.equals("192.168.1.1")) retVal = 0;
 //            if (CurrentGatewayAddress.equals("192.168.232.1")) {
 //                progressBar.setVisibility(ProgressBar.VISIBLE);
@@ -446,6 +449,8 @@ public class MainActivity extends AppCompatActivity {
 //                Log.d(TAG, "UpdateData: Ping result=" + retVal);
 //                if (retVal == 1) retVal = 2;
 //            }
+            // TODO Delete this assignment -- if uncommenting the above
+            // RetVal = 2 assumes we are using the app in a a Virtual Environment (Loop-back IP)
             retVal = 2;
 
             for (int i = 0; i < PATHS.length; i++) {
@@ -465,17 +470,17 @@ public class MainActivity extends AppCompatActivity {
 
     // We have a button to fetch information from the RPi, now we need to post data/changes to it.
     public void UpdateButtonPush(View view) {
+        // Can't push changes without having data first
         if (!HAVEDATA) {
             ToastMessage("No Data. Press \'Update\'", "Short");
             return;
         }
 
+        // Variables for ... flow control (?)
         boolean thresholdsChanged = false;
         boolean timerchanged = false;
 
-        Log.d(TAG, "UpdatePush_______");
-        // Check if anything has changed
-
+        // Check if user has made any changes to displayed data
 
         ////////////////////////////////////////////////////////// SYSTEM CONTROL ///////////////////////////////////////////////////////////////////////
         // System Enabled
@@ -484,6 +489,7 @@ public class MainActivity extends AppCompatActivity {
             String sysToggle = ((ToggleButton) mainPage.getView().findViewById(R.id.sysEnabledToggle)).getText().toString();
             String sysToggleFromFetch = (Boolean.parseBoolean(SystemState.getString("State"))) ? "Enabled" : "Disabled";
             if (!(sysToggle.equals(sysToggleFromFetch))) {
+                // User has set RPi to dis/enable --> Send update.
                 URL webUrl = ServerConnect.buildURL(URL[2] + PATHS[0]); // SystemEnabled
                 SystemState.put("State", sysToggle.equals("Enabled") ? "True" : "False");
                 new PiPush(SystemState.toString()).execute(webUrl);
@@ -494,8 +500,8 @@ public class MainActivity extends AppCompatActivity {
             // if the SystemTime DOES NOT match the fetched data, Prep for PiPush
             String datetimeInput = ((EditText) mainPage.getView().findViewById(R.id.sysTimeEdit)).getText().toString();
             if (datetimeInput.matches(patternSource)) {
-                if (!datetimeInput.equals(DateTime)) {
-//                    datetimeInput = "{'TimeStamp': '" + datetimeInput + "'}";
+                if (!datetimeInput.equals(DateTime.getString("TimeStamp"))) {
+                    // User has input a valid new date/time --> Send update.
                     JSONObject payload = new JSONObject("{'TimeStamp': '" + datetimeInput + "'}");
                     URL webUrl = ServerConnect.buildURL(URL[2] + PATHS[4]); // SystemTime Update
                     new PiPush(payload.toString()).execute(webUrl);
@@ -511,6 +517,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "UpdatePush: " + Thresholds.getInt(key));
             int currVal = Integer.parseInt(((EditText) schedule.getView().findViewById(R.id.dryTrgEdit)).getText().toString());
             if (currVal != Thresholds.getInt(key)) {
+                // User has changed the Dry threshold --> save new value, prep for update.
                 if (currVal <= 4096 && currVal >= 0) {
                     Thresholds.put(key, currVal);
                     thresholdsChanged = true;
@@ -755,6 +762,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {e.printStackTrace();}
 
 
+        // If any values have been changed by the user --> Send update(s)!
         if (thresholdsChanged) {
             URL webUrl = ServerConnect.buildURL(URL[2] + PATHS[2]); // Thresholds Update
             new PiPush(Thresholds.toString()).execute(webUrl);
@@ -780,6 +788,7 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
+    // TODO Replace this with a dynamic thing!
     // Function to get the phones DHCP Gateway address
     public String getGatewayAddress(){
         int ipaddr = -1;

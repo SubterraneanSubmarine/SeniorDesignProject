@@ -14,14 +14,10 @@ https://app.pluralsight.com/library/courses/android-fundamentals-fragments/table
                 For his teaching how to do Async internet/server fetches
  */
 import android.util.Log;
-import org.json.JSONObject;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -48,7 +44,7 @@ public class ServerConnect {
     }
 
     // This function is called from our AsyncTask -- since we are not allowed to
-    // holdup the main/UI thread with 'blocking' tasks.  // TODO Find reference for this?
+    // holdup the main/UI thread with 'blocking' tasks.
     public static String getJson(URL url) throws IOException {
         Log.d(TAG, "getJson from URL=" + url);
         // Using the Android class/library HttpURLConnection, we open a
@@ -69,7 +65,6 @@ public class ServerConnect {
             boolean hasData = scanner.hasNext();
             if (hasData) {
                 String result = scanner.next();
-                // Log.d(TAG, "HasData! " + result);
                 return result;
             } else {
                 Log.d(TAG, "getJSON In the Else");
@@ -88,6 +83,7 @@ public class ServerConnect {
         }
     }
 
+    // Here is our function that will be used to push data to the RPi
     public static void postJson(URL url, String payload) throws IOException {
         Log.d(TAG, "postJson from URL=" + url + " Payload: " + payload);
         // Using the Android class/library HttpURLConnection, we open a
@@ -97,9 +93,8 @@ public class ServerConnect {
         // https://developer.android.com/reference/java/net/HttpURLConnection
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         try {
-            // Inform the connection we will be POSTing JSON data.
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
+            // Setup the connection for POSTing JSON data.
+            connection.setDoOutput(true);  // Defaults connection type to "POST"
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setFixedLengthStreamingMode(payload.length());
 

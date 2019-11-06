@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SeniorDesignProject</string>
+    <string name="app_name">Smart Sprinkler System</string>
     <string name="submit_button">Update</string>
     <string name="timmer_button">View Current\\Basic Schedule</string>
     <string name="sensorsView_button">View Sensor Stats</string>

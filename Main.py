@@ -32,6 +32,8 @@ def signal_handler(sig, frame):
     print("Closing Program...")
     datalocker.ProgramRunning = False  # Signal to all running threads to wrap it up!
 
+
+# Helper functions for debug mode // user display
 def printSensors():
     message = ""
     for sensor in datalocker.SensorStats:
@@ -49,6 +51,8 @@ def printWaterQue():
             message = message + "\n" + str(qued)
     return message
 
+
+
 USE_PORT = 8008
 DEBUG_MODE = False
 FAKE_DATA = False
@@ -62,6 +66,7 @@ if __name__ == '__main__':
         DEBUG_MODE = True
         FAKE_DATA = True
         import fakedata
+        # We have our fake data, now lets replace datalocker info with it.
         i = 0
         while i < len(datalocker.SensorStats):
             datalocker.SensorStats[i] = fakedata.SensorStats[i]
@@ -73,7 +78,6 @@ if __name__ == '__main__':
         USE_PORT = int(args.port)
     
 
-
     # Register our signal handerls for the program
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
@@ -83,6 +87,7 @@ if __name__ == '__main__':
         
 
     # Create our threads that will run the system. (Save handles/ID's to list/array)
+    # The functions that the threads will run, have arguments passed to them via kwargs
     threads = []
     t1 = threading.Thread(target=scheduler.sprinkler_runner, kwargs={'DEBUG_MODE': DEBUG_MODE})
     threads.append(t1)
@@ -95,14 +100,18 @@ if __name__ == '__main__':
     for thread in threads:
         thread.start()
 
-    # If a kill signal is sent to the program...
-    #       Then the signal handler will change ProgramRunning to False
+
+    # If using debug mode, here are two prompts indicating what can be done to interact with the system
     userInputPrompt1 = "1: Set ProgramRunning-->True\n2: Set ProgramRunning-->False  (This will stop the program)\n3: Set SystemEnabled-->True\n4: Set SystemEnabled-->False\n5: Set timer_trigger...\n6: Set threshold...\n7: Set Date/Time...\n0: Clear Screen\n\nEnter Selection: "
     userInputPrompt2 = "1: Set ProgramRunning-->True\n2: Set ProgramRunning-->False  (This will stop the program)\n3: Set SystemEnabled-->True\n4: Set SystemEnabled-->False\n5: Set timer_trigger...\n6: Set threshold...\n7: Set Date/Time...\n8: Set sensor data...\n9: Signal NewData()\n0: Clear Screen\n\nEnter Selection: "
+    
+    # If a kill signal is sent to the program...
+    #       Then the signal handler will change ProgramRunning to False
     debug_vals_set = True
     while datalocker.ProgramRunning:
         if DEBUG_MODE:
-            try:
+            # If we are in DEBUG Mode, then offer lots of user alterable settings -- and print out helpful info
+            try:  # Try/except block only needed for captureing 'ctrl+c' when waiting on an input() call
                 os.system('clear')
                 print("Date\\Time: ", datetime.now().strftime("%A %H%M"),"\tProgramRunning(", ("True" if datalocker.ProgramRunning else "False"), ")\tSystemEnabled(", ("True" if datalocker.SystemEnabled else "False"), ")\tJSONSrv Port: ", USE_PORT)
                 print("-----------------------Current Thresholds-----------------------\n", datalocker.thresholds)
@@ -128,6 +137,7 @@ if __name__ == '__main__':
                 elif usr_input == 4:
                     datalocker.SystemEnabled = False
                 elif usr_input == 5:
+                    # TODO Make this nice
                     # for item in datalocker.timer_triggering:
                     #     for subitem in datalocker.timer_triggering[item]:
 
@@ -176,6 +186,7 @@ if __name__ == '__main__':
             except EOFError: 
                 datalocker.ProgramRunning = False
         else:
+            # We are not running in DEBUG Mode, so get some sleep!
             sleep(5)
         
     # After a kill signal has changed the ProgramRunning variable to False
