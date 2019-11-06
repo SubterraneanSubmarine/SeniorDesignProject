@@ -10,13 +10,37 @@ import re
 import datalocker
 from datetime import datetime
 from time import sleep
-import serial
-import busio
-import digitalio
-import board
-import adafruit_dht
-import adafruit_mcp3xxx.mcp3008 as mcp
-from adafruit_mcp3xxx.analog_in import AnalogIn
+from sys import platform
+if platform == "linux":
+    import serial
+    import busio
+    import digitalio
+    import board
+    import adafruit_dht
+    import adafruit_mcp3xxx.mcp3008 as MCP
+    from adafruit_mcp3xxx.analog_in import AnalogIn
+else:
+    import fakedata
+    busio = fakedata.fakeIO
+    digitalio = fakedata.fakeIO
+    board = fakedata.fakeIO
+    serial = fakedata.fakeIO
+    adafruit_dht = fakedata.fakeIO
+    MCP = fakedata.fakeIO
+    AnalogIn = fakedata.fakeIO
+
+    
+
+    
+    
+    
+
+
+
+    
+    
+    
+    
 
 # The Xbee (under MicroPython API) forwards a byte object/string that
 # needs to be formated before we can manipulate it as a data object
@@ -82,8 +106,10 @@ def log_data(payload):
 
 def talk_to_xbee(DEBUG_MODE=False):
     if DEBUG_MODE:
-        print("TODO")
-        return 0
+        print("# TODO")  # TODO
+        # if platform == "win32":
+        #     print("sprklrnnr closing")
+        #     return 0
     
     serial_set = False
 
@@ -92,7 +118,7 @@ def talk_to_xbee(DEBUG_MODE=False):
     mcp = MCP.MCP3008(spi, cs)
     anemometer = AnalogIn(mcp, MCP.P0)
 
-    dht = adafruit_dht.DHT22(board.D5)
+    dht = adafruit_dht.DHT22(board.D21)
 
     speed_average = [0, 0, 0, 0, 0]
     temp_average = [0, 0, 0, 0, 0]
@@ -111,31 +137,33 @@ def talk_to_xbee(DEBUG_MODE=False):
         except serial.SerialException:
             print("Serial connection failed, trying again...")
 
-    while pointer < 5:
+    while pointer < 5 and datalocker.ProgramRunning:
         try:
             temp_average[pointer] = dht.temperature
             humidity_average[pointer] = dht.humidity
             pointer = pointer + 1
         except RuntimeError as e:
             sleep(10)
+            print("dht-setup")
     pointer = 0
 
     # Possibly average this value
     anemometer_offset = anemometer.voltage
 
-    while pointer < 5:
+    while pointer < 5 and datalocker.ProgramRunning:
         try:
             speed_average[pointer] = abs((anemometer.voltage - anemometer_offset) * 20.25)
             pointer = pointer + 1
         except RuntimeError as e:
             sleep(10)
+            print("anemo-setup")
     pointer = 0
 
     while datalocker.ProgramRunning:
 
         if port.inWaiting() > 0:
             temp = convert_to_dict(port.readline())
-            temp['Timestamp'] = datetime.timestamp(datetime.now())
+            temp['Timestamp'] = int(datetime.timestamp(datetime.now()))
             temp['Minute'] = datetime.now().minute
             temp['Hour'] = datetime.now().hour
             temp['Day'] = datetime.now().day
@@ -145,7 +173,8 @@ def talk_to_xbee(DEBUG_MODE=False):
             temp['Humidity'] = sum(humidity_average)/len(humidity_average)
             temp['Wind'] = sum(speed_average)/len(speed_average)
 
-            log_data(temp)
+            if datalocker.NodeHealthStatus[temp["Sector"]] == "Red":
+                log_data(temp)
 
             datalocker.SensorStats[temp.get('Sector')] = temp
             datalocker.set_new()
@@ -165,3 +194,8 @@ def talk_to_xbee(DEBUG_MODE=False):
                 print("Temp/Humidity")
 
     port.close()
+
+if __name__ == '__main__':
+    while True:
+        datalocker.ProgramRunning = True
+        talk_to_xbee()

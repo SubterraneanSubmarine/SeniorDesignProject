@@ -17,18 +17,25 @@ Git gist: https://gist.github.com/nitaku/10d0662536f37a087e1b
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import json
+import re
+from sys import platform
+import subprocess
+from datetime import datetime
 # import ssl
 import datalocker
+import scheduler
 
 # Possible http://raspberrypiserver:port/{AvailablePaths for interacting with the server}
 AvailablePaths = [
-    "/TimerControl/State/",
-    "/TimerControl/DaysZonesTimes/",
-    "/TimerControl/thresholds/",
-    "/Xbee3/Dump/",
-    "/DateTime/"  # TODO code in the datetime elements: We need to be able to set and read the date/time of RPi from android app
-                  #TODO Consider adding in TempDisable?
+    "/SystemEnabled/",
+    "/TimerTriggering/",
+    "/Thresholds/",
+    "/SensorStats/",
+    "/DateTime/",
+    "/WateringQue/"
 ]
+
+REtimestamp = re.compile("(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)  \d{1,2} \d{1,2}:\d{1,2}:\d{1,2} \d{4}")
 
 """
 Here, we define a class that takes a BaseHTTPRequestHandler
@@ -65,19 +72,34 @@ class PiSrv(BaseHTTPRequestHandler):
             #       three tildes "~~~" will be appended to our transmitted message
             #       On the Android App side: The stream scanner will use a delimiter value of "~"
             #       Thus, ensuring* capture of our transmitted message
-            if requestPath == AvailablePaths[0]:  # "/TimerControl/State/"
+            if requestPath == AvailablePaths[0]:  # "/SystemEnabled/"
                 self.wfile.write(json.dumps(datalocker.SystemEnabled).encode("utf-8") + "~~~".encode("utf-8"))
 
-            if requestPath == AvailablePaths[1]: # "/TimerControl/DaysZonesTimes/"
+            if requestPath == AvailablePaths[1]: # "/TimerTriggering//"
                 self.wfile.write(json.dumps(datalocker.timer_triggering).encode("utf-8") + "~~~".encode("utf-8"))
 
-            if requestPath == AvailablePaths[2]: # "/TimerControl/thresholds/"
+            if requestPath == AvailablePaths[2]: # "/Thresholds/"
                 self.wfile.write(json.dumps(datalocker.thresholds).encode("utf-8") + "~~~".encode("utf-8"))
 
-            if requestPath == AvailablePaths[3]: # "/Xbee3/Dump/"
-                self.wfile.write(json.dumps(datalocker.SensorStats).encode("utf-8") + "~~~".encode("utf-8"))
-            #TODO Get data from GPIO \ stored data and return in Dump
+            if requestPath == AvailablePaths[3]: # "/SensorStats/"
+                message = {}
+                for index, itemOriginal in enumerate(datalocker.SensorStats):
+                    item = itemOriginal.copy()
+                    item["Health"] = datalocker.NodeHealthStatus[index]
+                    message[index] = item
+                
+                self.wfile.write(json.dumps(message).encode("utf-8") + "~~~".encode("utf-8"))
+            if requestPath == AvailablePaths[4]: # "/DateTime/"
+                self.wfile.write(json.dumps(datetime.now().strftime("%c")).encode("utf-8") + "~~~".encode("utf-8"))
 
+            if requestPath == AvailablePaths[5]: # "/WateringQue/"
+                message = {}
+                for index, itemOriginal in enumerate(scheduler.watering_queue):
+                    item = itemOriginal.copy()
+                    message[index] = item
+                if len(message) == 0:
+                    message[0] = "Nothing Queued"
+                self.wfile.write(json.dumps(message).encode("utf-8") + "~~~".encode("utf-8"))
         else:
             self.send_error(400, "Unexpected Path")
 
@@ -101,13 +123,13 @@ class PiSrv(BaseHTTPRequestHandler):
                     contentlength).decode("utf-8")
                 bodyData = json.loads(serializedBodyData)  # Creates Dict data type
                 # Now that we have the payload/body in an object, read the Path from the http request to determin how to handle the data
-                # "/TimerControl/State/"
+                # "/SystemEnabled/"
                 if requestPath == AvailablePaths[0]:
                     if "State" in bodyData:
-                        state = bodyData.get("State")
+                        state = str(bodyData.get("State"))
                         if state in ["True", "False"]:  # Check if the Value being sent is True or False
                             if state == "True":
-                                with datalocker.lock:  # TODO Consider not using a lock -- only this thread touches this data
+                                with datalocker.lock:  
                                     datalocker.SystemEnabled = True
                             elif state == "False":
                                 with datalocker.lock:
@@ -122,15 +144,14 @@ class PiSrv(BaseHTTPRequestHandler):
                     else:
                         self.send_error(400, "Expected \'State\' key")
 
-                # "/TimerControl/DaysZonesTimes/"
+                # "/TimerTriggering/"
                 if requestPath == AvailablePaths[1]:
                     # Check to make sure there are no more than 7 days passed in
                     if bodyData.keys() <= datalocker.timer_triggering.keys():
                         for key in bodyData.keys():
-                            # Check to make sure we have the array of [bool, int, int] with our Key
-                            if len(bodyData[key]) == 3:
-                                if bool == type(bodyData[key][0]) and int == type(bodyData[key][1]) and int == type(bodyData[key][2]):
-                                    # TODO Range-check the military integer values (?)
+                            # Check to make sure we have the array of [bool, int] with our Key
+                            if len(bodyData[key]) == 2:
+                                if bool == type(bodyData[key][0]) and int == type(bodyData[key][1]):
                                     with datalocker.lock:
                                         # We have the correct Data. Save it!
                                         datalocker.timer_triggering[key] = bodyData[key]
@@ -138,7 +159,7 @@ class PiSrv(BaseHTTPRequestHandler):
                                     self.send_error(
                                         400, "Expected value type error")
                             else:
-                                self.send_error(400, "Expected 3 values")
+                                self.send_error(400, "Expected 2 values")
                         # Send reply
                         self.set_header()
                         self.wfile.write(json.dumps(
@@ -146,31 +167,43 @@ class PiSrv(BaseHTTPRequestHandler):
                     else:
                         self.send_error(400, "Expected Week\\Day key")
 
-                # "/TimerControl/thresholds/"
+                # "/Thresholds/"
                 if requestPath == AvailablePaths[2]:
                     # Ensure the incoming data is not bigger than the current data/object
                     if bodyData.keys() <= datalocker.thresholds.keys():
                         for key in bodyData.keys():
-                            if len(bodyData[key]) == 2:
-                                if int == type(bodyData[key][1]):
-                                    with datalocker.lock:
-                                        datalocker.thresholds[key][1] = bodyData[key][1]
-                                else:
-                                    self.send_error(
-                                        400, "Expected value type error")
+                            if int == type(bodyData[key]):
+                                with datalocker.lock:
+                                    datalocker.thresholds[key] = bodyData[key]
                             else:
-                                self.send_error(400, "Expected 2 values")
+                                self.send_error(
+                                    400, "Expected value type error")
                         self.set_header()
                         self.wfile.write(json.dumps(
                             datalocker.thresholds).encode("utf-8"))
                     else:
                         self.send_error(400, "Expected Threshold keys")
 
-                # "/Xbee3/Dump/"
+                # "/SensorStats/"
                 if requestPath == AvailablePaths[3]:  # Deny efforts to push data into the Xbee's
-                    # TODO Do we want to try and post changes/data to the Xbee's?
                     self.send_error(400, "Post Not Available")
-                #TODO TempDisable (?)
+                
+                # "/DateTime/"
+                if requestPath == AvailablePaths[4]:
+                    if re.match(REtimestamp, bodyData["TimeStamp"]):
+                        if platform == "linux":
+                            upDate = subprocess.Popen(["sudo", "date", "-s", bodyData["TimeStamp"]])
+                            upDate.communicate()
+                            upDate.wait()
+                        else:
+                            print("Setting time to:", bodyData["TimeStamp"])
+                        self.set_header()
+                        self.wfile.write(json.dumps(
+                            datetime.now().strftime("%c")).encode("utf-8"))
+                    else:
+                        self.send_error(400, "Value Error")
+                
+
             else:
                 self.send_error(400, "No Content")
         else:
@@ -185,7 +218,7 @@ def run(server_class=HTTPServer, handler_class=PiSrv, port=8008, DEBUG_MODE=Fals
     RPiSrv = server_class(server_address, handler_class)
     RPiSrv.timeout = 0.5  # Do not block program/thread waiting for a request
     #RPiSrv.socket = ssl.wrap_socket(RPiSrv.socket, keyfile="key.pem", certfile="cert.pem", server_side=True)  # Oneday we could look into using SSL for the server
-    print(' ADD TO DEBUG OUTPUT: Starting RPiSrv on port ', port)
+    # print(' ADD TO DEBUG OUTPUT: Starting RPiSrv on port ', port)
     # Since this http.server is spawned on a thread, we will watch the ProgramRunning variable to know when to stop and shutdown the server.
     while datalocker.ProgramRunning:
         try:
