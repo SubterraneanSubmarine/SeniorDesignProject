@@ -13,10 +13,10 @@ import xbee
 import time
 from machine import Pin, ADC
 
-SLEEP_DURATION = 600 * 1000  # In seconds between soil samples
+SLEEP_DURATION = 60 * 1000  # In seconds between soil samples
 AVERAGE_SAMPLES = 3  # Number of soil samples to be taken before transmission
 LOW_VOLT_THRESH = 2300  # Voltage floor before sleep duration time is increased.
-LOW_LIGHT_THRESH = 4000  # Photoresistor ceiling before sleep duration time is increased.
+LOW_LIGHT_THRESH = 500  # Photoresistor ceiling before sleep duration time is increased.
 SLEEP_MULTIPLIER = 3  # Sleep duration will be multiplied by this number if one of the above conditions are met
 
 # Set the identifying string of the radio
@@ -75,8 +75,9 @@ while True:
 
         # Evaluate current iteration number
         iteration += 1
+        print("Iteration #{}".format(iteration))
 
-        if iteration > AVERAGE_SAMPLES:
+        if iteration == AVERAGE_SAMPLES:
             moisture = moisture_average / AVERAGE_SAMPLES
             ambiance = light_average / AVERAGE_SAMPLES
 
@@ -100,7 +101,7 @@ while True:
                       "\n")
 
                 xbee.transmit(xbee.ADDR_COORDINATOR,
-                              (", 'Sector': " + str(zone) +
+                              ("{'Sector': " + str(zone) +
                                ", 'Moisture': " + str(moisture) +
                                ", 'Sunlight': " + str(ambiance) +
                                ", 'Battery': " + str(battery) +
@@ -128,20 +129,23 @@ while True:
     sleep = SLEEP_DURATION
     if ambiance > LOW_LIGHT_THRESH or battery < LOW_VOLT_THRESH:
         sleep = SLEEP_DURATION * SLEEP_MULTIPLIER
+        print("Sleep duration increased to {}ms".format(sleep))
 
         # Deep sleep or wait if sleep switch is closed
     tilt_switch = Pin("D8", Pin.OUT)
     if sleep_enable.value():
+        print("Goodnight!")
         sleep_enable = Pin("P2", Pin.OUT)
         xbee.XBee().sleep_now(sleep, pin_wake=False)
         while xbee.atcmd("AI") != 0:
             time.sleep_ms(100)
-        sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
 
     else:
+        print("Waiting...")
         sleep_enable = Pin("P2", Pin.OUT)
         time.sleep_ms(sleep)
         while xbee.atcmd("AI") != 0:
             time.sleep_ms(100)
-        sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
+
     tilt_switch = Pin("D8", Pin.IN, Pin.PULL_DOWN)
+    sleep_enable = Pin("P2", Pin.IN, Pin.PULL_DOWN)
