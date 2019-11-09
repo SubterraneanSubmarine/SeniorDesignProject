@@ -518,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
             int currVal = Integer.parseInt(((EditText) schedule.getView().findViewById(R.id.dryTrgEdit)).getText().toString());
             if (currVal != Thresholds.getInt(key)) {
                 // User has changed the Dry threshold --> save new value, prep for update.
-                if (currVal <= 4096 && currVal >= 0) {
+                if (currVal <= 3500 && currVal >= 1400) {
                     Thresholds.put(key, currVal);
                     thresholdsChanged = true;
                 } else ToastMessage("Dry Value: Range Error", "Short");

@@ -766,7 +766,7 @@
                 android:id="@+id/dryRange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 -- to -- 4096"
+                android:text="1400 -- to -- 3500"
                 app:layout_constraintBottom_toBottomOf="@+id/dryTrgEdit"
                 app:layout_constraintEnd_toEndOf="@+id/trigThreshNewLabel"
                 app:layout_constraintStart_toStartOf="@+id/trigThreshNewLabel"
