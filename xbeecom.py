@@ -2,7 +2,7 @@
 David Carlson & Bryce Martin
 ECE 4800 Senior Design Project
 
-This File represents intractions of the Pi and Xbee3 coordinator (UART)
+This File represents interactions of the Pi and Xbee3 coordinator (UART)
 Tested in Python3.7(Windows) and 3.4(RPi)
 """
 import json
@@ -43,11 +43,9 @@ else:
     
 
 # The Xbee (under MicroPython API) forwards a byte object/string that
-# needs to be formated before we can manipulate it as a data object
+# needs to be formatted before we can manipulate it as a data object
 # We are 'JSON'ifying the data
-
-
-def convert_to_dict(bytes_in):
+def convert_to_dict(bytes_in, DEBUG_MODE=False):
     # Here is what the Xbee will send:
     # {'profile': 49413, 'dest_ep': 232,
     #   'broadcast': False, 'sender_nwk': 38204,
@@ -56,6 +54,9 @@ def convert_to_dict(bytes_in):
     #   'sender_eui64': b'\x00\x13\xa2\x00A\x99O\xcc',        ### NOTE This is the MAC Addr: A = 41, O = 4F
     #   'cluster': 17}
     temp = str(bytes_in, "utf-8")  # Convert byte data into a string
+    # if DEBUG_MODE:
+    #     print("In convert_to_dict" + temp)
+    
     split_list = re.split("('payload': )|('sender_eui64': )", temp)  # Isolating the payload string before we attempt JSON'ifying it
 
     # If we have a bad payload/message we should not continue
@@ -107,9 +108,6 @@ def log_data(payload):
 def talk_to_xbee(DEBUG_MODE=False):
     if DEBUG_MODE:
         print("# TODO")  # TODO
-        # if platform == "win32":
-        #     print("sprklrnnr closing")
-        #     return 0
     
     serial_set = False
 
@@ -162,7 +160,7 @@ def talk_to_xbee(DEBUG_MODE=False):
     while datalocker.ProgramRunning:
 
         if port.inWaiting() > 0:
-            temp = convert_to_dict(port.readline())
+            temp = convert_to_dict(port.readline(), DEBUG_MODE)
             temp['Timestamp'] = int(datetime.timestamp(datetime.now()))
             temp['Minute'] = datetime.now().minute
             temp['Hour'] = datetime.now().hour
@@ -175,6 +173,9 @@ def talk_to_xbee(DEBUG_MODE=False):
 
             if datalocker.NodeHealthStatus[temp["Sector"]] == "Red":
                 log_data(temp)
+
+            # if DEBUG_MODE:
+            #     print(temp)
 
             datalocker.SensorStats[temp.get('Sector')] = temp
             datalocker.set_new()
@@ -194,8 +195,3 @@ def talk_to_xbee(DEBUG_MODE=False):
                 print("Temp/Humidity")
 
     port.close()
-
-if __name__ == '__main__':
-    while True:
-        datalocker.ProgramRunning = True
-        talk_to_xbee()

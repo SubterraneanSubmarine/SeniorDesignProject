@@ -33,8 +33,8 @@ import org.json.JSONObject;
 import java.util.Iterator;
 
 
-// This is 90% a copy and amalgamation of StackOverflow and Google Developer documentation
-// Still learning how this works.
+// This is 90% a copy and amalgamation of StackOverflow and Google Developer documentation.
+// See comments for learning how this works
 
 
 public class SensorsPage extends Fragment {

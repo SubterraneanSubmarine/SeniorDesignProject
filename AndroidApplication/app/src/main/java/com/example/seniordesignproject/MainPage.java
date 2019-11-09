@@ -107,7 +107,7 @@ public class MainPage extends Fragment {
                 zone = jsonObjectSubValues.getString("Sector");
 
                 // Set the values of the TextViews
-                holder.xbeeSector.setText("Zone: " + zone);
+                holder.xbeeSector.setText("Sector: " + zone);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -172,17 +172,20 @@ public class MainPage extends Fragment {
                     String key = keys.next();
 
                     avTemp += Double.parseDouble((((JSONObject) (mainActivity.SensorStats.get(key))).get("Temperature").toString()));
-                    avMoist += Integer.parseInt((((JSONObject) (mainActivity.SensorStats.get(key))).get("Moisture").toString()));
-                    avSun += Integer.parseInt((((JSONObject) (mainActivity.SensorStats.get(key))).get("Sunlight").toString()));
+                    avMoist += Double.parseDouble((((JSONObject) (mainActivity.SensorStats.get(key))).get("Moisture").toString()));
+                    avSun += Double.parseDouble((((JSONObject) (mainActivity.SensorStats.get(key))).get("Sunlight").toString()));
                     avHum += Double.parseDouble((((JSONObject) (mainActivity.SensorStats.get(key))).get("Humidity").toString()));
                     avWind += Double.parseDouble((((JSONObject) (mainActivity.SensorStats.get(key))).get("Wind").toString()));
                     count++;
                 }
-                avTemp /= count;
-                avMoist /= count;
-                avSun /= count;
-                avHum /= count;
-                avWind /= count;
+                if (count > 0) {
+                    avTemp /= count;
+                    avMoist /= count;
+                    avSun /= count;
+                    avHum /= count;
+                    avWind /= count;
+                }
+
 
 //                boolean sysEnabled = Boolean.parseBoolean(mainActivity.PiResponses[0]);
                 boolean sysEnabled = Boolean.parseBoolean(mainActivity.SystemState.getString("State"));

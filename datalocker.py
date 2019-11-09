@@ -2,7 +2,7 @@
 David Carlson & Bryce Martin
 ECE 4800 Senior Design Project
 
-This File represents the globally accesed variables/objects/data
+This File represents the globally accessed variables/objects/data
 interactions of the Pi and (Xbee and Relays)
 This will also save/load stored data.
 
@@ -38,13 +38,13 @@ timer_triggering = {
 }
 
 thresholds = {
-    "Dry": 2000,  # The range for the soil is about 0.8 V to 2.6 V
+    "Dry": 2700,  # The range for the soil is about 0.8 V to 2.6 V
     "Wind max": 10,  # Anemometer range -> 0 to 32.4 m/s (0.4 V to 2 V)
     "Humidity max": 50,
     "Temperature min": 8,
     "Prohibited time start": 1100,
-    "Prohibited time end": 1800,
-    "Water Duration": 180  #900
+    "Prohibited time end": 1400,
+    "Water Duration": 1  #900
 }
 
 

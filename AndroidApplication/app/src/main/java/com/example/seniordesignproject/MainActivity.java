@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     // TODO Replace this with a DYNAMIC RPi lookup
     // Here are static addresses to the RPi
-    private String[] URL = {"http://192.168.1.104:8008",
+    private String[] URL = {"http://192.168.1.20:8008",
             "http://seniorproject.figureix.com:8008",
             "http://10.0.2.2:8008"  // Loopback IP for Android Emulator to 'LocalHost' of computer
     };
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     // This function is linked to a GUI Button: When pressed this runs
     public void MainButton(View view) {
         if (!HAVEDATA) {
-            ToastMessage("No Data. Press \'Update\'", "Short");
+            ToastMessage("No Data. Press \'FETCH\'", "Short");
             return;
         }
 
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
     // This function is linked to a GUI Button: When pressed this runs
     public void SensorsButton(View view) {
         if (!HAVEDATA) {
-            ToastMessage("No Data. Press \'Update\'", "Short");
+            ToastMessage("No Data. Press \'FETCH\'", "Short");
             return;
         }
 
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
     // This function is linked to a GUI Button: When pressed this runs
     public void TriggersButton(View view) {
         if (!HAVEDATA) {
-            ToastMessage("No Data. Press \'Update\'", "Short");
+            ToastMessage("No Data. Press \'FETCH\'", "Short");
             return;
         }
 
@@ -311,33 +311,33 @@ public class MainActivity extends AppCompatActivity {
 
                 // Save our responses into data-objects that we can use
                 try {
-                    SystemState = new JSONObject("{'State': "+ PiResponses[0] + "}");
+                    SystemState = new JSONObject("{'State': "+ PiResponses[0] + "}"); // SystemEnabled
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 try {
-                    TimerTriggering = new JSONObject(PiResponses[1]);
+                    TimerTriggering = new JSONObject(PiResponses[1]); // TimerTriggering
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 try {
-                    Thresholds = new JSONObject(PiResponses[2]);
+                    Thresholds = new JSONObject(PiResponses[2]); //
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 try {
-                    SensorStats = new JSONObject(PiResponses[3]);
+                    SensorStats = new JSONObject(PiResponses[3]); //
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 try {
-                    DateTime = new JSONObject("{'TimeStamp': " + PiResponses[4] + "}");
+                    DateTime = new JSONObject("{'TimeStamp': " + PiResponses[4] + "}"); //
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 try {
                     if (PiResponses[5].isEmpty()) Log.d(TAG, "PiResponse[5] is EMPTY");
-                    WateringQue = new JSONObject(PiResponses[5]);
+                    WateringQue = new JSONObject(PiResponses[5]); // WateringQue
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -451,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
             // TODO Delete this assignment -- if uncommenting the above
             // RetVal = 2 assumes we are using the app in a a Virtual Environment (Loop-back IP)
-            retVal = 2;
+            retVal = 0;
 
             for (int i = 0; i < PATHS.length; i++) {
                 try {
@@ -472,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
     public void UpdateButtonPush(View view) {
         // Can't push changes without having data first
         if (!HAVEDATA) {
-            ToastMessage("No Data. Press \'Update\'", "Short");
+            ToastMessage("No Data. Press \'FETCH\'", "Short");
             return;
         }
 
@@ -490,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
             String sysToggleFromFetch = (Boolean.parseBoolean(SystemState.getString("State"))) ? "Enabled" : "Disabled";
             if (!(sysToggle.equals(sysToggleFromFetch))) {
                 // User has set RPi to dis/enable --> Send update.
-                URL webUrl = ServerConnect.buildURL(URL[2] + PATHS[0]); // SystemEnabled
+                URL webUrl = ServerConnect.buildURL(URL[0] + PATHS[0]); // SystemEnabled
                 SystemState.put("State", sysToggle.equals("Enabled") ? "True" : "False");
                 new PiPush(SystemState.toString()).execute(webUrl);
             }
@@ -503,7 +503,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!datetimeInput.equals(DateTime.getString("TimeStamp"))) {
                     // User has input a valid new date/time --> Send update.
                     JSONObject payload = new JSONObject("{'TimeStamp': '" + datetimeInput + "'}");
-                    URL webUrl = ServerConnect.buildURL(URL[2] + PATHS[4]); // SystemTime Update
+                    URL webUrl = ServerConnect.buildURL(URL[0] + PATHS[4]); // SystemTime Update
                     new PiPush(payload.toString()).execute(webUrl);
                 }
             }
@@ -764,11 +764,11 @@ public class MainActivity extends AppCompatActivity {
 
         // If any values have been changed by the user --> Send update(s)!
         if (thresholdsChanged) {
-            URL webUrl = ServerConnect.buildURL(URL[2] + PATHS[2]); // Thresholds Update
+            URL webUrl = ServerConnect.buildURL(URL[0] + PATHS[2]); // Thresholds Update
             new PiPush(Thresholds.toString()).execute(webUrl);
         }
         if (timerchanged) {
-            URL webUrl = ServerConnect.buildURL(URL[2] + PATHS[1]); // TimerTriggering Update
+            URL webUrl = ServerConnect.buildURL(URL[0] + PATHS[1]); // TimerTriggering Update
             new PiPush(TimerTriggering.toString()).execute(webUrl);
         }
     }

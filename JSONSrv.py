@@ -6,7 +6,7 @@ This file contains the server for fetching/pushing data
 
 Tested in Python3.7 and 3.4(RPi)
 
-Builtin Webserver of python being used to serve/recieve JSON Payloads
+Builtin Webserver of python being used to serve/receive JSON Payloads
 Inspiration for this code sourced from GitHub user: Nitaku
 Git gist: https://gist.github.com/nitaku/10d0662536f37a087e1b
 
@@ -26,7 +26,7 @@ The BaseHTTPRequestHandler has defined functions that we can expand upon
 
 # Additional class\library information for PythonHTTPServer:
 # https://docs.python.org/3/library/http.server.html
-#### From Python Documentaion: "http.server is not recommended for production. It only implements basic security checks." ####
+#### From Python Documentation: "http.server is not recommended for production. It only implements basic security checks." ####
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import socketserver
 import json
@@ -48,7 +48,7 @@ AvailablePaths = [
     "/WateringQue/"
 ]
 
-# Regex for ensuring we have appropriate datetime data being recieved.
+# Regex for ensuring we have appropriate datetime data being received.
 REtimestamp = re.compile("(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)  \d{1,2} \d{1,2}:\d{1,2}:\d{1,2} \d{4}")
 
 
@@ -87,6 +87,8 @@ class PiSrv(BaseHTTPRequestHandler):
             if requestPath == AvailablePaths[3]: # "/SensorStats/"
                 message = {}
                 for index, itemOriginal in enumerate(datalocker.SensorStats):
+                    if itemOriginal is None:
+                        continue
                     item = itemOriginal.copy()
                     item["Health"] = datalocker.NodeHealthStatus[index]
                     message[index] = item
@@ -125,7 +127,7 @@ class PiSrv(BaseHTTPRequestHandler):
                 serializedBodyData = self.rfile.read(
                     contentlength).decode("utf-8")
                 bodyData = json.loads(serializedBodyData)  # Creates Dict data type
-                # Now that we have the payload/body in an object, read the Path from the http request to determin how to handle the data
+                # Now that we have the payload/body in an object, read the Path from the http request to determine how to handle the data
                 # "/SystemEnabled/"
                 if requestPath == AvailablePaths[0]:
                     if "State" in bodyData:
@@ -212,7 +214,7 @@ class PiSrv(BaseHTTPRequestHandler):
         else:
             self.send_error(400, "Unexpected Path")
 
-# From Python documentaion: https://docs.python.org/3/library/http.server.html
+# From Python documentation: https://docs.python.org/3/library/http.server.html
 # Here, we pre-define several of our HTTPServer variables for the run function -- if run() is called without any arguments
 def run(server_class=HTTPServer, handler_class=PiSrv, port=8008, DEBUG_MODE=False):
     # listen on any IP-Address\Interface but only on the given port

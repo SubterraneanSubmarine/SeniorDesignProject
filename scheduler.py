@@ -45,9 +45,7 @@ def sprinkler_runner(DEBUG_MODE=False):
     start_time = 0
     if DEBUG_MODE:
         print("# TODO")  # TODO
-        # if platform == "win32":
-        #     print("sprklrnnr closing")
-        #     return 0
+
 
     # Run thread as long as an interrupt isn't sent
     for relay in relays:
@@ -83,7 +81,7 @@ def sprinkler_runner(DEBUG_MODE=False):
                         datalocker.NodeHealthStatus[sensor["Sector"]] = "Green"
 
                     # If reading is less than user set threshold  # TODO -- How do we want to handle the threshold value?
-                    if (sensor["Moisture"] < datalocker.thresholds["Dry"]
+                    if (sensor["Moisture"] > datalocker.thresholds["Dry"]
                         # AND not already in the wateringQue
                             and not next((item for item in watering_queue if item["Sector"] == sensor["Sector"]), False)):
                         # then add the sensor to the wateringQue
@@ -131,14 +129,28 @@ def sprinkler_runner(DEBUG_MODE=False):
                     start_time = datetime.timestamp(datetime.now())
                     if DEBUG_MODE:
                         datalocker.DEBUGSectorWatering[watering_queue[0]["Sector"]] = datetime.now().strftime("%H%M")
+        
 
-
-            if (start_time and datetime.timestamp(datetime.now()) - start_time) > (datalocker.thresholds["Water Duration"]):
+            if (start_time and datetime.timestamp(datetime.now()) - start_time) > (datalocker.thresholds["Water Duration"] * 60):  # Convert to Min
                 relays[watering_queue[0]["Sector"]].value = False
                 print("Sector: ", watering_queue[0]["Sector"], " watering has ended.")
-                watering_queue.pop(0)
+                popval = watering_queue.pop(0)
                 start_time = 0
                 if DEBUG_MODE:
-                    datalocker.DEBUGSectorWatering[watering_queue[0]["Sector"]] = 0
-
+                    datalocker.DEBUGSectorWatering[popval["Sector"]] = 0
+                sleep(30)  # Give sprinkler system time to transistion
+        
+    #     else:
+    #         for relay in relays:
+    #            relay.value = False
+            
+    #         watering_queue.clear()
+    #         start_time = 0
+    #         if DEBUG_MODE:
+    #             for sector in datalocker.DEBUGSectorWatering:
+    #                 if sector != "UnSet" and sector > 0:
+    #                     sector = 0
     
+    # # System is going down! Turn off all sprinklers
+    # for relay in relays:
+    #     relay.value = False

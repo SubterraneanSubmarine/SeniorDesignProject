@@ -184,7 +184,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="-- Watering Que (at update) --"
+        android:text="-- Future and/or Current Watering Que (at update) --"
         android:textColor="@android:color/black"
         android:textSize="12sp"
         android:textStyle="bold"

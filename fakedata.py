@@ -1,3 +1,14 @@
+"""
+David Carlson & Bryce Martin
+ECE 4800 Senior Design Project
+
+This file is used solely for DEBUG and running the 
+RPi Sprinkler Controller code on a windows computer
+    This was done to facilitate AndroidApp development
+    where access to the full RPi+XbeeCoordinator+Nodes
+    and actual sensors was unavailable/inconvenient.
+
+"""
 import argparse
 import sys
 import os
@@ -78,12 +89,4 @@ class fakeIO2():
             self.direction = dir
         def value(self, en):
             self.enable = en
-
-
-
-if __name__ == "__main__":
-    import datalocker
-    for item in datalocker.timer_triggering:
-        for subitem in datalocker.timer_triggering[item]:
-            print(item, subitem)
 

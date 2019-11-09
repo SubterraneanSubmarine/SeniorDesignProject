@@ -23,7 +23,7 @@ import datalocker
 
 # Here are some command-line options can be used for testing/help
 parser = argparse.ArgumentParser(description="Smart Sprinkler Controller.", epilog="Senior Project by Bryce and David.")
-parser.add_argument("--debug", help="Run Sprinker Controller in a debug mode.", action="store_true")
+parser.add_argument("--debug", help="Run Sprinkler Controller in a debug mode.", action="store_true")
 parser.add_argument("--debug_fake_data", help="Program will run using data contained within 'fakedata.py'. This argument defaults program into debug mode", action="store_true")
 parser.add_argument("--port", help="Set port the JSONServer will listen on (must be greater than 1024).", )
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         USE_PORT = int(args.port)
     
 
-    # Register our signal handerls for the program
+    # Register our signal handlers for the program
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
     
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     while datalocker.ProgramRunning:
         if DEBUG_MODE:
             # If we are in DEBUG Mode, then offer lots of user alterable settings -- and print out helpful info
-            try:  # Try/except block only needed for captureing 'ctrl+c' when waiting on an input() call
+            try:  # Try/except block only needed for capturing 'ctrl+c' when waiting on an input() call
                 os.system('clear')
                 print("Date\\Time: ", datetime.now().strftime("%A %H%M"),"\tProgramRunning(", ("True" if datalocker.ProgramRunning else "False"), ")\tSystemEnabled(", ("True" if datalocker.SystemEnabled else "False"), ")\tJSONSrv Port: ", USE_PORT)
                 print("-----------------------Current Thresholds-----------------------\n", datalocker.thresholds)
@@ -145,7 +145,7 @@ if __name__ == '__main__':
                     #     default2 = datalocker.timer_triggering[day][1]
                     day = input("Enter a Day: ")
                     boool = int(input("1(True) or 0(False): "))
-                    time = input("HHMM: ")
+                    time = int(input("HHMM: "))
                     datalocker.timer_triggering[day][0] = True if boool == 1 else False
                     datalocker.timer_triggering[day][1] = int(time)
                 elif usr_input == 6:
@@ -154,7 +154,7 @@ if __name__ == '__main__':
                         default = datalocker.thresholds[item]
                         usrinput = input("Set "+str(item)+" ("+str(default)+") to: ")
                         if usrinput:
-                            datalocker.thresholds[item] = usrinput
+                            datalocker.thresholds[item] = int(usrinput)
                 elif usr_input == 7:
                     set_time = input("Set RPi Time  ex:\"Wed, Oct 30 2019 14:14:00 MDT\": ")
                     if platform == "win32":
